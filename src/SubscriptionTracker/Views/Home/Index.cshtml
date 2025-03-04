@@ -1,0 +1,46 @@
+﻿@{
+    ViewData["Title"] = "首頁";
+}
+
+<div class="text-center">
+    <h1 class="display-4">訂閱管理系統</h1>
+    <p>追蹤您的訂閱服務費用與繳費日期</p>
+</div>
+
+<div class="row mt-4">
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">管理訂閱服務</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">新增、修改或刪除您的訂閱服務</p>
+                <a asp-controller="Subscriptions" asp-action="Index" class="btn btn-primary">管理訂閱</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">訂閱日曆</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">查看您的訂閱服務按日期排列</p>
+                <a asp-controller="Home" asp-action="Calendar" class="btn btn-success">查看日曆</a>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-md-4">
+        <div class="card mb-4">
+            <div class="card-header">
+                <h5 class="card-title mb-0">訂閱報表</h5>
+            </div>
+            <div class="card-body">
+                <p class="card-text">查看訂閱服務報表及統計資料</p>
+                <a asp-controller="Report" asp-action="Index" class="btn btn-info">查看報表</a>
+            </div>
+        </div>
+    </div>
+</div>

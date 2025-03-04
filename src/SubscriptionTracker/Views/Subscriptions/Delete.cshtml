@@ -1,0 +1,49 @@
+@model SubscriptionTracker.Models.Subscription
+
+@{
+    ViewData["Title"] = "刪除訂閱";
+}
+
+<h1>刪除訂閱服務</h1>
+
+<div class="alert alert-danger">
+    <h4>您確定要刪除此訂閱服務嗎？</h4>
+    <p>此操作無法復原。</p>
+</div>
+
+<div class="card mb-4">
+    <div class="card-header">
+        <h5 class="mb-0">訂閱服務資訊</h5>
+    </div>
+    <div class="card-body">
+        <dl class="row">
+            <dt class="col-sm-3">服務名稱</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Name)</dd>
+            
+            <dt class="col-sm-3">月費</dt>
+            <dd class="col-sm-9">@Html.DisplayFor(model => model.Cost)</dd>
+            
+            <dt class="col-sm-3">繳費日期</dt>
+            <dd class="col-sm-9">每月 @Model.PaymentDate.Day 日</dd>
+            
+            <dt class="col-sm-3">剩餘天數</dt>
+            <dd class="col-sm-9">
+                <span class="badge @(Model.DaysRemaining <= 5 ? "bg-danger" : Model.DaysRemaining <= 10 ? "bg-warning" : "bg-success")">
+                    @Model.DaysRemaining 天
+                </span>
+            </dd>
+            
+            <dt class="col-sm-3">年度費用</dt>
+            <dd class="col-sm-9">@((Model.Cost * 12).ToString("c"))</dd>
+        </dl>
+    </div>
+    <div class="card-footer">
+        <form asp-action="Delete">
+            <input type="hidden" asp-for="Id" />
+            <div class="d-flex justify-content-between">
+                <a asp-action="Index" class="btn btn-secondary">返回列表</a>
+                <button type="submit" class="btn btn-danger">確認刪除</button>
+            </div>
+        </form>
+    </div>
+</div>
