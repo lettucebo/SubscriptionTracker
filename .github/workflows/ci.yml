@@ -30,5 +30,4 @@ jobs:
       working-directory: src
       
     - name: Test
-      run: dotnet test --no-build --verbosity normal
-      working-directory: src/SubscriptionTracker.UnitTests
+      run: dotnet test src/SubscriptionTracker.UnitTests/SubscriptionTracker.UnitTests.csproj --no-build --verbosity normal
