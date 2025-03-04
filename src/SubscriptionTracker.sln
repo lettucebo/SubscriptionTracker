@@ -4,6 +4,8 @@ VisualStudioVersion = 17.5.2.0
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscriptionTracker", "SubscriptionTracker\SubscriptionTracker.csproj", "{A7E4191C-FADD-465F-F9A0-B9F55D612692}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscriptionTracker.UnitTests", "SubscriptionTracker.UnitTests\SubscriptionTracker.UnitTests.csproj", "{FB6835AE-B870-666E-A1E9-ED6D94420F42}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -14,12 +16,13 @@ Global
 		{A7E4191C-FADD-465F-F9A0-B9F55D612692}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{A7E4191C-FADD-465F-F9A0-B9F55D612692}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{A7E4191C-FADD-465F-F9A0-B9F55D612692}.Release|Any CPU.Build.0 = Release|Any CPU
+		{FB6835AE-B870-666E-A1E9-ED6D94420F42}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{FB6835AE-B870-666E-A1E9-ED6D94420F42}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{FB6835AE-B870-666E-A1E9-ED6D94420F42}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{FB6835AE-B870-666E-A1E9-ED6D94420F42}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
-	EndGlobalSection
-	GlobalSection(NestedProjects) = preSolution
-		{A7E4191C-FADD-465F-F9A0-B9F55D612692} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {D588E619-A6E4-4BBD-923A-7DC74E6DA922}
