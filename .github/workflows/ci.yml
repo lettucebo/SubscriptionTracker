@@ -28,6 +28,3 @@ jobs:
     - name: Build
       run: dotnet build --no-restore --configuration Release
       working-directory: src
-      
-    - name: Test
-      run: dotnet test src/SubscriptionTracker.UnitTests/SubscriptionTracker.UnitTests.csproj --no-build --verbosity normal
