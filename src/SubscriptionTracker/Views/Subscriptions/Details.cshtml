@@ -1,0 +1,74 @@
+@model SubscriptionTracker.Models.Subscription
+
+@{
+    ViewData["Title"] = "訂閱詳情";
+}
+
+<h1>訂閱服務詳情</h1>
+
+<div class="row mt-3">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-header">
+                <h5 class="mb-0">@Model.Name</h5>
+            </div>
+            <div class="card-body">
+                <div class="row mb-3">
+                    <div class="col-md-4">
+                        <h6>訂閱服務名稱</h6>
+                        <p class="lead">@Model.Name</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>月費</h6>
+                        <p class="lead">@Model.Cost.ToString("c")</p>
+                    </div>
+                    <div class="col-md-4">
+                        <h6>繳費日期</h6>
+                        <p class="lead">每月 @Model.PaymentDate.Day 日</p>
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>下次繳費</h6>
+                                <p class="lead">
+                                    @{
+                                        var today = DateTime.Today;
+                                        var nextPaymentDate = new DateTime(today.Year, today.Month, Model.PaymentDate.Day);
+                                        if (nextPaymentDate < today)
+                                        {
+                                            nextPaymentDate = nextPaymentDate.AddMonths(1);
+                                        }
+                                    }
+                                    @nextPaymentDate.ToString("yyyy-MM-dd")
+                                    <span class="badge @(Model.DaysRemaining <= 5 ? "bg-danger" : Model.DaysRemaining <= 10 ? "bg-warning" : "bg-success")">
+                                        剩餘 @Model.DaysRemaining 天
+                                    </span>
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card bg-light">
+                            <div class="card-body">
+                                <h6>年度費用</h6>
+                                <p class="lead">@((Model.Cost * 12).ToString("c"))</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="card-footer">
+                <div class="d-flex justify-content-between">
+                    <a asp-action="Index" class="btn btn-secondary">返回列表</a>
+                    <div>
+                        <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-primary">編輯</a>
+                        <a asp-action="Delete" asp-route-id="@Model.Id" class="btn btn-danger">刪除</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

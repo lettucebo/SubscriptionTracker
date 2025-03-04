@@ -1,0 +1,27 @@
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.5.2.0
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SubscriptionTracker", "SubscriptionTracker\SubscriptionTracker.csproj", "{A7E4191C-FADD-465F-F9A0-B9F55D612692}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7E4191C-FADD-465F-F9A0-B9F55D612692}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7E4191C-FADD-465F-F9A0-B9F55D612692}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7E4191C-FADD-465F-F9A0-B9F55D612692}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7E4191C-FADD-465F-F9A0-B9F55D612692}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(NestedProjects) = preSolution
+		{A7E4191C-FADD-465F-F9A0-B9F55D612692} = {827E0CD3-B72D-47B6-A68D-7590B98EB39B}
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D588E619-A6E4-4BBD-923A-7DC74E6DA922}
+	EndGlobalSection
+EndGlobal
