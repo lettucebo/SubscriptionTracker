@@ -1,0 +1,40 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - 'releases/*'
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: '8.0.x'
+
+    - name: Install dependencies
+      run: dotnet restore
+
+    - name: Build
+      run: dotnet build --no-restore --configuration Release
+
+    - name: Test
+      run: dotnet test --no-build --verbosity normal
+
+    - name: Mend Bolt Security Scan
+      uses: whitesource/bolt-action@v1
+      with:
+        apiKey: ${{ secrets.WHITESOURCE_API_KEY }}
+        userKey: ${{ secrets.WHITESOURCE_USER_KEY }}
+        productName: 'SubscriptionTracker'
+        projectToken: ${{ secrets.WHITESOURCE_PROJECT_TOKEN }}
