@@ -29,11 +29,3 @@ jobs:
 
     - name: Test
       run: dotnet test --no-build --verbosity normal
-
-    - name: Mend Bolt Security Scan
-      uses: whitesource/mend-bolt-action@v1.0.0
-      with:
-        apiKey: ${{ secrets.WHITESOURCE_API_KEY }}
-        userKey: ${{ secrets.WHITESOURCE_USER_KEY }}
-        productName: 'SubscriptionTracker'
-        projectToken: ${{ secrets.WHITESOURCE_PROJECT_TOKEN }}
