@@ -23,7 +23,7 @@ jobs:
 
     - name: Install dependencies
       run: dotnet restore
-      working-directory: src/SubscriptionTracker.sln
+      working-directory: src/
 
     - name: Build
       run: dotnet build --no-restore --configuration Release
