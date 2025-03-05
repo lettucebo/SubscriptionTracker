@@ -9,10 +9,6 @@
 - 訂閱日曆視圖
 - 訂閱報表功能
 
-- sdakljfkldasfjalksdfjlasdk
-
-- ewrowerwe
-
 ## 技術架構
 
 - 後端框架：ASP.NET Core 8.0
