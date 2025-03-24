@@ -22,12 +22,12 @@
     </div>
 
     <!-- Edit Modal -->
-    <div class="modal fade" id="editModal" tabindex="-1" ref="editModal">
+    <div class="modal" :class="{ show: isModalOpen, 'd-block': isModalOpen }" tabindex="-1">
       <div class="modal-dialog">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">Edit Subscription</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            <button type="button" class="btn-close" @click="closeModal"></button>
           </div>
           <div class="modal-body">
             <div v-if="error" class="alert alert-danger mb-3">
@@ -39,7 +39,7 @@
             </div>
           </div>
           <div class="modal-footer">
-            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal" :disabled="updating">Cancel</button>
+            <button type="button" class="btn btn-secondary" @click="closeModal" :disabled="updating">Cancel</button>
             <button type="button" class="btn btn-primary" @click="saveEventChanges" :disabled="updating">
               <span v-if="updating" class="spinner-border spinner-border-sm me-1" role="status"></span>
               {{ updating ? 'Saving...' : 'Save changes' }}
@@ -48,6 +48,7 @@
         </div>
       </div>
     </div>
+    <div v-if="isModalOpen" class="modal-backdrop show"></div>
   </div>
 </template>
 
@@ -55,7 +56,6 @@
 import { ref, onMounted, computed } from 'vue'
 import axios from 'axios'
 import { config } from '@/config'
-import { Modal } from 'bootstrap'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
@@ -69,12 +69,12 @@ export default {
     const loading = ref(false)
     const error = ref(null)
     const subscriptions = ref([])
-    const editModal = ref(null)
     const editEvent = ref({
       id: null,
       startDate: ''
     })
     const updating = ref(false)
+    const isModalOpen = ref(false)
 
     const fetchEvents = async () => {
       loading.value = true
@@ -121,7 +121,13 @@ export default {
         startDate: info.event.start.toISOString().split('T')[0]
       }
       error.value = null
-      editModal.value.show()
+      document.body.classList.add('modal-open')
+      isModalOpen.value = true
+    }
+
+    const closeModal = () => {
+      isModalOpen.value = false
+      document.body.classList.remove('modal-open')
     }
 
     const handleEventDrop = async (info) => {
@@ -150,7 +156,7 @@ export default {
         await axios.put(`${config.baseUrl}/api/subscription/${editEvent.value.id}/dates`, {
           startDate: editEvent.value.startDate
         })
-        editModal.value.hide()
+        closeModal()
         await fetchEvents()
       } catch (err) {
         error.value = 'Failed to update subscription dates'
@@ -186,7 +192,6 @@ export default {
     }))
 
     onMounted(() => {
-      editModal.value = new Modal(document.getElementById('editModal'))
       fetchEvents()
     })
 
@@ -195,9 +200,10 @@ export default {
       error,
       calendarOptions,
       editEvent,
-      editModal,
       saveEventChanges,
-      updating
+      updating,
+      closeModal,
+      isModalOpen
     }
   }
 }
@@ -233,6 +239,20 @@ export default {
 
 :deep(.fc-toolbar-title) {
   font-size: 1.5rem !important;
+}
+
+.modal-backdrop {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+.modal {
+  z-index: 1050;
 }
 
 @media (max-width: 768px) {
