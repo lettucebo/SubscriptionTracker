@@ -1,48 +1,124 @@
 <template>
   <div class="subscriptions">
     <div class="header-container">
-      <h1>Subscriptions</h1>
-      <router-link to="/subscription-form" class="btn btn-primary mb-3">
-        New Subscription
+      <div class="d-flex flex-column">
+        <h1>Subscriptions</h1>
+        <p class="text-muted" v-if="subscriptions.length > 0">
+          Total Monthly: ${{ totalMonthlyAmount.toFixed(2) }}
+        </p>
+      </div>
+      <router-link to="/subscription-form" class="btn btn-primary">
+        <i class="bi bi-plus-lg"></i> New Subscription
       </router-link>
     </div>
-    <table class="table table-striped">
-      <thead>
+
+    <div class="mb-3">
+      <input 
+        type="text" 
+        v-model="searchQuery" 
+        class="form-control" 
+        placeholder="Search subscriptions..."
+        @input="filterSubscriptions"
+      >
+    </div>
+
+    <div v-if="loading" class="text-center my-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Loading...</span>
+      </div>
+    </div>
+
+    <div v-else-if="error" class="alert alert-danger" role="alert">
+      {{ error }}
+    </div>
+
+    <div v-else-if="filteredSubscriptions.length === 0" class="text-center my-5">
+      <p class="text-muted">No subscriptions found</p>
+    </div>
+
+    <div v-else class="table-responsive">
+      <table class="table table-hover border">
+      <thead class="table-light">
         <tr>
-          <th>Name</th>
-          <th>Billing Cycle</th>
-          <th>Amount (Cycle)</th>
-          <th>Effective Monthly</th>
-          <th>Date Range</th>
-          <th>Category</th>
+          <th @click="sort('name')" class="sortable">
+            Name <i :class="getSortIconClass('name')"></i>
+          </th>
+          <th @click="sort('billingCycle')" class="sortable">
+            Billing Cycle <i :class="getSortIconClass('billingCycle')"></i>
+          </th>
+          <th @click="sort('amount')" class="sortable">
+            Amount <i :class="getSortIconClass('amount')"></i>
+          </th>
+          <th @click="sort('effectiveMonthlyPrice')" class="sortable">
+            Monthly Cost <i :class="getSortIconClass('effectiveMonthlyPrice')"></i>
+          </th>
+          <th @click="sort('startDate')" class="sortable">
+            Date Range <i :class="getSortIconClass('startDate')"></i>
+          </th>
+          <th @click="sort('category')" class="sortable">
+            Category <i :class="getSortIconClass('category')"></i>
+          </th>
+          <th>Status</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="sub in subscriptions" :key="sub.id">
-          <td>{{ sub.name }}</td>
-          <td class="text-capitalize">{{ sub.billingCycle }}</td>
-          <td>${{ sub.amount.toFixed(2) }} ({{ sub.billingCycle }})</td>
-          <td>${{ sub.effectiveMonthlyPrice?.toFixed(2) }}</td>
+        <tr v-for="sub in filteredSubscriptions" :key="sub.id">
           <td>
-            {{ new Date(sub.startDate).toLocaleDateString() }} - 
-            {{ sub.endDate ? new Date(sub.endDate).toLocaleDateString() : 'Active' }}
+            <div class="d-flex align-items-center">
+              <span class="subscription-name">{{ sub.name }}</span>
+            </div>
           </td>
-          <td>{{ sub.category }}</td>
-          <td :class="{'text-danger': sub.remainingDays < 7}">
-            {{ sub.remainingDays }} days
+          <td class="text-capitalize">
+            <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
+          </td>
+          <td>${{ formatCurrency(sub.amount) }}</td>
+          <td>${{ formatCurrency(sub.effectiveMonthlyPrice) }}</td>
+          <td>
+            <div class="small">
+              {{ formatDate(sub.startDate) }}
+              <br>
+              <span :class="{ 'text-danger': isExpiringSoon(sub) }">
+                {{ sub.endDate ? formatDate(sub.endDate) : 'Active' }}
+              </span>
+            </div>
           </td>
           <td>
-            <router-link :to="`/subscription-form/${sub.id}`" class="btn btn-sm btn-outline-primary me-2">
-              Edit
-            </router-link>
-            <button @click="deleteSubscription(sub.id)" class="btn btn-sm btn-outline-danger">
-              Delete
-            </button>
+            <span class="badge" :class="getCategoryClass(sub.category)">
+              {{ sub.category }}
+            </span>
+          </td>
+          <td>
+            <span 
+              class="badge" 
+              :class="getStatusClass(sub)"
+              :title="getStatusTitle(sub)"
+            >
+              {{ getStatusText(sub) }}
+            </span>
+          </td>
+          <td>
+            <div class="btn-group">
+              <router-link 
+                :to="`/subscription-form/${sub.id}`" 
+                class="btn btn-sm btn-outline-primary"
+                title="Edit"
+              >
+                <i class="bi bi-pencil"></i>
+              </router-link>
+              <button 
+                @click="deleteSubscription(sub.id)" 
+                class="btn btn-sm btn-outline-danger"
+                title="Delete"
+              >
+                <i class="bi bi-trash"></i>
+              </button>
+            </div>
           </td>
         </tr>
       </tbody>
-    </table>
+      </table>
+    </div>
   </div>
 </template>
 
@@ -55,7 +131,18 @@ export default {
   data() {
     return {
       subscriptions: [],
-      router: this.$router
+      filteredSubscriptions: [],
+      loading: true,
+      error: null,
+      searchQuery: '',
+      sortKey: 'name',
+      sortOrder: 'asc'
+    }
+  },
+  computed: {
+    totalMonthlyAmount() {
+      return this.subscriptions.reduce((total, sub) => 
+        total + (sub.effectiveMonthlyPrice || 0), 0)
     }
   },
   created() {
@@ -63,22 +150,105 @@ export default {
   },
   methods: {
     async fetchSubscriptions() {
+      this.loading = true
+      this.error = null
       try {
-        const response = await axios.get(`${config.baseUrl}/api/subscription`);
-        this.subscriptions = response.data;
+        const response = await axios.get(`${config.baseUrl}/api/subscription`)
+        this.subscriptions = response.data
+        this.filterSubscriptions()
       } catch (error) {
-        console.error("Error fetching subscriptions:", error);
+        this.error = "Failed to load subscriptions. Please try again later."
+        console.error("Error fetching subscriptions:", error)
+      } finally {
+        this.loading = false
       }
     },
     async deleteSubscription(id) {
       if (confirm('Are you sure you want to delete this subscription?')) {
         try {
-          await axios.delete(`${config.baseUrl}/api/subscription/${id}`);
-          this.fetchSubscriptions();
+          await axios.delete(`${config.baseUrl}/api/subscription/${id}`)
+          this.fetchSubscriptions()
         } catch (error) {
-          console.error("Error deleting subscription:", error);
+          this.error = "Failed to delete subscription. Please try again."
+          console.error("Error deleting subscription:", error)
         }
       }
+    },
+    filterSubscriptions() {
+      const query = this.searchQuery.toLowerCase()
+      this.filteredSubscriptions = this.subscriptions.filter(sub => 
+        sub.name.toLowerCase().includes(query) ||
+        sub.category.toLowerCase().includes(query) ||
+        sub.billingCycle.toLowerCase().includes(query)
+      )
+      this.sort(this.sortKey)
+    },
+    sort(key) {
+      this.sortOrder = this.sortKey === key ? 
+        this.sortOrder === 'asc' ? 'desc' : 'asc' : 'asc'
+      this.sortKey = key
+      
+      this.filteredSubscriptions.sort((a, b) => {
+        let comparison = 0
+        const aVal = this.getSortValue(a, key)
+        const bVal = this.getSortValue(b, key)
+        
+        if (aVal > bVal) comparison = 1
+        if (aVal < bVal) comparison = -1
+        return this.sortOrder === 'desc' ? comparison * -1 : comparison
+      })
+    },
+    getSortValue(sub, key) {
+      if (key === 'startDate' || key === 'endDate') {
+        return new Date(sub[key] || 0).getTime()
+      }
+      return sub[key] || ''
+    },
+    getSortIconClass(key) {
+      if (this.sortKey !== key) return 'bi bi-arrow-down-up'
+      return this.sortOrder === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'
+    },
+    formatDate(date) {
+      return new Date(date).toLocaleDateString('en-US', {
+        year: 'numeric',
+        month: 'short',
+        day: 'numeric'
+      })
+    },
+    formatCurrency(amount) {
+      return amount?.toFixed(2) || '0.00'
+    },
+    isExpiringSoon(sub) {
+      if (!sub.endDate) return false
+      const daysUntilExpiry = Math.ceil(
+        (new Date(sub.endDate) - new Date()) / (1000 * 60 * 60 * 24)
+      )
+      return daysUntilExpiry <= 7 && daysUntilExpiry > 0
+    },
+    getCategoryClass(category) {
+      const classes = {
+        'Entertainment': 'bg-purple',
+        'Software': 'bg-info',
+        'Utilities': 'bg-success',
+        'Shopping': 'bg-warning',
+        'Other': 'bg-secondary'
+      }
+      return classes[category] || 'bg-secondary'
+    },
+    getStatusClass(sub) {
+      if (!sub.endDate) return 'bg-success'
+      return this.isExpiringSoon(sub) ? 'bg-warning' : 'bg-info'
+    },
+    getStatusText(sub) {
+      if (!sub.endDate) return 'Active'
+      const daysLeft = Math.ceil(
+        (new Date(sub.endDate) - new Date()) / (1000 * 60 * 60 * 24)
+      )
+      return daysLeft > 0 ? `${daysLeft} days left` : 'Expired'
+    },
+    getStatusTitle(sub) {
+      if (!sub.endDate) return 'Ongoing subscription'
+      return this.isExpiringSoon(sub) ? 'Subscription ending soon' : 'Fixed term subscription'
     }
   }
 }
@@ -87,11 +257,53 @@ export default {
 <style scoped>
 .subscriptions {
   margin-top: 2rem;
+  padding: 0 1rem;
 }
 .header-container {
   display: flex;
   justify-content: space-between;
-  align-items: center;
+  align-items: flex-start;
   margin-bottom: 1.5rem;
+}
+.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+.sortable:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+.subscription-name {
+  font-weight: 500;
+}
+.bg-purple {
+  background-color: #6f42c1;
+  color: white;
+}
+.table-responsive {
+  border-radius: 0.25rem;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+}
+.table {
+  margin-bottom: 0;
+}
+th {
+  white-space: nowrap;
+}
+.btn-group {
+  display: flex;
+  gap: 0.25rem;
+}
+@media (max-width: 768px) {
+  .table-responsive {
+    font-size: 0.875rem;
+  }
+  .header-container {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1rem;
+  }
+  .header-container .btn {
+    align-self: flex-start;
+  }
 }
 </style>
