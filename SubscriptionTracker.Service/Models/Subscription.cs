@@ -66,23 +66,5 @@ namespace SubscriptionTracker.Service.Models
         /// </summary>
         public Category Category { get; set; } = null!;
 
-        /// <summary>
-        /// Calculates effective monthly price considering billing cycle and discount.
-        /// </summary>
-        [JsonProperty]
-        public decimal EffectiveMonthlyPrice => BillingCycle.ToLower() switch
-        {
-            "yearly" => Math.Round((Amount * (1 - DiscountRate)) / 12, 2),
-            "monthly" => Amount,
-            _ => throw new ArgumentException($"Invalid billing cycle: {BillingCycle}")
-        };
-
-        public int RemainingDays => EndDate.HasValue ? 
-            (EndDate.Value - DateTime.Today).Days : 
-            BillingCycle switch {
-                "yearly" => (StartDate.AddYears(1) - DateTime.Today).Days,
-                "monthly" => (StartDate.AddMonths(1) - DateTime.Today).Days,
-                _ => 0
-            };
     }
 }
