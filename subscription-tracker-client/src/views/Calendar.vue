@@ -8,7 +8,7 @@
 <script>
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
-import VueCalendar from 'vue-calendar-3'
+import { Calendar as VueCalendar } from 'vue-calendar-3'
 
 export default {
   name: "CalendarPage",
