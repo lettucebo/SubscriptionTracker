@@ -72,7 +72,10 @@
           <td class="text-capitalize">
             <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
           </td>
-          <td>${{ formatCurrency(sub.amount) }}</td>
+          <td>
+            ${{ formatCurrency(sub.amount) }}
+            <span class="badge bg-secondary" v-if="sub.billingCycle==='yearly'">Yearly</span>
+          </td>
           <td>${{ formatCurrency(sub.effectiveMonthlyPrice) }}</td>
           <td>
             <div class="small">
@@ -141,8 +144,10 @@ export default {
   },
   computed: {
     totalMonthlyAmount() {
-      return this.subscriptions.reduce((total, sub) => 
-        total + (sub.effectiveMonthlyPrice || 0), 0)
+      return this.subscriptions.reduce((total, sub) => {
+        const monthlyAmount = sub.effectiveMonthlyPrice || 0;
+        return total + Math.round(monthlyAmount * 100) / 100;
+      }, 0);
     }
   },
   created() {
@@ -219,7 +224,8 @@ export default {
       })
     },
     formatCurrency(amount) {
-      return amount?.toFixed(2) || '0.00'
+      if (amount === null || amount === undefined) return '0.00';
+      return (Math.round(amount * 100) / 100).toFixed(2);
     },
     isExpiringSoon(sub) {
       if (!sub.endDate) return false
