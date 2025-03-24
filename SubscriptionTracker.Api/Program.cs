@@ -3,6 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.OpenApi.Models;
+using System.Reflection;
+using Swashbuckle.AspNetCore.Filters;
 using SubscriptionTracker.Service.Data;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -16,6 +18,7 @@ builder.Services.AddDbContext<SubscriptionTracker.Service.Data.SubscriptionDbCon
 
 // Configure Swagger/OpenAPI.
 builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerExamplesFromAssemblies(Assembly.GetEntryAssembly());
 builder.Services.AddSwaggerGen(options =>
 {
     options.SwaggerDoc("v1", new OpenApiInfo
@@ -24,6 +27,14 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API for tracking subscription services."
     });
+    
+    // 加入 XML 註解支援
+    var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
+    var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
+    options.IncludeXmlComments(xmlPath);
+    
+    // 啟用範例功能
+    options.ExampleFilters();
 });
 
 // Configure CORS policy.
@@ -34,6 +45,25 @@ builder.Services.AddCors(options =>
 });
 
 var app = builder.Build();
+
+// 初始化資料庫
+using (var scope = app.Services.CreateScope())
+{
+    var services = scope.ServiceProvider;
+    var context = services.GetRequiredService<SubscriptionDbContext>();
+    context.Database.EnsureCreated();
+}
+
+// Home redirect to Swagger
+app.Use(async (context, next) =>
+{
+    if (context.Request.Path == "/")
+    {
+        context.Response.Redirect("/swagger", permanent: true);
+        return;
+    }
+    await next();
+});
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

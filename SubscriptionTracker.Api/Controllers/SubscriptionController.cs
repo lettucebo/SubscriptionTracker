@@ -1,5 +1,6 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Swashbuckle.AspNetCore.Annotations;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
 using System;
@@ -31,8 +32,13 @@ namespace SubscriptionTracker.Api.Controllers
         /// </summary>
         /// <param name="category">Optional subscription category to filter by.</param>
         /// <returns>A list of subscriptions with computed remaining days.</returns>
+        /// <response code="200">Returns the list of subscriptions</response>
         [HttpGet]
-        public async Task<IActionResult> GetSubscriptions([FromQuery] string category = null)
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetSubscriptions(
+            [FromQuery] 
+            string category = null)
         {
             var query = _context.Subscriptions.AsQueryable();
 
@@ -63,8 +69,15 @@ namespace SubscriptionTracker.Api.Controllers
         /// </summary>
         /// <param name="id">The identifier of the subscription.</param>
         /// <returns>The subscription if found; otherwise, NotFound.</returns>
+        /// <response code="200">Returns the requested subscription</response>
+        /// <response code="404">Subscription not found</response>
         [HttpGet("{id}")]
-        public async Task<IActionResult> GetSubscription(int id)
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetSubscription(
+            [FromRoute] 
+            int id)
         {
             var subscription = await _context.Subscriptions.FindAsync(id);
             if (subscription == null)
@@ -79,8 +92,16 @@ namespace SubscriptionTracker.Api.Controllers
         /// </summary>
         /// <param name="subscription">The subscription object to create.</param>
         /// <returns>The created subscription.</returns>
+        /// <response code="201">Returns the newly created subscription</response>
+        /// <response code="400">Invalid input data</response>
         [HttpPost]
-        public async Task<IActionResult> CreateSubscription([FromBody] Subscription subscription)
+        [Consumes("application/json")]
+        [Produces("application/json")]
+        [ProducesResponseType(StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<IActionResult> CreateSubscription(
+            [FromBody] 
+            Subscription subscription)
         {
             if (!ModelState.IsValid)
             {
@@ -99,8 +120,19 @@ namespace SubscriptionTracker.Api.Controllers
         /// <param name="id">The identifier of the subscription to update.</param>
         /// <param name="subscription">The updated subscription object.</param>
         /// <returns>NoContent if update is successful; otherwise, NotFound or BadRequest.</returns>
+        /// <response code="204">Update successful</response>
+        /// <response code="400">ID mismatch</response>
+        /// <response code="404">Subscription not found</response>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateSubscription(int id, [FromBody] Subscription subscription)
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateSubscription(
+            [FromRoute] 
+            int id,
+            [FromBody] 
+            Subscription subscription)
         {
             if (id != subscription.Id)
             {
@@ -133,8 +165,14 @@ namespace SubscriptionTracker.Api.Controllers
         /// </summary>
         /// <param name="id">The identifier of the subscription to delete.</param>
         /// <returns>NoContent if deletion is successful; otherwise, NotFound.</returns>
+        /// <response code="204">Deletion successful</response>
+        /// <response code="404">Subscription not found</response>
         [HttpDelete("{id}")]
-        public async Task<IActionResult> DeleteSubscription(int id)
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> DeleteSubscription(
+            [FromRoute] 
+            int id)
         {
             var subscription = await _context.Subscriptions.FindAsync(id);
             if (subscription == null)
