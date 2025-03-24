@@ -3,7 +3,7 @@
     <h1>Categories Management</h1>
     <div class="actions">
       <button @click="showCreateForm = true" class="btn btn-primary">
-        Add New Category
+        <i class="fas fa-plus me-2"></i>Add New Category
       </button>
     </div>
 
@@ -11,8 +11,8 @@
     <table class="table table-hover">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Description</th>
+          <th><i class="fas fa-tag me-2"></i>Name</th>
+          <th><i class="fas fa-info me-2"></i>Description</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -21,11 +21,11 @@
           <td>{{ category.name }}</td>
           <td>{{ category.description }}</td>
           <td>
-            <button @click="editCategory(category)" class="btn btn-sm btn-warning mr-2">
-              Edit
+            <button @click="editCategory(category)" class="btn btn-sm btn-warning me-2">
+              <i class="fas fa-pen-to-square me-1"></i>Edit
             </button>
             <button @click="deleteCategory(category.id)" class="btn btn-sm btn-danger">
-              Delete
+              <i class="fas fa-trash-can me-1"></i>Delete
             </button>
           </td>
         </tr>
@@ -38,6 +38,7 @@
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title">
+              <i class="fas" :class="editingCategory ? 'fa-pen me-2' : 'fa-folder me-2'"></i>
               {{ editingCategory ? 'Edit Category' : 'New Category' }}
             </h5>
             <button type="button" class="btn-close" aria-label="Close" @click="closeModal"></button>
@@ -45,18 +46,19 @@
           <div class="modal-body">
             <form @submit.prevent="submitForm">
               <div class="form-group">
-                <label>Name</label>
+                <label><i class="fas fa-tag me-2"></i>Name</label>
                 <input v-model="formData.name" type="text" class="form-control" required>
               </div>
               <div class="form-group">
-                <label>Description</label>
+                <label><i class="fas fa-info me-2"></i>Description</label>
                 <textarea v-model="formData.description" class="form-control"></textarea>
               </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="closeModal">
-                  Cancel
+                  <i class="fas fa-times me-2"></i>Cancel
                 </button>
                 <button type="submit" class="btn btn-primary">
+                  <i class="fas" :class="editingCategory ? 'fa-check me-2' : 'fa-plus me-2'"></i>
                   {{ editingCategory ? 'Update' : 'Create' }}
                 </button>
               </div>

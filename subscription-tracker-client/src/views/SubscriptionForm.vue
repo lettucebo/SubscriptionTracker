@@ -15,7 +15,7 @@
                   <label for="name" class="form-label">Name <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text">
-                      <i class="bi bi-tag"></i>
+                    <i class="fas fa-tag"></i>
                     </span>
                     <input 
                       type="text" 
@@ -37,7 +37,7 @@
                   <label for="category" class="form-label">Category <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text">
-                      <i class="bi bi-folder"></i>
+                      <i class="fas fa-folder-open"></i>
                     </span>
                     <select 
                       id="category" 
@@ -172,7 +172,7 @@
                 Cancel
               </router-link>
               <button type="submit" class="btn btn-primary">
-                <i class="bi" :class="isEdit ? 'bi-check-circle' : 'bi-plus-circle'"></i>
+                <i class="fas" :class="isEdit ? 'fa-check-circle' : 'fa-plus-circle'"></i>
                 {{ isEdit ? "Update Subscription" : "Create Subscription" }}
               </button>
             </div>
