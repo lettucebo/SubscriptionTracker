@@ -3,6 +3,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
+using SubscriptionTracker.Service.Services;
 using System;
 using System.Linq;
 using System.Threading.Tasks;
@@ -57,15 +58,19 @@ namespace SubscriptionTracker.Api.Controllers
                 s.Name,
                 s.Amount,
                 s.StartDate,
+                s.EndDate,
                 s.BillingCycle,
+                s.DiscountRate,
                 Category = new
                 {
                     s.Category.Id,
                     s.Category.Name,
                     s.Category.Description
                 },
-                RemainingDays = s.RemainingDays,
-                EffectiveMonthlyPrice = s.EffectiveMonthlyPrice
+                RemainingDays = SubscriptionCalculator.CalculateRemainingDays(
+                    s.StartDate, s.EndDate, s.BillingCycle),
+                EffectiveMonthlyPrice = SubscriptionCalculator.CalculateEffectiveMonthlyPrice(
+                    s.BillingCycle, s.Amount, s.DiscountRate)
             })
             .OrderBy(s => s.RemainingDays)
             .ToList();
@@ -95,7 +100,28 @@ namespace SubscriptionTracker.Api.Controllers
             {
                 return NotFound();
             }
-            return Ok(subscription);
+            var result = new
+            {
+                subscription.Id,
+                subscription.Name,
+                subscription.Amount,
+                subscription.StartDate,
+                subscription.EndDate,
+                subscription.BillingCycle,
+                subscription.DiscountRate,
+                Category = new
+                {
+                    subscription.Category.Id,
+                    subscription.Category.Name,
+                    subscription.Category.Description
+                },
+                RemainingDays = SubscriptionCalculator.CalculateRemainingDays(
+                    subscription.StartDate, subscription.EndDate, subscription.BillingCycle),
+                EffectiveMonthlyPrice = SubscriptionCalculator.CalculateEffectiveMonthlyPrice(
+                    subscription.BillingCycle, subscription.Amount, subscription.DiscountRate)
+            };
+            
+            return Ok(result);
         }
 
         /// <summary>
@@ -122,7 +148,28 @@ namespace SubscriptionTracker.Api.Controllers
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
 
-            return CreatedAtAction(nameof(GetSubscription), new { id = subscription.Id }, subscription);
+            var result = new
+            {
+                subscription.Id,
+                subscription.Name,
+                subscription.Amount,
+                subscription.StartDate,
+                subscription.EndDate,
+                subscription.BillingCycle,
+                subscription.DiscountRate,
+                Category = subscription.Category == null ? null : new
+                {
+                    subscription.Category.Id,
+                    subscription.Category.Name,
+                    subscription.Category.Description
+                },
+                RemainingDays = SubscriptionCalculator.CalculateRemainingDays(
+                    subscription.StartDate, subscription.EndDate, subscription.BillingCycle),
+                EffectiveMonthlyPrice = SubscriptionCalculator.CalculateEffectiveMonthlyPrice(
+                    subscription.BillingCycle, subscription.Amount, subscription.DiscountRate)
+            };
+
+            return CreatedAtAction(nameof(GetSubscription), new { id = subscription.Id }, result);
         }
 
         /// <summary>
