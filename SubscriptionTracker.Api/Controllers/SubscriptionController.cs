@@ -198,13 +198,9 @@ namespace SubscriptionTracker.Api.Controllers
         }
 
         /// <summary>
-        /// Checks if a subscription exists.
-        /// </summary>
-        /// <param name="id">The identifier of the subscription.</param>
-        /// <returns>True if the subscription exists; otherwise, false.</returns>
-        /// <summary>
         /// Updates the start date for a subscription.
         /// </summary>
+        /// <returns>True if the subscription exists; otherwise, false.</returns>
         /// <param name="id">The identifier of the subscription to update.</param>
         /// <param name="startDate">The new start date.</param>
         /// <returns>NoContent if update is successful; otherwise, NotFound.</returns>

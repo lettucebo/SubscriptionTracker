@@ -41,6 +41,13 @@ namespace SubscriptionTracker.Service.Data
 
                 entity.Property(c => c.Description)
                     .HasMaxLength(200);
+
+                // Soft delete configuration
+                entity.Property(c => c.IsDelete)
+                    .HasDefaultValue(false);
+                
+                entity.Property(c => c.DeleteAt)
+                    .IsRequired(false);
             });
 
             // Configure Subscription entity

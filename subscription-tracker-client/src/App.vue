@@ -15,6 +15,9 @@
               <router-link to="/subscriptions" class="nav-link">Subscriptions</router-link>
             </li>
             <li class="nav-item">
+              <router-link to="/categories" class="nav-link">Categories</router-link>
+            </li>
+            <li class="nav-item">
               <router-link to="/calendar" class="nav-link">Calendar</router-link>
             </li>
             <li class="nav-item">
