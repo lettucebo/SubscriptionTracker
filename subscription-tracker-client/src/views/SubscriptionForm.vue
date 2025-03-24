@@ -42,17 +42,17 @@
                     <select 
                       id="category" 
                       class="form-select" 
-                      v-model="subscription.category"
+                      v-model="subscription.categoryId"
                       required
-                      :class="{ 'is-invalid': showError && !subscription.category }"
+                      :class="{ 'is-invalid': showError && !subscription.categoryId }"
                     >
-                      <option value="">Select a category</option>
-                      <option v-for="category in categories" :key="category" :value="category">
-                        {{ category }}
+                      <option :value="null">Select a category</option>
+                      <option v-for="category in categories" :key="category.id" :value="category.id">
+                        {{ category.name }}
                       </option>
                     </select>
                   </div>
-                  <div class="invalid-feedback" v-if="showError && !subscription.category">
+                  <div class="invalid-feedback" v-if="showError && !subscription.categoryId">
                     Please select a category
                   </div>
                 </div>
@@ -200,22 +200,26 @@ export default {
       discountRate: 0,
       startDate: '',
       endDate: null,
-      category: ''
+      categoryId: null
     })
     const isEdit = ref(false)
     const showError = ref(false)
     const route = useRoute()
     const router = useRouter()
+    const categories = ref([])
 
-    const categories = [
-      'Entertainment',
-      'Software',
-      'Utilities',
-      'Shopping',
-      'Other'
-    ]
+    const loadCategories = async () => {
+      try {
+        const response = await axios.get(`${config.baseUrl}/api/category`)
+        categories.value = response.data
+      } catch (error) {
+        console.error("Error loading categories:", error)
+      }
+    }
 
     onMounted(async () => {
+      await loadCategories()
+      
       if (route.params.id) {
         isEdit.value = true
         try {
@@ -249,7 +253,7 @@ export default {
       
       // Basic form validation
       if (!subscription.value.name ||
-          !subscription.value.category ||
+          !subscription.value.categoryId ||
           !subscription.value.amount ||
           !subscription.value.billingCycle ||
           !subscription.value.startDate) {

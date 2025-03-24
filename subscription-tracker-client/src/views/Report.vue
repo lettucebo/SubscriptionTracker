@@ -22,10 +22,10 @@
             <h3 class="filter-title">Filters</h3>
             <div class="mb-3">
               <label for="categoryFilter" class="form-label">Category</label>
-              <select id="categoryFilter" v-model="selectedCategory" class="form-select">
-                <option value="">All Categories</option>
-                <option v-for="category in uniqueCategories" :key="category" :value="category">
-                  {{ category }}
+              <select id="categoryFilter" v-model="selectedCategoryId" class="form-select">
+                <option :value="null">All Categories</option>
+                <option v-for="category in categories" :key="category.id" :value="category.id">
+                  {{ category.name }}
                 </option>
               </select>
             </div>
@@ -82,8 +82,8 @@
                       </div>
                     </td>
                     <td>
-                      <span class="badge" :class="getCategoryClass(sub.category)">
-                        {{ sub.category }}
+                      <span class="badge bg-info">
+                        {{ sub.category?.name }}
                       </span>
                     </td>
                     <td>
@@ -106,17 +106,17 @@
               <div class="card-body">
                 <h3 class="card-title">Expenses by Category</h3>
                 <div class="category-chart">
-                  <div v-for="(amount, category) in categoryExpenses" 
-                       :key="category" 
+                  <div v-for="category in categoriesWithExpenses" 
+                       :key="category.id" 
                        class="category-bar-item">
                     <div class="category-bar-label">
-                      <span class="badge" :class="getCategoryClass(category)">{{ category }}</span>
+                      <span class="badge bg-info">{{ category.name }}</span>
                     </div>
                     <div class="category-bar-container">
                       <div class="category-bar" 
-                           :style="{ width: getCategoryPercentage(amount) + '%' }">
+                           :style="{ width: getCategoryPercentage(category.amount) + '%' }">
                       </div>
-                      <span class="category-amount">${{ amount.toFixed(2) }}</span>
+                      <span class="category-amount">${{ category.amount.toFixed(2) }}</span>
                     </div>
                   </div>
                 </div>
@@ -138,31 +138,36 @@ export default {
   name: "ReportPage",
   setup() {
     const subscriptions = ref([])
-    const selectedCategory = ref("")
+    const categories = ref([])
+    const selectedCategoryId = ref(null)
     const sortOption = ref("name")
     const loading = ref(true)
     const error = ref(null)
 
-    const fetchSubscriptions = async () => {
+    const fetchData = async () => {
       loading.value = true
       error.value = null
       try {
-        const response = await axios.get(`${config.baseUrl}/api/subscription`)
-        subscriptions.value = response.data
+        const [subsResponse, catsResponse] = await Promise.all([
+          axios.get(`${config.baseUrl}/api/subscription`),
+          axios.get(`${config.baseUrl}/api/category`)
+        ])
+        subscriptions.value = subsResponse.data
+        categories.value = catsResponse.data
       } catch (err) {
-        error.value = "Failed to load subscription data"
-        console.error("Error fetching subscriptions:", err)
+        error.value = "Failed to load data"
+        console.error("Error fetching data:", err)
       } finally {
         loading.value = false
       }
     }
 
-    onMounted(fetchSubscriptions)
+    onMounted(fetchData)
 
     const filteredSubscriptions = computed(() => {
       let subs = subscriptions.value
-      if (selectedCategory.value) {
-        subs = subs.filter(sub => sub.category === selectedCategory.value)
+      if (selectedCategoryId.value) {
+        subs = subs.filter(sub => sub.categoryId === selectedCategoryId.value)
       }
       return subs
     })
@@ -175,16 +180,11 @@ export default {
           case 'dueDate':
             return new Date(getNextPaymentDate(a)) - new Date(getNextPaymentDate(b))
           case 'category':
-            return a.category.localeCompare(b.category)
+            return (a.category?.name || '').localeCompare(b.category?.name || '')
           default: // name
             return a.name.localeCompare(b.name)
         }
       })
-    })
-
-    const uniqueCategories = computed(() => {
-      const categories = subscriptions.value.map(sub => sub.category)
-      return [...new Set(categories)].sort()
     })
 
     const totalMonthly = computed(() => 
@@ -200,15 +200,24 @@ export default {
     const categoryExpenses = computed(() => {
       const expenses = {}
       filteredSubscriptions.value.forEach(sub => {
-        expenses[sub.category] = (expenses[sub.category] || 0) + 
-          (sub.effectiveMonthlyPrice || 0)
+        if (sub.category) {
+          expenses[sub.categoryId] = (expenses[sub.categoryId] || 0) + 
+            (sub.effectiveMonthlyPrice || 0)
+        }
       })
       return expenses
     })
 
+    const categoriesWithExpenses = computed(() => {
+      return categories.value.map(cat => ({
+        ...cat,
+        amount: categoryExpenses.value[cat.id] || 0
+      })).sort((a, b) => b.amount - a.amount)
+    })
+
     const getCategoryPercentage = (amount) => {
-      const max = Math.max(...Object.values(categoryExpenses.value))
-      return (amount / max) * 100
+      const max = Math.max(...categoriesWithExpenses.value.map(c => c.amount))
+      return max ? (amount / max) * 100 : 0
     }
 
     const formatDate = (date) => {
@@ -220,19 +229,22 @@ export default {
     }
 
     const getNextPaymentDate = (sub) => {
-      // Implementation depends on your business logic
-      return sub.endDate || new Date()
-    }
-
-    const getCategoryClass = (category) => {
-      const classes = {
-        'Entertainment': 'bg-purple',
-        'Software': 'bg-info',
-        'Utilities': 'bg-success',
-        'Shopping': 'bg-warning',
-        'Other': 'bg-secondary'
+      if (sub.endDate) return sub.endDate
+      
+      const lastDate = new Date(sub.startDate)
+      const today = new Date()
+      
+      if (sub.billingCycle === 'yearly') {
+        while (lastDate < today) {
+          lastDate.setFullYear(lastDate.getFullYear() + 1)
+        }
+      } else { // monthly
+        while (lastDate < today) {
+          lastDate.setMonth(lastDate.getMonth() + 1)
+        }
       }
-      return classes[category] || 'bg-secondary'
+      
+      return lastDate
     }
 
     const getStatusClass = (sub) => {
@@ -263,19 +275,18 @@ export default {
 
     return {
       subscriptions,
-      selectedCategory,
+      categories,
+      selectedCategoryId,
       sortOption,
       loading,
       error,
       filteredSubscriptions,
       sortedSubscriptions,
-      uniqueCategories,
       totalMonthly,
       averageCost,
-      categoryExpenses,
+      categoriesWithExpenses,
       formatDate,
       getNextPaymentDate,
-      getCategoryClass,
       getStatusClass,
       getStatusText,
       getStatusTitle,
@@ -359,7 +370,7 @@ export default {
 
 .category-bar {
   height: 12px;
-  background: #e9ecef;
+  background: #0dcaf0;
   border-radius: 6px;
   transition: width 0.3s ease;
 }
@@ -369,11 +380,6 @@ export default {
   text-align: right;
   font-weight: 500;
   color: #6c757d;
-}
-
-.bg-purple {
-  background-color: #6f42c1;
-  color: white;
 }
 
 @media (max-width: 768px) {

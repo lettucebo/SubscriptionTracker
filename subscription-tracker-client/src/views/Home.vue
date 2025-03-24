@@ -63,9 +63,9 @@
             <div class="card-body">
               <h3 class="card-title">Categories</h3>
               <div class="category-list">
-                <div v-for="(count, category) in categoryStats" :key="category" class="category-item">
-                  <span class="badge" :class="getCategoryClass(category)">{{ category }}</span>
-                  <span class="category-count">{{ count }}</span>
+                <div v-for="(stats, categoryId) in categoryStats" :key="categoryId" class="category-item">
+                  <span class="badge bg-info">{{ getCategoryName(categoryId) }}</span>
+                  <span class="category-count">{{ stats.count }} (${{ stats.monthlyTotal.toFixed(2) }})</span>
                 </div>
               </div>
             </div>
@@ -101,27 +101,36 @@ export default {
   name: "HomePage",
   setup() {
     const subscriptions = ref([])
+    const categories = ref([])
     const loading = ref(true)
     const error = ref(null)
 
-    const fetchSubscriptions = async () => {
+    const fetchData = async () => {
       try {
-        const response = await axios.get(`${config.baseUrl}/api/subscription`)
-        subscriptions.value = response.data
+        const [subsResponse, catsResponse] = await Promise.all([
+          axios.get(`${config.baseUrl}/api/subscription`),
+          axios.get(`${config.baseUrl}/api/category`)
+        ])
+        subscriptions.value = subsResponse.data
+        categories.value = catsResponse.data
       } catch (err) {
-        error.value = "Failed to load subscription data"
-        console.error("Error fetching subscriptions:", err)
+        error.value = "Failed to load data"
+        console.error("Error fetching data:", err)
       } finally {
         loading.value = false
       }
     }
 
-    onMounted(fetchSubscriptions)
+    onMounted(fetchData)
 
-    const totalMonthlyAmount = computed(() => 
-      subscriptions.value.reduce((total, sub) => 
-        total + (sub.effectiveMonthlyPrice || 0), 0)
-    )
+    const totalMonthlyAmount = computed(() => {
+      return subscriptions.value.reduce((total, sub) => {
+        if (sub.billingCycle === 'yearly') {
+          return total + ((sub.amount * (1 - (sub.discountRate || 0))) / 12)
+        }
+        return total + sub.amount
+      }, 0)
+    })
 
     const activeSubscriptions = computed(() =>
       subscriptions.value.filter(sub => !sub.endDate || new Date(sub.endDate) > new Date())
@@ -138,22 +147,30 @@ export default {
     )
 
     const categoryStats = computed(() => {
-      const stats = {}
-      subscriptions.value.forEach(sub => {
-        stats[sub.category] = (stats[sub.category] || 0) + 1
-      })
-      return stats
+      return categories.value.reduce((acc, category) => {
+        const categoryId = category.id
+        const categorySubscriptions = subscriptions.value.filter(
+          sub => sub.categoryId === categoryId
+        )
+        
+        const monthlyTotal = categorySubscriptions.reduce((total, sub) => {
+          if (sub.billingCycle === 'yearly') {
+            return total + ((sub.amount * (1 - (sub.discountRate || 0))) / 12)
+          }
+          return total + sub.amount
+        }, 0)
+
+        acc[categoryId] = {
+          count: categorySubscriptions.length,
+          monthlyTotal: monthlyTotal
+        }
+        return acc
+      }, {})
     })
 
-    const getCategoryClass = (category) => {
-      const classes = {
-        'Entertainment': 'bg-purple',
-        'Software': 'bg-info',
-        'Utilities': 'bg-success',
-        'Shopping': 'bg-warning',
-        'Other': 'bg-secondary'
-      }
-      return classes[category] || 'bg-secondary'
+    const getCategoryName = (categoryId) => {
+      const category = categories.value.find(c => c.id === Number(categoryId))
+      return category?.name || 'Unknown'
     }
 
     return {
@@ -164,7 +181,7 @@ export default {
       activeSubscriptions,
       expiringSoonCount,
       categoryStats,
-      getCategoryClass
+      getCategoryName
     }
   }
 }
@@ -247,19 +264,14 @@ export default {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
+  padding: 0.75rem;
   background: #f8f9fa;
   border-radius: 0.5rem;
 }
 
 .category-count {
-  font-weight: bold;
+  font-weight: 500;
   color: #6c757d;
-}
-
-.bg-purple {
-  background-color: #6f42c1;
-  color: white;
 }
 
 .quick-actions {
