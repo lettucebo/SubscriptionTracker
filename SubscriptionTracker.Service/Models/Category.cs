@@ -23,5 +23,15 @@ namespace SubscriptionTracker.Service.Models
         /// Gets or sets the description of the category.
         /// </summary>
         public string Description { get; set; } = "";
+
+        /// <summary>
+        /// Gets or sets whether the category is soft deleted.
+        /// </summary>
+        public bool IsDelete { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the deletion timestamp.
+        /// </summary>
+        public DateTime? DeleteAt { get; set; }
     }
 }

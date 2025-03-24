@@ -22,7 +22,9 @@ namespace SubscriptionTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
-            return await _context.Categories.ToListAsync();
+            return await _context.Categories
+                .Where(c => !c.IsDelete)
+                .ToListAsync();
         }
 
         /// <summary>
@@ -94,13 +96,8 @@ namespace SubscriptionTracker.Api.Controllers
                 return NotFound();
             }
 
-            // Check if category is in use
-            if (await _context.Subscriptions.AnyAsync(s => s.CategoryId == id))
-            {
-                return BadRequest("Cannot delete category that is in use by subscriptions");
-            }
-
-            _context.Categories.Remove(category);
+            category.IsDelete = true;
+            category.DeleteAt = DateTime.UtcNow;
             await _context.SaveChangesAsync();
 
             return NoContent();

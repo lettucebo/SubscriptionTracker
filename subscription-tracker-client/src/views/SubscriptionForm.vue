@@ -194,7 +194,6 @@ export default {
   setup() {
     const subscription = ref({
       name: '',
-      fee: 0,
       billingCycle: '',
       amount: null,
       discountRate: 0,
@@ -208,18 +207,28 @@ export default {
     const router = useRouter()
     const categories = ref([])
 
-    const loadCategories = async () => {
+    const loadCategories = async (subscriptionCategoryId = null) => {
       try {
         const response = await axios.get(`${config.baseUrl}/api/category`)
         categories.value = response.data
+        
+        // If editing and the subscription's category was soft-deleted
+        if (subscriptionCategoryId && !categories.value.find(c => c.id === subscriptionCategoryId)) {
+          try {
+            const categoryResponse = await axios.get(`${config.baseUrl}/api/category/${subscriptionCategoryId}`)
+            if (categoryResponse.data) {
+              categories.value = [...categories.value, categoryResponse.data]
+            }
+          } catch (error) {
+            console.error("Error fetching soft-deleted category:", error)
+          }
+        }
       } catch (error) {
         console.error("Error loading categories:", error)
       }
     }
 
     onMounted(async () => {
-      await loadCategories()
-      
       if (route.params.id) {
         isEdit.value = true
         try {
@@ -229,10 +238,13 @@ export default {
             startDate: response.data.startDate?.substr(0, 10),
             endDate: response.data.endDate?.substr(0, 10)
           }
+          await loadCategories(subscription.value.categoryId)
         } catch (error) {
           console.error("Error fetching subscription:", error)
           showError.value = true
         }
+      } else {
+        await loadCategories()
       }
     })
 
@@ -280,7 +292,8 @@ export default {
       showError, 
       submitForm, 
       effectiveMonthlyPrice,
-      discountRatePercentage 
+      discountRatePercentage,
+      loadCategories
     }
   }
 }
