@@ -57,13 +57,15 @@ namespace SubscriptionTracker.Api.Controllers
                 s.Name,
                 s.Amount,
                 s.StartDate,
+                s.BillingCycle,
                 Category = new
                 {
                     s.Category.Id,
                     s.Category.Name,
                     s.Category.Description
                 },
-                RemainingDays = s.RemainingDays
+                RemainingDays = s.RemainingDays,
+                EffectiveMonthlyPrice = s.EffectiveMonthlyPrice
             })
             .OrderBy(s => s.RemainingDays)
             .ToList();
@@ -200,6 +202,46 @@ namespace SubscriptionTracker.Api.Controllers
         /// </summary>
         /// <param name="id">The identifier of the subscription.</param>
         /// <returns>True if the subscription exists; otherwise, false.</returns>
+        /// <summary>
+        /// Updates the start date for a subscription.
+        /// </summary>
+        /// <param name="id">The identifier of the subscription to update.</param>
+        /// <param name="startDate">The new start date.</param>
+        /// <returns>NoContent if update is successful; otherwise, NotFound.</returns>
+        /// <response code="204">Update successful</response>
+        /// <response code="404">Subscription not found</response>
+        [HttpPut("{id}/dates")]
+        [Consumes("application/json")]
+        [ProducesResponseType(StatusCodes.Status204NoContent)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> UpdateSubscriptionDates(
+            [FromRoute] int id,
+            [FromBody] DateTime startDate)
+        {
+            var subscription = await _context.Subscriptions.FindAsync(id);
+            if (subscription == null)
+            {
+                return NotFound();
+            }
+
+            subscription.StartDate = startDate;
+
+            try
+            {
+                await _context.SaveChangesAsync();
+            }
+            catch (DbUpdateConcurrencyException)
+            {
+                if (!SubscriptionExists(id))
+                {
+                    return NotFound();
+                }
+                throw;
+            }
+
+            return NoContent();
+        }
+
         private bool SubscriptionExists(int id)
         {
             return _context.Subscriptions.Any(s => s.Id == id);

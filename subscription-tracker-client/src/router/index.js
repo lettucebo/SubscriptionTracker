@@ -3,12 +3,18 @@ import Home from '../views/Home.vue'
 import Subscriptions from '../views/Subscriptions.vue'
 import Report from '../views/Report.vue'
 import SubscriptionForm from '../views/SubscriptionForm.vue'
+import Calendar from '../views/Calendar.vue'
 
 const routes = [
   {
     path: '/',
     name: 'Home',
     component: Home
+  },
+  {
+    path: '/calendar',
+    name: 'Calendar',
+    component: Calendar
   },
   {
     path: '/subscriptions',
