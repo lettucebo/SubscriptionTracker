@@ -9,6 +9,7 @@ namespace SubscriptionTracker.Service.Data
     public class SubscriptionDbContext : DbContext
     {
         public DbSet<Subscription> Subscriptions { get; set; }
+        public DbSet<Category> Categories { get; set; }
 
         public SubscriptionDbContext(DbContextOptions<SubscriptionDbContext> options)
             : base(options)
@@ -31,7 +32,24 @@ namespace SubscriptionTracker.Service.Data
         {
             base.OnModelCreating(modelBuilder);
             
+            // Configure Category entity
+            modelBuilder.Entity<Category>(entity =>
+            {
+                entity.Property(c => c.Name)
+                    .HasMaxLength(50)
+                    .IsRequired();
+
+                entity.Property(c => c.Description)
+                    .HasMaxLength(200);
+            });
+
             // Configure Subscription entity
+            modelBuilder.Entity<Subscription>()
+                .HasOne(s => s.Category)
+                .WithMany()
+                .HasForeignKey(s => s.CategoryId)
+                .OnDelete(DeleteBehavior.Restrict);
+
             modelBuilder.Entity<Subscription>(entity =>
             {
                 entity.Property(s => s.Amount)
@@ -46,6 +64,15 @@ namespace SubscriptionTracker.Service.Data
                     .HasDefaultValue(0m);
             });
 
+            // Seed categories
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Name = "Entertainment", Description = "Streaming and entertainment services" },
+                new Category { Id = 2, Name = "Music", Description = "Music streaming services" },
+                new Category { Id = 3, Name = "Shopping", Description = "Shopping and delivery services" },
+                new Category { Id = 4, Name = "Productivity", Description = "Work and productivity tools" },
+                new Category { Id = 5, Name = "Design", Description = "Design and creative tools" }
+            );
+
             // Seed 10 sample subscriptions
             modelBuilder.Entity<Subscription>().HasData(
                 new Subscription { 
@@ -56,7 +83,7 @@ namespace SubscriptionTracker.Service.Data
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-30),
                     EndDate = DateTime.Today.AddDays(335),
-                    Category = "Entertainment" 
+                    CategoryId = 1 // Entertainment
                 },
                 new Subscription { 
                     Id = 2, 
@@ -65,7 +92,7 @@ namespace SubscriptionTracker.Service.Data
                     BillingCycle = "monthly", 
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-15),
-                    Category = "Music" 
+                    CategoryId = 2 // Music
                 },
                 new Subscription { 
                     Id = 3, 
@@ -75,7 +102,7 @@ namespace SubscriptionTracker.Service.Data
                     DiscountRate = 0.17m,
                     StartDate = DateTime.Today.AddDays(-60),
                     EndDate = DateTime.Today.AddDays(305),
-                    Category = "Shopping" 
+                    CategoryId = 3 // Shopping
                 },
                 new Subscription { 
                     Id = 4, 
@@ -85,7 +112,7 @@ namespace SubscriptionTracker.Service.Data
                     DiscountRate = 0.15m,
                     StartDate = DateTime.Today.AddDays(-90),
                     EndDate = DateTime.Today.AddDays(275),
-                    Category = "Productivity" 
+                    CategoryId = 4 // Productivity
                 },
                 new Subscription { 
                     Id = 5, 
@@ -94,7 +121,7 @@ namespace SubscriptionTracker.Service.Data
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-20),
-                    Category = "Entertainment" 
+                    CategoryId = 1 // Entertainment
                 },
                 new Subscription { 
                     Id = 6, 
@@ -103,7 +130,7 @@ namespace SubscriptionTracker.Service.Data
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-10),
-                    Category = "Entertainment" 
+                    CategoryId = 1 // Entertainment
                 },
                 new Subscription { 
                     Id = 7, 
@@ -112,7 +139,7 @@ namespace SubscriptionTracker.Service.Data
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-25),
-                    Category = "Music" 
+                    CategoryId = 2 // Music
                 },
                 new Subscription { 
                     Id = 8, 
@@ -122,7 +149,7 @@ namespace SubscriptionTracker.Service.Data
                     DiscountRate = 0.1m,
                     StartDate = DateTime.Today.AddDays(-180),
                     EndDate = DateTime.Today.AddDays(185),
-                    Category = "Productivity" 
+                    CategoryId = 4 // Productivity
                 },
                 new Subscription { 
                     Id = 9, 
@@ -132,7 +159,7 @@ namespace SubscriptionTracker.Service.Data
                     DiscountRate = 0.2m,
                     StartDate = DateTime.Today.AddDays(-365),
                     EndDate = DateTime.Today.AddDays(365),
-                    Category = "Productivity" 
+                    CategoryId = 4 // Productivity
                 },
                 new Subscription { 
                     Id = 10, 
@@ -141,7 +168,7 @@ namespace SubscriptionTracker.Service.Data
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-5),
-                    Category = "Design" 
+                    CategoryId = 5 // Design
                 }
             );
         }

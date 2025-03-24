@@ -57,9 +57,14 @@ namespace SubscriptionTracker.Service.Models
         public DateTime? EndDate { get; set; }
 
         /// <summary>
+        /// Gets or sets the category ID of the subscription.
+        /// </summary>
+        public int CategoryId { get; set; }
+
+        /// <summary>
         /// Gets or sets the category of the subscription.
         /// </summary>
-        public string Category { get; set; } = "";
+        public Category Category { get; set; } = null!;
 
         /// <summary>
         /// Calculates effective monthly price considering discount.

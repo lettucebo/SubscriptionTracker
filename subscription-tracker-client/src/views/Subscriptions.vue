@@ -55,8 +55,8 @@
           <th @click="sort('startDate')" class="sortable">
             Date Range <i :class="getSortIconClass('startDate')"></i>
           </th>
-          <th @click="sort('category')" class="sortable">
-            Category <i :class="getSortIconClass('category')"></i>
+          <th @click="sort('category.name')" class="sortable">
+            Category <i :class="getSortIconClass('category.name')"></i>
           </th>
           <th>Status</th>
           <th>Actions</th>
@@ -84,8 +84,8 @@
             </div>
           </td>
           <td>
-            <span class="badge" :class="getCategoryClass(sub.category)">
-              {{ sub.category }}
+            <span class="badge bg-info">
+              {{ sub.category?.name }}
             </span>
           </td>
           <td>
@@ -178,7 +178,7 @@ export default {
       const query = this.searchQuery.toLowerCase()
       this.filteredSubscriptions = this.subscriptions.filter(sub => 
         sub.name.toLowerCase().includes(query) ||
-        sub.category.toLowerCase().includes(query) ||
+        (sub.category?.name || '').toLowerCase().includes(query) ||
         sub.billingCycle.toLowerCase().includes(query)
       )
       this.sort(this.sortKey)
@@ -202,6 +202,9 @@ export default {
       if (key === 'startDate' || key === 'endDate') {
         return new Date(sub[key] || 0).getTime()
       }
+      if (key === 'category.name') {
+        return sub.category?.name || ''
+      }
       return sub[key] || ''
     },
     getSortIconClass(key) {
@@ -224,16 +227,6 @@ export default {
         (new Date(sub.endDate) - new Date()) / (1000 * 60 * 60 * 24)
       )
       return daysUntilExpiry <= 7 && daysUntilExpiry > 0
-    },
-    getCategoryClass(category) {
-      const classes = {
-        'Entertainment': 'bg-purple',
-        'Software': 'bg-info',
-        'Utilities': 'bg-success',
-        'Shopping': 'bg-warning',
-        'Other': 'bg-secondary'
-      }
-      return classes[category] || 'bg-secondary'
     },
     getStatusClass(sub) {
       if (!sub.endDate) return 'bg-success'
@@ -274,10 +267,6 @@ export default {
 }
 .subscription-name {
   font-weight: 500;
-}
-.bg-purple {
-  background-color: #6f42c1;
-  color: white;
 }
 .table-responsive {
   border-radius: 0.25rem;

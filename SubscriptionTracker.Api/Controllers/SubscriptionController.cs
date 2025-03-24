@@ -30,7 +30,7 @@ namespace SubscriptionTracker.Api.Controllers
         /// <summary>
         /// Gets all subscriptions with optional filtering by category and sorts by remaining days.
         /// </summary>
-        /// <param name="category">Optional subscription category to filter by.</param>
+        /// <param name="categoryId">Optional category ID to filter subscriptions by.</param>
         /// <returns>A list of subscriptions with computed remaining days.</returns>
         /// <response code="200">Returns the list of subscriptions</response>
         [HttpGet]
@@ -38,13 +38,15 @@ namespace SubscriptionTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSubscriptions(
             [FromQuery] 
-            string category = null)
+            int? categoryId = null)
         {
-            var query = _context.Subscriptions.AsQueryable();
+            var query = _context.Subscriptions
+                .Include(s => s.Category)
+                .AsQueryable();
 
-            if (!string.IsNullOrWhiteSpace(category))
+            if (categoryId.HasValue)
             {
-                query = query.Where(s => s.Category == category);
+                query = query.Where(s => s.CategoryId == categoryId.Value);
             }
 
             var subscriptions = await query.ToListAsync();
@@ -55,8 +57,13 @@ namespace SubscriptionTracker.Api.Controllers
                 s.Name,
                 s.Amount,
                 s.StartDate,
-                s.Category,
-                RemainingDays = (s.StartDate.AddYears(1) - DateTime.Today).Days
+                Category = new
+                {
+                    s.Category.Id,
+                    s.Category.Name,
+                    s.Category.Description
+                },
+                RemainingDays = s.RemainingDays
             })
             .OrderBy(s => s.RemainingDays)
             .ToList();
@@ -79,7 +86,9 @@ namespace SubscriptionTracker.Api.Controllers
             [FromRoute] 
             int id)
         {
-            var subscription = await _context.Subscriptions.FindAsync(id);
+            var subscription = await _context.Subscriptions
+                .Include(s => s.Category)
+                .FirstOrDefaultAsync(s => s.Id == id);
             if (subscription == null)
             {
                 return NotFound();
