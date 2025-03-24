@@ -28,6 +28,7 @@
 
 <script>
 import axios from 'axios'
+import { config } from '@/config'
 
 export default {
   name: "SubscriptionsPage",
@@ -43,7 +44,7 @@ export default {
     async fetchSubscriptions() {
       try {
         // Adjust the API URL as needed.
-        const response = await axios.get("https://localhost:5001/api/subscription");
+        const response = await axios.get(`${config.baseUrl}/api/subscription`);
         this.subscriptions = response.data;
       } catch (error) {
         console.error("Error fetching subscriptions:", error);
