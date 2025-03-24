@@ -249,10 +249,16 @@ export default {
     })
 
     const effectiveMonthlyPrice = computed(() => {
-      if (subscription.value.billingCycle === 'yearly' && subscription.value.amount) {
-        return ((subscription.value.amount * (1 - (subscription.value.discountRate || 0))) / 12).toFixed(2)
+      if (!subscription.value.amount) return '0.00';
+      
+      switch (subscription.value.billingCycle?.toLowerCase()) {
+        case 'yearly':
+          return (Math.round((subscription.value.amount * (1 - (subscription.value.discountRate || 0))) / 12 * 100) / 100).toFixed(2);
+        case 'monthly':
+          return subscription.value.amount.toFixed(2);
+        default:
+          return '0.00';
       }
-      return subscription.value.amount?.toFixed(2) || '0.00'
     })
 
     const discountRatePercentage = computed({
