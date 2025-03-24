@@ -9,23 +9,29 @@
     <table class="table table-striped">
       <thead>
         <tr>
-          <th>ID</th>
           <th>Name</th>
-          <th>Fee</th>
-          <th>Payment Date</th>
+          <th>Billing Cycle</th>
+          <th>Amount (Cycle)</th>
+          <th>Effective Monthly</th>
+          <th>Date Range</th>
           <th>Category</th>
-          <th>Remaining Days</th>
           <th>Actions</th>
         </tr>
       </thead>
       <tbody>
         <tr v-for="sub in subscriptions" :key="sub.id">
-          <td>{{ sub.id }}</td>
           <td>{{ sub.name }}</td>
-          <td>{{ sub.fee }}</td>
-          <td>{{ new Date(sub.paymentDate).toLocaleDateString() }}</td>
+          <td class="text-capitalize">{{ sub.billingCycle }}</td>
+          <td>${{ sub.amount.toFixed(2) }} ({{ sub.billingCycle }})</td>
+          <td>${{ sub.effectiveMonthlyPrice?.toFixed(2) }}</td>
+          <td>
+            {{ new Date(sub.startDate).toLocaleDateString() }} - 
+            {{ sub.endDate ? new Date(sub.endDate).toLocaleDateString() : 'Active' }}
+          </td>
           <td>{{ sub.category }}</td>
-          <td>{{ sub.remainingDays }}</td>
+          <td :class="{'text-danger': sub.remainingDays < 7}">
+            {{ sub.remainingDays }} days
+          </td>
           <td>
             <router-link :to="`/subscription-form/${sub.id}`" class="btn btn-sm btn-outline-primary me-2">
               Edit

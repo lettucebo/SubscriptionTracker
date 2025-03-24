@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using Newtonsoft.Json;
 
 namespace SubscriptionTracker.Service.Models
 {
@@ -21,20 +22,61 @@ namespace SubscriptionTracker.Service.Models
         public string Name { get; set; } = "";
 
         /// <summary>
-        /// Gets or sets the fee of the subscription.
+        /// Gets or sets the billing amount.
         /// </summary>
         [Required]
-        public decimal Fee { get; set; }
+    public decimal Amount { get; set; }
+    
+    [Obsolete("Fee has been replaced by Amount")]
+    public decimal Fee { 
+        get => Amount;
+        set => Amount = value;
+    }
 
         /// <summary>
-        /// Gets or sets the payment date.
+        /// Gets or sets the billing cycle (monthly/yearly).
         /// </summary>
         [Required]
-        public DateTime PaymentDate { get; set; }
+        public string BillingCycle { get; set; } = "monthly";
+
+        /// <summary>
+        /// Gets or sets the discount rate for yearly payments.
+        /// </summary>
+        [Range(0, 1)]
+        public decimal DiscountRate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the subscription start date.
+        /// </summary>
+        [Required]
+        public DateTime StartDate { get; set; }
+
+        /// <summary>
+        /// Gets or sets the subscription end date (optional).
+        /// </summary>
+        public DateTime? EndDate { get; set; }
 
         /// <summary>
         /// Gets or sets the category of the subscription.
         /// </summary>
         public string Category { get; set; } = "";
+
+        /// <summary>
+        /// Calculates effective monthly price considering discount.
+        /// </summary>
+        [JsonProperty]
+        public decimal EffectiveMonthlyPrice => BillingCycle switch
+        {
+            "yearly" => (Amount * (1 - DiscountRate)) / 12,
+            _ => Amount
+        };
+
+        public int RemainingDays => EndDate.HasValue ? 
+            (EndDate.Value - DateTime.Today).Days : 
+            BillingCycle switch {
+                "yearly" => (StartDate.AddYears(1) - DateTime.Today).Days,
+                "monthly" => (StartDate.AddMonths(1) - DateTime.Today).Days,
+                _ => 0
+            };
     }
 }

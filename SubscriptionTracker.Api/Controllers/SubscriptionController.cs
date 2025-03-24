@@ -53,10 +53,10 @@ namespace SubscriptionTracker.Api.Controllers
             {
                 s.Id,
                 s.Name,
-                s.Fee,
-                s.PaymentDate,
+                s.Amount,
+                s.StartDate,
                 s.Category,
-                RemainingDays = (s.PaymentDate - DateTime.Today).Days
+                RemainingDays = (s.StartDate.AddYears(1) - DateTime.Today).Days
             })
             .OrderBy(s => s.RemainingDays)
             .ToList();
