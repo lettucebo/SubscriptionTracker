@@ -27,6 +27,7 @@
 import axios from 'axios'
 import { ref, onMounted } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
+import { config } from '@/config'
 
 export default {
   name: "SubscriptionFormPage",
@@ -45,7 +46,7 @@ export default {
       if (route.params.id) {
         isEdit.value = true
         try {
-          const response = await axios.get(`https://localhost:5001/api/subscription/${route.params.id}`)
+          const response = await axios.get(`${config.baseUrl}/api/subscription/${route.params.id}`)
           subscription.value = response.data
           if (subscription.value.paymentDate) {
             // Format date string to YYYY-MM-DD for input field
@@ -60,9 +61,9 @@ export default {
     const submitForm = async () => {
       try {
         if (isEdit.value) {
-          await axios.put(`https://localhost:5001/api/subscription/${subscription.value.id}`, subscription.value)
+          await axios.put(`${config.baseUrl}/api/subscription/${subscription.value.id}`, subscription.value)
         } else {
-          await axios.post("https://localhost:5001/api/subscription", subscription.value)
+          await axios.post(`${config.baseUrl}/api/subscription`, subscription.value)
         }
         router.push('/subscriptions')
       } catch (error) {

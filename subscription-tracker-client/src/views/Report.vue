@@ -41,6 +41,7 @@
 <script>
 import axios from 'axios'
 import { ref, onMounted, computed } from 'vue'
+import { config } from '@/config'
 
 export default {
   name: "ReportPage",
@@ -50,7 +51,7 @@ export default {
 
     const fetchSubscriptions = async () => {
       try {
-        const response = await axios.get("https://localhost:5001/api/subscription")
+        const response = await axios.get(`${config.baseUrl}/api/subscription`)
         subscriptions.value = response.data
       } catch (error) {
         console.error("Error fetching subscriptions:", error)

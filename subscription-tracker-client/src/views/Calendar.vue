@@ -9,6 +9,7 @@
 import { ref, onMounted } from 'vue'
 import axios from 'axios'
 import { Calendar as VueCalendar } from 'vue-calendar-3'
+import { config } from '@/config'
 
 export default {
   name: "CalendarPage",
@@ -20,7 +21,7 @@ export default {
 
     const fetchSubscriptions = async () => {
       try {
-        const response = await axios.get("https://localhost:5001/api/subscription")
+        const response = await axios.get(`${config.baseUrl}/api/subscription`)
         // Map each subscription to a calendar event with title and date.
         calendarEvents.value = response.data.map(sub => ({
           title: sub.name,
