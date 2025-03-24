@@ -73,8 +73,8 @@
             <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
           </td>
           <td>
+            <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
             ${{ formatCurrency(sub.amount) }}
-            <span class="badge bg-secondary" v-if="sub.billingCycle==='yearly'">Yearly</span>
           </td>
           <td>${{ formatCurrency(sub.effectiveMonthlyPrice) }}</td>
           <td>
