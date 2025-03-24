@@ -36,11 +36,13 @@ namespace SubscriptionTracker.Tests
             // Seed a test subscription.
             _context.Subscriptions.Add(new Subscription 
             { 
-                Id = 1, 
-                Name = "Test Service", 
-                Fee = 10.0m, 
-                PaymentDate = DateTime.Today.AddDays(5), 
-                Category = "Test" 
+                Id = 1,
+                Name = "Test Service",
+                BillingCycle = "monthly",
+                Amount = 10.0m,
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddMonths(1),
+                Category = "Test"
             });
             _context.SaveChanges();
 
@@ -91,8 +93,10 @@ namespace SubscriptionTracker.Tests
             {
                 Id = 2,
                 Name = "New Service",
-                Fee = 20.0m,
-                PaymentDate = DateTime.Today.AddDays(10),
+                BillingCycle = "yearly",
+                Amount = 120.0m,
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddYears(1),
                 Category = "Test"
             };
  
@@ -114,15 +118,17 @@ namespace SubscriptionTracker.Tests
             {
                 Id = 3,
                 Name = "Update Test",
-                Fee = 30.0m,
-                PaymentDate = DateTime.Today.AddDays(15),
+                BillingCycle = "monthly",
+                Amount = 30.0m,
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddMonths(1),
                 Category = "Test"
             };
             _context.Subscriptions.Add(subscriptionToUpdate);
             _context.SaveChanges();
  
             // Modify subscription.
-            subscriptionToUpdate.Fee = 35.0m;
+            subscriptionToUpdate.Amount = 35.0m;
  
             // Act.
             var result = await _controller.UpdateSubscription(3, subscriptionToUpdate);
@@ -142,8 +148,10 @@ namespace SubscriptionTracker.Tests
             {
                 Id = 4,
                 Name = "Delete Test",
-                Fee = 40.0m,
-                PaymentDate = DateTime.Today.AddDays(20),
+                BillingCycle = "monthly",
+                Amount = 40.0m,
+                StartDate = DateTime.Today,
+                EndDate = DateTime.Today.AddMonths(1),
                 Category = "Test"
             };
             _context.Subscriptions.Add(subscriptionToDelete);
