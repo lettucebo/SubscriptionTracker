@@ -100,24 +100,55 @@ export default {
       return colors[category] || '#808080'
     }
 
+    const generateRecurringEvents = (subscription) => {
+      const events = [];
+      const startDate = new Date(subscription.startDate);
+      const endDate = new Date();
+      endDate.setMonth(endDate.getMonth() + 12); // Show next 12 months
+
+      let currentDate = new Date(startDate);
+      while (currentDate <= endDate) {
+        events.push({
+          id: `${subscription.id}-${currentDate.getTime()}`,
+          title: subscription.name,
+          start: currentDate.toISOString().split('T')[0],
+          allDay: true,
+          extendedProps: {
+            subscriptionId: subscription.id,
+            amount: subscription.amount,
+            billingCycle: subscription.billingCycle,
+            isRecurring: true
+          },
+          backgroundColor: getEventColor(subscription.category?.name),
+          borderColor: getEventColor(subscription.category?.name)
+        });
+
+        // Add months based on billing cycle
+        switch (subscription.billingCycle) {
+          case 'Monthly':
+            currentDate.setMonth(currentDate.getMonth() + 1);
+            break;
+          case 'Quarterly':
+            currentDate.setMonth(currentDate.getMonth() + 3);
+            break;
+          case 'Annually':
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            break;
+          default:
+            currentDate.setMonth(currentDate.getMonth() + 1);
+        }
+      }
+      return events;
+    };
+
     const calendarEvents = computed(() => 
-      subscriptions.value.map(sub => ({
-        id: sub.id,
-        title: sub.name,
-        start: sub.startDate,
-        allDay: true,
-        extendedProps: {
-          amount: sub.amount,
-          billingCycle: sub.billingCycle
-        },
-        backgroundColor: getEventColor(sub.category?.name),
-        borderColor: getEventColor(sub.category?.name)
-      }))
+      subscriptions.value.flatMap(sub => generateRecurringEvents(sub))
     )
 
     const handleEventClick = (info) => {
+      const subscriptionId = info.event.extendedProps.subscriptionId || info.event.id;
       editEvent.value = {
-        id: info.event.id,
+        id: subscriptionId,
         startDate: info.event.start.toISOString().split('T')[0]
       }
       error.value = null
@@ -132,10 +163,11 @@ export default {
 
     const handleEventDrop = async (info) => {
       updating.value = true
-      editEvent.value.id = info.event.id
+      const subscriptionId = info.event.extendedProps.subscriptionId || info.event.id;
+      editEvent.value.id = subscriptionId;
 
       try {
-        await axios.put(`${config.baseUrl}/api/subscription/${info.event.id}/dates`, {
+        await axios.put(`${config.baseUrl}/api/subscription/${subscriptionId}/dates`, {
           startDate: info.event.start.toISOString()
         })
         await fetchEvents()
@@ -184,6 +216,7 @@ export default {
             <div class="fc-title">${arg.event.title}</div>
             <div class="fc-description small">
               ${arg.event.extendedProps.amount ? '$' + arg.event.extendedProps.amount.toFixed(2) : ''}
+              ${arg.event.extendedProps.billingCycle ? ` (${arg.event.extendedProps.billingCycle})` : ''}
               ${updating.value && arg.event.id === editEvent.value.id ? ' (Updating...)' : ''}
             </div>
           </div>
