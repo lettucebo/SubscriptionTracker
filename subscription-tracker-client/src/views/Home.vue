@@ -148,10 +148,9 @@ export default {
 
     const categoryStats = computed(() => {
       return categories.value.reduce((acc, category) => {
-        const categoryId = category.id
-        const categorySubscriptions = subscriptions.value.filter(
-          sub => sub.categoryId === categoryId
-        )
+        const categorySubscriptions = subscriptions.value.filter(sub => {
+          return sub.category?.id === category.id
+        })
         
         const monthlyTotal = categorySubscriptions.reduce((total, sub) => {
           if (sub.billingCycle === 'yearly') {
@@ -160,7 +159,7 @@ export default {
           return total + sub.amount
         }, 0)
 
-        acc[categoryId] = {
+        acc[category.id] = {
           count: categorySubscriptions.length,
           monthlyTotal: monthlyTotal
         }
@@ -169,7 +168,7 @@ export default {
     })
 
     const getCategoryName = (categoryId) => {
-      const category = categories.value.find(c => c.id === Number(categoryId))
+      const category = categories.value.find(c => c.id === parseInt(categoryId))
       return category?.name || 'Unknown'
     }
 
