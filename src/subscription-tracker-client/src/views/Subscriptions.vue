@@ -8,7 +8,7 @@
         </p>
       </div>
       <router-link to="/subscription-form" class="btn btn-primary">
-        <i class="bi bi-plus-lg"></i> New Subscription
+        <i class="fas fa-circle-plus me-2"></i>New Subscription
       </router-link>
     </div>
 
@@ -107,14 +107,14 @@
                 class="btn btn-sm btn-outline-primary"
                 title="Edit"
               >
-                <i class="bi bi-pencil"></i>
+                <i class="fas fa-pen-to-square"></i>
               </router-link>
               <button 
                 @click="deleteSubscription(sub.id)" 
                 class="btn btn-sm btn-outline-danger"
                 title="Delete"
               >
-                <i class="bi bi-trash"></i>
+                <i class="fas fa-trash-can"></i>
               </button>
             </div>
           </td>
