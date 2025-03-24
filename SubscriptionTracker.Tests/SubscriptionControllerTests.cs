@@ -6,6 +6,7 @@ using Microsoft.VisualStudio.TestTools.UnitTesting;
 using SubscriptionTracker.Api.Controllers;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
+using FluentAssertions;
 
 namespace SubscriptionTracker.Tests
 {
@@ -24,9 +25,9 @@ namespace SubscriptionTracker.Tests
         [TestInitialize]
         public void Setup()
         {
-            // Create new in-memory database options.
+            // Create new in-memory database options with a unique database name.
             var options = new DbContextOptionsBuilder<SubscriptionDbContext>()
-                .UseInMemoryDatabase(databaseName: "TestSubscriptionDB")
+                .UseInMemoryDatabase(databaseName: Guid.NewGuid().ToString())
                 .Options;
             
             // Initialize the context.
@@ -46,7 +47,7 @@ namespace SubscriptionTracker.Tests
             // Initialize the controller with the test context.
             _controller = new SubscriptionController(_context);
         }
-
+ 
         /// <summary>
         /// Tests retrieving an existing subscription returns an OkObjectResult.
         /// </summary>
@@ -55,14 +56,14 @@ namespace SubscriptionTracker.Tests
         {
             // Arrange.
             int testId = 1;
-
+ 
             // Act.
             var result = await _controller.GetSubscription(testId);
-
+ 
             // Assert.
-            Assert.IsInstanceOfType(result, typeof(OkObjectResult));
+            result.Should().BeOfType<OkObjectResult>();
         }
-
+ 
         /// <summary>
         /// Tests retrieving a non-existing subscription returns a NotFoundResult.
         /// </summary>
@@ -71,14 +72,14 @@ namespace SubscriptionTracker.Tests
         {
             // Arrange.
             int testId = 999;
-
+ 
             // Act.
             var result = await _controller.GetSubscription(testId);
-
+ 
             // Assert.
-            Assert.IsInstanceOfType(result, typeof(NotFoundResult));
+            result.Should().BeOfType<NotFoundResult>();
         }
-        
+     
         /// <summary>
         /// Tests creating a new subscription returns a CreatedAtActionResult.
         /// </summary>
@@ -94,12 +95,75 @@ namespace SubscriptionTracker.Tests
                 PaymentDate = DateTime.Today.AddDays(10),
                 Category = "Test"
             };
-
+ 
             // Act.
             var result = await _controller.CreateSubscription(newSubscription);
-
+ 
             // Assert.
-            Assert.IsInstanceOfType(result, typeof(CreatedAtActionResult));
+            result.Should().BeOfType<CreatedAtActionResult>();
+        }
+ 
+        /// <summary>
+        /// Tests updating an existing subscription returns NoContentResult.
+        /// </summary>
+        [TestMethod]
+        public async Task UpdateSubscription_ReturnsNoContent_WhenUpdateIsSuccessful()
+        {
+            // Arrange: create a subscription to update.
+            var subscriptionToUpdate = new Subscription 
+            {
+                Id = 3,
+                Name = "Update Test",
+                Fee = 30.0m,
+                PaymentDate = DateTime.Today.AddDays(15),
+                Category = "Test"
+            };
+            _context.Subscriptions.Add(subscriptionToUpdate);
+            _context.SaveChanges();
+ 
+            // Modify subscription.
+            subscriptionToUpdate.Fee = 35.0m;
+ 
+            // Act.
+            var result = await _controller.UpdateSubscription(3, subscriptionToUpdate);
+ 
+            // Assert.
+            result.Should().BeOfType<NoContentResult>();
+        }
+ 
+        /// <summary>
+        /// Tests deleting an existing subscription returns NoContentResult.
+        /// </summary>
+        [TestMethod]
+        public async Task DeleteSubscription_ReturnsNoContent_WhenDeletionIsSuccessful()
+        {
+            // Arrange: create a subscription to delete.
+            var subscriptionToDelete = new Subscription
+            {
+                Id = 4,
+                Name = "Delete Test",
+                Fee = 40.0m,
+                PaymentDate = DateTime.Today.AddDays(20),
+                Category = "Test"
+            };
+            _context.Subscriptions.Add(subscriptionToDelete);
+            _context.SaveChanges();
+ 
+            // Act.
+            var result = await _controller.DeleteSubscription(4);
+ 
+            // Assert.
+            result.Should().BeOfType<NoContentResult>();
+        }
+ 
+        /// <summary>
+        /// Cleanup after each test.
+        /// </summary>
+        [TestCleanup]
+        public void Cleanup()
+        {
+            _context.Database.EnsureDeleted();
+            _context.Dispose();
         }
     }
 }
