@@ -14,6 +14,14 @@ namespace SubscriptionTracker.Service.Models
         public int Id { get; set; }
 
         /// <summary>
+        /// Gets or sets the color code in hex format
+        /// </summary>
+        [Required]
+        [MaxLength(7)]
+        [RegularExpression("^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$", ErrorMessage = "Invalid color code format")]
+        public string ColorCode { get; set; } = "#3A86FF";
+
+        /// <summary>
         /// Gets or sets the name of the category.
         /// </summary>
         [Required]
