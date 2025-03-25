@@ -18,6 +18,9 @@ namespace SubscriptionTracker.Tests
             result.Should().BeApproximately(expectedMonthlyPrice, 0.01m);
         }
 
+        /// <summary>
+        /// Verifies monthly subscriptions return the same amount without discount
+        /// </summary>
         [DataTestMethod]
         [DynamicData(nameof(GetMonthlyTestData), DynamicDataSourceType.Method)]
         public void CalculateEffectiveMonthlyPrice_ForMonthly_ReturnsSameAmount(string billingCycle, decimal amount)
@@ -28,6 +31,9 @@ namespace SubscriptionTracker.Tests
             result.Should().Be(amount);
         }
 
+        /// <summary>
+        /// Tests invalid billing cycle handling
+        /// </summary>
         [TestMethod]
         public void CalculateEffectiveMonthlyPrice_InvalidBillingCycle_ThrowsArgumentException()
         {
@@ -38,6 +44,9 @@ namespace SubscriptionTracker.Tests
                .WithMessage("Invalid billing cycle: invalid");
         }
 
+        /// <summary>
+        /// Tests remaining days calculation with fixed end date
+        /// </summary>
         [TestMethod]
         public void CalculateRemainingDays_WithEndDate_ReturnsDaysDifference()
         {
@@ -50,6 +59,9 @@ namespace SubscriptionTracker.Tests
             result.Should().Be(10);
         }
 
+        /// <summary>
+        /// Tests yearly subscription remaining days calculation without end date
+        /// </summary>
         [TestMethod]
         public void CalculateRemainingDays_ForYearly_NoEndDate_ReturnsDaysUntilNextYear()
         {
@@ -62,6 +74,9 @@ namespace SubscriptionTracker.Tests
             result.Should().Be(expected);
         }
 
+        /// <summary>
+        /// Tests monthly subscription remaining days calculation without end date
+        /// </summary>
         [TestMethod]
         public void CalculateRemainingDays_ForMonthly_NoEndDate_ReturnsDaysUntilNextMonth()
         {
@@ -74,6 +89,9 @@ namespace SubscriptionTracker.Tests
             result.Should().Be(expected);
         }
 
+        /// <summary>
+        /// Tests invalid billing cycle handling when no end date exists
+        /// </summary>
         [TestMethod]
         public void CalculateRemainingDays_InvalidBillingCycle_NoEndDate_ReturnsZero()
         {
@@ -87,6 +105,9 @@ namespace SubscriptionTracker.Tests
 
         // Additional test cases for increased coverage
 
+        /// <summary>
+        /// Additional test cases for yearly subscription price calculation
+        /// </summary>
         [DataTestMethod]
         [DynamicData(nameof(GetYearlyAdditionalTestData), DynamicDataSourceType.Method)]
         public void CalculateEffectiveMonthlyPrice_ForYearly_AdditionalTest(string billingCycle, decimal amount, decimal discountRate, decimal expectedMonthlyPrice)
@@ -97,6 +118,9 @@ namespace SubscriptionTracker.Tests
             result.Should().BeApproximately(expectedMonthlyPrice, 0.01m);
         }
 
+        /// <summary>
+        /// Additional test cases for monthly subscription price verification
+        /// </summary>
         [DataTestMethod]
         [DynamicData(nameof(GetMonthlyAdditionalTestData), DynamicDataSourceType.Method)]
         public void CalculateEffectiveMonthlyPrice_ForMonthly_AdditionalTest(string billingCycle, decimal amount)
@@ -107,6 +131,9 @@ namespace SubscriptionTracker.Tests
             result.Should().Be(amount);
         }
 
+        /// <summary>
+        /// Tests remaining days calculation with past end date
+        /// </summary>
         [TestMethod]
         public void CalculateRemainingDays_WithPastEndDate_ReturnsNegativeDays()
         {
@@ -119,21 +146,37 @@ namespace SubscriptionTracker.Tests
             result.Should().Be(-5);
         }
 
+        /// <summary>
+        /// Provides test data for yearly price calculation
+        /// - 120/year with 10% discount = 9/month
+        /// </summary>
         public static IEnumerable<object[]> GetYearlyTestData()
         {
             yield return new object[] { "yearly", 120M, 0.1M, 9.0M };
         }
 
+        /// <summary>
+        /// Provides test data for monthly price verification
+        /// - 15/month with no discount
+        /// </summary>
         public static IEnumerable<object[]> GetMonthlyTestData()
         {
             yield return new object[] { "monthly", 15M };
         }
 
+        /// <summary>
+        /// Provides additional test data for yearly price calculation
+        /// - 240/year with 20% discount = 16/month
+        /// </summary>
         public static IEnumerable<object[]> GetYearlyAdditionalTestData()
         {
             yield return new object[] { "yearly", 240M, 0.2M, 16.0M };
         }
 
+        /// <summary>
+        /// Provides additional test data for monthly price verification
+        /// - 50/month with no discount
+        /// </summary>
         public static IEnumerable<object[]> GetMonthlyAdditionalTestData()
         {
             yield return new object[] { "monthly", 50M };
