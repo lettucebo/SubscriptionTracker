@@ -70,17 +70,7 @@
                 Other
               </span>
             </div>
-            <div class="view-toggle d-none d-md-block">
-              <div class="btn-group" role="group">
-                <button type="button" class="btn btn-outline-primary" @click="setCalendarView('dayGridMonth')">
-                  <i class="fas fa-calendar-alt me-1"></i> Month
-                </button>
-                <button type="button" class="btn btn-outline-primary" @click="setCalendarView('dayGridWeek')">
-                  <i class="fas fa-calendar-week me-1"></i> Week
-                </button>
-              </div>
-            </div>
-          </div>
+                      </div>
         </div>
         <div class="card-body p-0 p-md-3">
           <FullCalendar 
@@ -388,7 +378,8 @@ export default {
         prev: 'fa-chevron-left',
         next: 'fa-chevron-right',
         prevYear: 'fa-angle-double-left',
-        nextYear: 'fa-angle-double-right'
+        nextYear: 'fa-angle-double-right',
+        today: 'fa-calendar-day',
       },
       eventContent: (arg) => ({
         html: `
