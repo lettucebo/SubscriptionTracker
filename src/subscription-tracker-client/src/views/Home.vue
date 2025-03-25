@@ -99,12 +99,21 @@ import { config } from '@/config'
 
 export default {
   name: "HomePage",
+  /**
+   * Component setup function
+   * @returns {Object} Component properties and methods
+   */
   setup() {
     const subscriptions = ref([])
     const categories = ref([])
     const loading = ref(true)
     const error = ref(null)
 
+    /**
+     * Fetch initial subscription and category data
+     * @async
+     * @returns {Promise<void>}
+     */
     const fetchData = async () => {
       try {
         const [subsResponse, catsResponse] = await Promise.all([
@@ -123,6 +132,11 @@ export default {
 
     onMounted(fetchData)
 
+    /**
+     * Calculate total monthly cost across all subscriptions
+     * @computed
+     * @returns {number} Total monthly amount
+     */
     const totalMonthlyAmount = computed(() => {
       return subscriptions.value.reduce((total, sub) => {
         if (sub.billingCycle === 'yearly') {
@@ -132,10 +146,20 @@ export default {
       }, 0)
     })
 
+    /**
+     * Filter active subscriptions
+     * @computed
+     * @returns {Array} Active subscriptions
+     */
     const activeSubscriptions = computed(() =>
       subscriptions.value.filter(sub => !sub.endDate || new Date(sub.endDate) > new Date())
     )
 
+    /**
+     * Count subscriptions expiring within 7 days
+     * @computed
+     * @returns {number} Count of expiring subscriptions
+     */
     const expiringSoonCount = computed(() =>
       subscriptions.value.filter(sub => {
         if (!sub.endDate) return false
@@ -146,6 +170,11 @@ export default {
       }).length
     )
 
+    /**
+     * Calculate statistics per category
+     * @computed
+     * @returns {Object} Category statistics
+     */
     const categoryStats = computed(() => {
       return categories.value.reduce((acc, category) => {
         const categorySubscriptions = subscriptions.value.filter(sub => {
@@ -167,6 +196,11 @@ export default {
       }, {})
     })
 
+    /**
+     * Get category name by ID
+     * @param {number} categoryId - Category ID
+     * @returns {string} Category name
+     */
     const getCategoryName = (categoryId) => {
       const category = categories.value.find(c => c.id === parseInt(categoryId))
       return category?.name || 'Unknown'

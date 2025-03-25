@@ -168,6 +168,17 @@ import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
 
+/**
+ * Calendar view component for managing subscription events
+ * @component
+ * @vue-data {boolean} loading - Data loading state
+ * @vue-data {string|null} error - Error message
+ * @vue-data {Array} subscriptions - List of subscriptions
+ * @vue-data {Object} editEvent - Currently edited event data
+ * @vue-data {boolean} updating - Update in progress flag
+ * @vue-data {boolean} isModalOpen - Modal visibility state
+ * @vue-computed {Array} calendarEvents - Generated calendar events from subscriptions
+ */
 export default {
   name: 'CalendarView',
   components: {
@@ -189,6 +200,10 @@ export default {
     const fullCalendar = ref(null)
     const currentView = ref('dayGridMonth')
 
+    /**
+     * Fetch subscriptions from API
+     * @async
+     */
     const fetchEvents = async () => {
       loading.value = true
       error.value = null
@@ -217,6 +232,11 @@ export default {
       return colors[category] || '#808080'
     }
 
+    /**
+     * Generate recurring calendar events from subscription data
+     * @param {Object} subscription - Subscription data
+     * @returns {Array} Array of calendar events
+     */
     const generateRecurringEvents = (subscription) => {
       const events = [];
       const startDate = new Date(subscription.startDate);
@@ -264,6 +284,10 @@ export default {
       subscriptions.value.flatMap(sub => generateRecurringEvents(sub))
     )
 
+    /**
+     * Handle calendar event click
+     * @param {Object} info - FullCalendar event info
+     */
     const handleEventClick = (info) => {
       const subscriptionId = info.event.extendedProps.subscriptionId || info.event.id;
       editEvent.value = {
@@ -283,6 +307,11 @@ export default {
       document.body.classList.remove('modal-open')
     }
 
+    /**
+     * Handle event drag-and-drop update
+     * @async
+     * @param {Object} info - FullCalendar event drop info
+     */
     const handleEventDrop = async (info) => {
       updating.value = true
       const subscriptionId = info.event.extendedProps.subscriptionId || info.event.id;
@@ -302,6 +331,10 @@ export default {
       }
     }
 
+    /**
+     * Save event changes to API
+     * @async
+     */
     const saveEventChanges = async () => {
       updating.value = true
       error.value = null

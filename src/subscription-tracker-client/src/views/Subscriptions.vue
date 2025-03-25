@@ -131,6 +131,17 @@ import { config } from '@/config'
 
 export default {
   name: "SubscriptionsPage",
+  /**
+   * Component data properties
+   * @returns {Object} Initial state
+   * @vue-data {Array} subscriptions - List of all subscriptions
+   * @vue-data {Array} filteredSubscriptions - Filtered list of subscriptions
+   * @vue-data {boolean} loading - Data loading state
+   * @vue-data {string|null} error - Error message
+   * @vue-data {string} searchQuery - Search filter query
+   * @vue-data {string} sortKey - Current sort key
+   * @vue-data {string} sortOrder - Current sort order (asc/desc)
+   */
   data() {
     return {
       subscriptions: [],
@@ -143,6 +154,10 @@ export default {
     }
   },
   computed: {
+    /**
+     * Calculate total monthly cost of all subscriptions
+     * @returns {number} Total monthly amount
+     */
     totalMonthlyAmount() {
       return this.subscriptions.reduce((total, sub) => {
         const monthlyAmount = sub.effectiveMonthlyPrice || 0;
@@ -150,10 +165,18 @@ export default {
       }, 0);
     }
   },
+  /**
+   * Lifecycle hook - runs when component is created
+   */
   created() {
     this.fetchSubscriptions()
   },
   methods: {
+    /**
+     * Fetch subscriptions from API
+     * @async
+     * @returns {Promise<void>}
+     */
     async fetchSubscriptions() {
       this.loading = true
       this.error = null
@@ -168,6 +191,12 @@ export default {
         this.loading = false
       }
     },
+    /**
+     * Delete a subscription by ID
+     * @async
+     * @param {number} id - Subscription ID to delete
+     * @returns {Promise<void>}
+     */
     async deleteSubscription(id) {
       if (confirm('Are you sure you want to delete this subscription?')) {
         try {
@@ -179,6 +208,10 @@ export default {
         }
       }
     },
+    /**
+     * Filter subscriptions based on search query
+     * and apply current sort
+     */
     filterSubscriptions() {
       const query = this.searchQuery.toLowerCase()
       this.filteredSubscriptions = this.subscriptions.filter(sub => 
@@ -188,6 +221,10 @@ export default {
       )
       this.sort(this.sortKey)
     },
+    /**
+     * Sort subscriptions by specified key
+     * @param {string} key - Column key to sort by
+     */
     sort(key) {
       this.sortOrder = this.sortKey === key ? 
         this.sortOrder === 'asc' ? 'desc' : 'asc' : 'asc'
@@ -203,6 +240,12 @@ export default {
         return this.sortOrder === 'desc' ? comparison * -1 : comparison
       })
     },
+    /**
+     * Get value for sorting from subscription object
+     * @param {Object} sub - Subscription object
+     * @param {string} key - Sort key
+     * @returns {any} Value to sort by
+     */
     getSortValue(sub, key) {
       if (key === 'startDate' || key === 'endDate') {
         return new Date(sub[key] || 0).getTime()
@@ -212,10 +255,20 @@ export default {
       }
       return sub[key] || ''
     },
+    /**
+     * Get icon class for sort indicator
+     * @param {string} key - Column key
+     * @returns {string} Bootstrap icon class
+     */
     getSortIconClass(key) {
       if (this.sortKey !== key) return 'bi bi-arrow-down-up'
       return this.sortOrder === 'asc' ? 'bi bi-sort-up' : 'bi bi-sort-down'
     },
+    /**
+     * Format date to localized string
+     * @param {string} date - ISO date string
+     * @returns {string} Formatted date
+     */
     formatDate(date) {
       return new Date(date).toLocaleDateString('en-US', {
         year: 'numeric',
@@ -223,10 +276,20 @@ export default {
         day: 'numeric'
       })
     },
+    /**
+     * Format currency value
+     * @param {number} amount - Currency amount
+     * @returns {string} Formatted currency string
+     */
     formatCurrency(amount) {
       if (amount === null || amount === undefined) return '0.00';
       return (Math.round(amount * 100) / 100).toFixed(2);
     },
+    /**
+     * Check if subscription is expiring within 7 days
+     * @param {Object} sub - Subscription object
+     * @returns {boolean} True if expiring soon
+     */
     isExpiringSoon(sub) {
       if (!sub.endDate) return false
       const daysUntilExpiry = Math.ceil(
@@ -234,10 +297,20 @@ export default {
       )
       return daysUntilExpiry <= 7 && daysUntilExpiry > 0
     },
+    /**
+     * Get CSS class for status badge
+     * @param {Object} sub - Subscription object
+     * @returns {string} Bootstrap badge class
+     */
     getStatusClass(sub) {
       if (!sub.endDate) return 'bg-success'
       return this.isExpiringSoon(sub) ? 'bg-warning' : 'bg-info'
     },
+    /**
+     * Get status display text
+     * @param {Object} sub - Subscription object
+     * @returns {string} Status text
+     */
     getStatusText(sub) {
       if (!sub.endDate) return 'Active'
       const daysLeft = Math.ceil(
@@ -245,6 +318,11 @@ export default {
       )
       return daysLeft > 0 ? `${daysLeft} days left` : 'Expired'
     },
+    /**
+     * Get status tooltip text
+     * @param {Object} sub - Subscription object
+     * @returns {string} Tooltip text
+     */
     getStatusTitle(sub) {
       if (!sub.endDate) return 'Ongoing subscription'
       return this.isExpiringSoon(sub) ? 'Subscription ending soon' : 'Fixed term subscription'

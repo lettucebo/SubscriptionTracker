@@ -91,6 +91,11 @@ export default {
     await this.fetchCategories();
   },
   methods: {
+    /**
+     * Fetch categories from API
+     * @async
+     * @returns {Promise<void>}
+     */
     async fetchCategories() {
       try {
         const response = await axios.get(`${config.baseUrl}/api/category`);
@@ -99,10 +104,20 @@ export default {
         console.error('Error fetching categories:', error);
       }
     },
+    /**
+     * Set up category for editing
+     * @param {Object} category - Category object to edit
+     */
     editCategory(category) {
       this.editingCategory = category;
       this.formData = { ...category };
     },
+    /**
+     * Delete a category by ID
+     * @async
+     * @param {number} id - ID of category to delete
+     * @returns {Promise<void>}
+     */
     async deleteCategory(id) {
       if (confirm('Are you sure you want to delete this category?')) {
         try {
@@ -113,6 +128,11 @@ export default {
         }
       }
     },
+    /**
+     * Handle form submission for create/update
+     * @async
+     * @returns {Promise<void>}
+     */
     async submitForm() {
       try {
         if (this.editingCategory) {
@@ -126,6 +146,9 @@ export default {
         console.error('Error saving category:', error);
       }
     },
+    /**
+     * Close modal and reset form
+     */
     closeModal() {
       this.showCreateForm = false;
       this.editingCategory = null;
