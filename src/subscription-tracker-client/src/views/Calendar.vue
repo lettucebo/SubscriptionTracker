@@ -165,17 +165,19 @@ export default {
 
         // Add months based on billing cycle
         switch (subscription.billingCycle) {
-          case 'Monthly':
+          case 'Monthly'.toLowerCase():
             currentDate.setMonth(currentDate.getMonth() + 1);
             break;
-          // case 'Quarterly':
-          //   currentDate.setMonth(currentDate.getMonth() + 3);
-          //   break;
-          // case 'Annually':
-          //   currentDate.setFullYear(currentDate.getFullYear() + 1);
-          //   break;
+          case 'Quarterly'.toLowerCase():
+            currentDate.setMonth(currentDate.getMonth() + 3);
+            break;
+          case 'Yearly'.toLowerCase():
+            currentDate.setFullYear(currentDate.getFullYear() + 1);
+            break;
           default:
             currentDate.setMonth(currentDate.getMonth() + 1);
+            console.warn(`Unknown billing cycle: ${subscription.billingCycle}`);
+            break;
         }
       }
       return events;
