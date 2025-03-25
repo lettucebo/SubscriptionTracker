@@ -84,29 +84,48 @@ namespace SubscriptionTracker.Api.Controllers
         /// <response code="404">If category not found</response>
         /// <response code="409">If concurrency conflict occurs</response>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, Category category)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] Category category)
         {
-            if (id != category.Id)
+            if (!ModelState.IsValid)
             {
-                return BadRequest();
+                return BadRequest(ModelState);
             }
 
-            _context.Entry(category).State = EntityState.Modified;
+            if (id != category.Id)
+            {
+                return BadRequest("ID mismatch");
+            }
+
+            var existingCategory = await _context.Categories.FindAsync(id);
+            if (existingCategory == null)
+            {
+                return NotFound();
+            }
+
+            // Explicitly update allowed fields
+            existingCategory.Name = category.Name;
+            existingCategory.Description = category.Description;
+            existingCategory.ColorCode = category.ColorCode;
 
             try
             {
                 await _context.SaveChangesAsync();
             }
-            catch (DbUpdateConcurrencyException)
+            catch (DbUpdateConcurrencyException ex)
             {
                 if (!CategoryExists(id))
                 {
                     return NotFound();
                 }
-                throw;
+                return StatusCode(409, "Concurrency conflict: " + ex.Message);
+            }
+            catch (Exception ex)
+            {
+                return StatusCode(500, "Internal server error: " + ex.Message);
             }
 
-            return NoContent();
+            await _context.Entry(existingCategory).ReloadAsync();
+            return Ok(await _context.Categories.FindAsync(id));
         }
 
         /// <summary>
