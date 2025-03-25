@@ -1,0 +1,116 @@
+:root {
+  /* Primary colors */
+  --bs-primary-rgb: 13, 110, 253;
+  --bs-primary-lighter: #e6f0ff;
+  --bs-primary-darker: #0257d5;
+  
+  /* Calendar event colors */
+  --calendar-entertainment: #ff4d4d;
+  --calendar-utilities: #4d94ff;
+  --calendar-software: #47d147;
+  --calendar-other: #ff944d;
+  
+  /* Animation durations */
+  --transition-speed: 0.2s;
+  
+  /* Custom shadows */
+  --shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
+  --shadow-md: 0 .5rem 1rem rgba(0, 0, 0, .15);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .175);
+  
+  /* Custom border radiuses */
+  --border-radius-sm: 0.25rem;
+  --border-radius-md: 0.5rem;
+  --border-radius-lg: 0.75rem;
+  --border-radius-xl: 1rem;
+  --border-radius-pill: 50rem;
+}
+
+/* Optional: Dark mode variables (can be activated with a class on the body) */
+.dark-mode {
+  --bs-primary-rgb: 82, 161, 255;
+  --bs-primary-lighter: #1e293b;
+  --bs-primary-darker: #90caf9;
+  
+  /* Other dark mode colors */
+  --bs-dark-bg: #121212;
+  --bs-dark-surface: #1e1e1e;
+  --bs-dark-text: #e0e0e0;
+}
+
+/* Bootstrap components overrides */
+.btn {
+  transition: all var(--transition-speed) ease;
+}
+
+.btn-primary, .bg-primary {
+  background-color: rgb(var(--bs-primary-rgb)) !important;
+}
+
+.text-primary {
+  color: rgb(var(--bs-primary-rgb)) !important;
+}
+
+.btn-outline-primary {
+  border-color: rgb(var(--bs-primary-rgb)) !important;
+  color: rgb(var(--bs-primary-rgb)) !important;
+}
+
+.btn-outline-primary:hover {
+  background-color: rgb(var(--bs-primary-rgb)) !important;
+  color: white !important;
+}
+
+.rounded-custom {
+  border-radius: var(--border-radius-md);
+}
+
+/* Calendar specific custom styles */
+.fc-event {
+  border-radius: var(--border-radius-md) !important;
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.fade-in {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+/* Box shadows for all cards */
+.card {
+  transition: all var(--transition-speed) ease;
+  box-shadow: var(--shadow-sm);
+}
+
+.card:hover {
+  box-shadow: var(--shadow-md);
+}
+
+/* High contrast focus styles for accessibility */
+:focus {
+  outline: 3px solid rgba(var(--bs-primary-rgb), 0.5) !important;
+  outline-offset: 2px !important;
+}
+
+.form-control:focus, .btn:focus {
+  box-shadow: 0 0 0 0.25rem rgba(var(--bs-primary-rgb), 0.25) !important;
+}
+
+/* Custom gradient text */
+.text-gradient {
+  background: linear-gradient(135deg, #0d6efd 0%, #7366ff 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  text-fill-color: transparent;
+}
