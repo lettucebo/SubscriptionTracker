@@ -7,12 +7,12 @@
       </button>
     </div>
 
-    <!-- Category Table -->
     <table class="table table-hover">
       <thead>
         <tr>
           <th><i class="fas fa-tag me-2"></i>Name</th>
           <th><i class="fas fa-info me-2"></i>Description</th>
+          <th><i class="fas fa-palette me-2"></i>Color</th>
           <th>Actions</th>
         </tr>
       </thead>
@@ -20,6 +20,10 @@
         <tr v-for="category in categories" :key="category.id">
           <td>{{ category.name }}</td>
           <td>{{ category.description }}</td>
+          <td>
+            <div class="color-preview" :style="{'background-color': category.colorCode}"></div>
+            {{ category.colorCode }}
+          </td>
           <td>
             <button @click="editCategory(category)" class="btn btn-sm btn-warning me-2">
               <i class="fas fa-pen-to-square me-1"></i>Edit
@@ -53,6 +57,25 @@
                 <label><i class="fas fa-info me-2"></i>Description</label>
                 <textarea v-model="formData.description" class="form-control"></textarea>
               </div>
+              <div class="form-group">
+                <label><i class="fas fa-palette me-2"></i>Color</label>
+                <div class="color-picker-container">
+                  <input 
+                    v-model="formData.colorCode" 
+                    type="color" 
+                    class="form-control color-input"
+                  >
+                  <div class="color-suggestions">
+                    <div 
+                      v-for="color in suggestedColors" 
+                      :key="color" 
+                      class="color-suggestion" 
+                      :style="{'background-color': color}"
+                      @click="formData.colorCode = color"
+                    ></div>
+                  </div>
+                </div>
+              </div>
               <div class="modal-footer">
                 <button type="button" class="btn btn-secondary" @click="closeModal">
                   <i class="fas fa-times me-2"></i>Cancel
@@ -72,7 +95,7 @@
 
 <script>
 import axios from 'axios';
-import { config } from '@/config'
+import { config } from '@/config';
 
 export default {
   name: 'CategoriesManagement',
@@ -83,19 +106,21 @@ export default {
       editingCategory: null,
       formData: {
         name: '',
-        description: ''
-      }
+        description: '',
+        colorCode: '#3A86FF'
+      },
+      suggestedColors: [
+        '#E63946', '#F28C28', '#FFBE0B', '#70B77E',
+        '#00A8E8', '#3A86FF', '#6A4C93', '#FFB6B9',
+        '#8ECAE6', '#95D5B2', '#F7D6E0', '#1D3557',
+        '#2D3A3A', '#5E503F', '#6C757D'
+      ]
     };
   },
   async created() {
     await this.fetchCategories();
   },
   methods: {
-    /**
-     * Fetch categories from API
-     * @async
-     * @returns {Promise<void>}
-     */
     async fetchCategories() {
       try {
         const response = await axios.get(`${config.baseUrl}/api/category`);
@@ -104,20 +129,10 @@ export default {
         console.error('Error fetching categories:', error);
       }
     },
-    /**
-     * Set up category for editing
-     * @param {Object} category - Category object to edit
-     */
     editCategory(category) {
       this.editingCategory = category;
       this.formData = { ...category };
     },
-    /**
-     * Delete a category by ID
-     * @async
-     * @param {number} id - ID of category to delete
-     * @returns {Promise<void>}
-     */
     async deleteCategory(id) {
       if (confirm('Are you sure you want to delete this category?')) {
         try {
@@ -128,11 +143,6 @@ export default {
         }
       }
     },
-    /**
-     * Handle form submission for create/update
-     * @async
-     * @returns {Promise<void>}
-     */
     async submitForm() {
       try {
         if (this.editingCategory) {
@@ -146,13 +156,14 @@ export default {
         console.error('Error saving category:', error);
       }
     },
-    /**
-     * Close modal and reset form
-     */
     closeModal() {
       this.showCreateForm = false;
       this.editingCategory = null;
-      this.formData = { name: '', description: '' };
+      this.formData = { 
+        name: '', 
+        description: '',
+        colorCode: '#3A86FF'
+      };
     }
   }
 };
@@ -161,5 +172,46 @@ export default {
 <style scoped>
 .modal {
   background-color: rgba(0, 0, 0, 0.5);
+}
+
+.color-preview {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  display: inline-block;
+  margin-right: 8px;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+}
+
+.color-input {
+  height: 40px;
+  width: 100%;
+  padding: 5px;
+  cursor: pointer;
+}
+
+.color-picker-container {
+  position: relative;
+}
+
+.color-suggestions {
+  display: flex;
+  flex-wrap: wrap;
+  margin-top: 10px;
+  gap: 8px;
+}
+
+.color-suggestion {
+  width: 30px;
+  height: 30px;
+  border-radius: 4px;
+  cursor: pointer;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: transform 0.2s;
+}
+
+.color-suggestion:hover {
+  transform: scale(1.1);
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
 }
 </style>
