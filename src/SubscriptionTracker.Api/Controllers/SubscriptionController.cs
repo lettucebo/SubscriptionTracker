@@ -11,8 +11,23 @@ using System.Threading.Tasks;
 namespace SubscriptionTracker.Api.Controllers
 {
     /// <summary>
-    /// Controller for managing subscription services.
+    /// REST API controller for managing subscription lifecycle operations
     /// </summary>
+    /// <remarks>
+    /// <para>This controller provides:</para>
+    /// <list type="bullet">
+    /// <item><description>Full CRUD operations for subscriptions</description></item>
+    /// <item><description>Financial metric calculations</description></item>
+    /// <item><description>Date management features</description></item>
+    /// <item><description>Category-based filtering</description></item>
+    /// </list>
+    /// <para>Uses:</para>
+    /// <list type="bullet">
+    /// <item><description>Entity Framework Core for data access</description></item>
+    /// <item><description>Repository pattern for data management</description></item>
+    /// <item><description>SubscriptionCalculator for financial logic</description></item>
+    /// </list>
+    /// </remarks>
     [ApiController]
     [Route("api/[controller]")]
     public class SubscriptionController : ControllerBase
@@ -29,11 +44,15 @@ namespace SubscriptionTracker.Api.Controllers
         }
 
         /// <summary>
-        /// Gets all subscriptions with optional filtering by category and sorts by remaining days.
+        /// Retrieves all subscriptions with optional category filtering
         /// </summary>
-        /// <param name="categoryId">Optional category ID to filter subscriptions by.</param>
-        /// <returns>A list of subscriptions with computed remaining days.</returns>
-        /// <response code="200">Returns the list of subscriptions</response>
+        /// <param name="categoryId">Optional category identifier for filtering</param>
+        /// <returns>
+        /// List of subscriptions with calculated financial metrics and category details,
+        /// ordered by remaining days in ascending order
+        /// </returns>
+        /// <response code="200">Successfully retrieved subscriptions list</response>
+        /// <response code="500">Internal server error</response>
         [HttpGet]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -79,12 +98,15 @@ namespace SubscriptionTracker.Api.Controllers
         }
 
         /// <summary>
-        /// Gets a subscription by its unique identifier.
+        /// Retrieves a single subscription by its unique identifier
         /// </summary>
-        /// <param name="id">The identifier of the subscription.</param>
-        /// <returns>The subscription if found; otherwise, NotFound.</returns>
-        /// <response code="200">Returns the requested subscription</response>
+        /// <param name="id">Subscription identifier (integer)</param>
+        /// <returns>
+        /// Complete subscription details including calculated metrics and category information
+        /// </returns>
+        /// <response code="200">Successfully retrieved subscription details</response>
         /// <response code="404">Subscription not found</response>
+        /// <response code="400">Invalid identifier format</response>
         [HttpGet("{id}")]
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -125,12 +147,15 @@ namespace SubscriptionTracker.Api.Controllers
         }
 
         /// <summary>
-        /// Creates a new subscription.
+        /// Creates a new subscription entry
         /// </summary>
-        /// <param name="subscription">The subscription object to create.</param>
-        /// <returns>The created subscription.</returns>
-        /// <response code="201">Returns the newly created subscription</response>
-        /// <response code="400">Invalid input data</response>
+        /// <param name="subscription">
+        /// Subscription data including amount, billing cycle, and optional category
+        /// </param>
+        /// <returns>Newly created subscription with calculated metrics</returns>
+        /// <response code="201">Subscription created successfully</response>
+        /// <response code="400">Invalid input data or validation failure</response>
+        /// <response code="500">Database update error</response>
         [HttpPost]
         [Consumes("application/json")]
         [Produces("application/json")]
@@ -173,14 +198,17 @@ namespace SubscriptionTracker.Api.Controllers
         }
 
         /// <summary>
-        /// Updates an existing subscription.
+        /// Updates an existing subscription's details
         /// </summary>
-        /// <param name="id">The identifier of the subscription to update.</param>
-        /// <param name="subscription">The updated subscription object.</param>
-        /// <returns>NoContent if update is successful; otherwise, NotFound or BadRequest.</returns>
-        /// <response code="204">Update successful</response>
-        /// <response code="400">ID mismatch</response>
+        /// <param name="id">Subscription identifier to update</param>
+        /// <param name="subscription">Updated subscription data</param>
+        /// <returns>
+        /// No content response if successful, error details otherwise
+        /// </returns>
+        /// <response code="204">Subscription updated successfully</response>
+        /// <response code="400">ID mismatch or invalid data</response>
         /// <response code="404">Subscription not found</response>
+        /// <response code="409">Concurrency conflict</response>
         [HttpPut("{id}")]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -219,12 +247,15 @@ namespace SubscriptionTracker.Api.Controllers
         }
 
         /// <summary>
-        /// Deletes a subscription by its unique identifier.
+        /// Permanently deletes a subscription
         /// </summary>
-        /// <param name="id">The identifier of the subscription to delete.</param>
-        /// <returns>NoContent if deletion is successful; otherwise, NotFound.</returns>
-        /// <response code="204">Deletion successful</response>
+        /// <param name="id">Subscription identifier to delete</param>
+        /// <returns>
+        /// No content response if successful, error details otherwise
+        /// </returns>
+        /// <response code="204">Subscription deleted successfully</response>
         /// <response code="404">Subscription not found</response>
+        /// <response code="500">Deletion operation failed</response>
         [HttpDelete("{id}")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -245,14 +276,17 @@ namespace SubscriptionTracker.Api.Controllers
         }
 
         /// <summary>
-        /// Updates the start date for a subscription.
+        /// Updates subscription start date and recalculates metrics
         /// </summary>
-        /// <returns>True if the subscription exists; otherwise, false.</returns>
-        /// <param name="id">The identifier of the subscription to update.</param>
-        /// <param name="startDate">The new start date.</param>
-        /// <returns>NoContent if update is successful; otherwise, NotFound.</returns>
-        /// <response code="204">Update successful</response>
+        /// <param name="id">Subscription identifier</param>
+        /// <param name="startDate">New effective start date (UTC)</param>
+        /// <returns>
+        /// No content response if successful, error details otherwise
+        /// </returns>
+        /// <response code="204">Start date updated successfully</response>
+        /// <response code="400">Invalid date format</response>
         /// <response code="404">Subscription not found</response>
+        /// <response code="409">Concurrency conflict</response>
         [HttpPut("{id}/dates")]
         [Consumes("application/json")]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
@@ -285,6 +319,16 @@ namespace SubscriptionTracker.Api.Controllers
             return NoContent();
         }
 
+        /// <summary>
+        /// Checks existence of a subscription in the database
+        /// </summary>
+        /// <param name="id">Subscription identifier to verify</param>
+        /// <returns>
+        /// True if subscription exists, false otherwise
+        /// </returns>
+        /// <remarks>
+        /// Internal helper method used for concurrency checks
+        /// </remarks>
         private bool SubscriptionExists(int id)
         {
             return _context.Subscriptions.Any(s => s.Id == id);
