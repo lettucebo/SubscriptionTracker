@@ -470,6 +470,11 @@ const getEventColor = (category) => {
   border-radius: 8px;
 }
 
+/* Make "Calendar View" heading black */
+.header-container h1.mb-0.fw-bold {
+  color: #000;
+}
+
 /* Header with gradient */
 .bg-gradient {
   background: linear-gradient(135deg, var(--bs-primary) 0%, #7366ff 100%);
