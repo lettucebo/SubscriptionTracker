@@ -9,14 +9,14 @@
         <div>
           <h1 class="mb-0 fw-bold">Calendar View</h1>
           <p class="text-muted mb-0 d-none d-md-block">
-            <i class="fas fa-info-circle me-1"></i> 
+            <i class="fas fa-info-circle me-1"></i>
             Track your subscription payments at a glance
           </p>
         </div>
       </div>
       <div>
         <button @click="refreshCalendar" class="btn btn-outline-primary btn-lg rounded-pill" :disabled="loading">
-          <i class="fas fa-sync-alt me-1" :class="{'fa-spin': loading}"></i>
+          <i class="fas fa-sync-alt me-1" :class="{ 'fa-spin': loading }"></i>
           <span class="ms-1 d-none d-md-inline">Refresh</span>
         </button>
       </div>
@@ -38,7 +38,8 @@
       </p>
     </div>
 
-    <div v-else-if="error" class="alert alert-danger shadow-sm rounded-3 border-start border-danger border-5" role="alert">
+    <div v-else-if="error" class="alert alert-danger shadow-sm rounded-3 border-start border-danger border-5"
+      role="alert">
       <div class="d-flex align-items-center">
         <i class="fas fa-exclamation-triangle fa-2x me-3 text-danger"></i>
         <div>
@@ -53,31 +54,15 @@
         <div class="card-header bg-transparent border-0 pt-3">
           <div class="d-flex justify-content-between align-items-center mx-2">
             <div class="calendar-legend d-none d-md-flex">
-              <span class="legend-item me-3">
-                <span class="color-dot" style="background-color: #ff4d4d;"></span>
-                Entertainment
-              </span>
-              <span class="legend-item me-3">
-                <span class="color-dot" style="background-color: #4d94ff;"></span>
-                Utilities
-              </span>
-              <span class="legend-item me-3">
-                <span class="color-dot" style="background-color: #47d147;"></span>
-                Software
-              </span>
-              <span class="legend-item">
-                <span class="color-dot" style="background-color: #ff944d;"></span>
-                Other
+              <span v-for="category in uniqueCategories" :key="category.name" class="legend-item me-3">
+                <span class="color-dot" :style="{ backgroundColor: category.color }"></span>
+                {{ category.name }}
               </span>
             </div>
-                      </div>
+          </div>
         </div>
         <div class="card-body p-0 p-md-3">
-          <FullCalendar 
-            ref="fullCalendar"
-            :options="calendarOptions"
-            class="calendar-container" 
-          />
+          <FullCalendar ref="fullCalendar" :options="calendarOptions" class="calendar-container" />
         </div>
       </div>
     </div>
@@ -100,7 +85,7 @@
                 <span>{{ error }}</span>
               </div>
             </div>
-            
+
             <div class="subscription-details mb-4 p-3 rounded-3 bg-light">
               <h6 class="text-primary mb-2">
                 <i class="fas fa-tag me-2"></i>
@@ -108,7 +93,7 @@
               </h6>
               <div class="d-flex justify-content-between">
                 <div class="text-muted">
-                  <i class="fas fa-dollar-sign me-1"></i> 
+                  <i class="fas fa-dollar-sign me-1"></i>
                   {{ editEvent.amount ? editEvent.amount.toFixed(2) : '0.00' }}
                 </div>
                 <div>
@@ -119,7 +104,7 @@
                 </div>
               </div>
             </div>
-            
+
             <div class="mb-4">
               <label class="form-label fw-bold">
                 <i class="far fa-calendar-alt me-2 text-primary"></i>
@@ -129,12 +114,8 @@
                 <span class="input-group-text bg-light border-end-0">
                   <i class="fas fa-calendar-day text-primary"></i>
                 </span>
-                <input 
-                  type="date" 
-                  class="form-control border-start-0" 
-                  v-model="editEvent.startDate" 
-                  :disabled="updating"
-                >
+                <input type="date" class="form-control border-start-0" v-model="editEvent.startDate"
+                  :disabled="updating">
               </div>
               <div class="form-text mt-2">
                 <i class="fas fa-info-circle me-1 text-primary"></i>
@@ -143,7 +124,8 @@
             </div>
           </div>
           <div class="modal-footer bg-light">
-            <button type="button" class="btn btn-outline-secondary rounded-pill" @click="closeModal" :disabled="updating">
+            <button type="button" class="btn btn-outline-secondary rounded-pill" @click="closeModal"
+              :disabled="updating">
               <i class="fas fa-times me-1"></i>
               Cancel
             </button>
@@ -222,10 +204,26 @@ export default {
       fetchEvents()
     }
 
-const getEventColor = (category) => {
-  if (!category) return '#808080';
-  return category.colorCode || '#808080';
-}
+    // Define standard colors for category types
+    const categoryColors = {
+      'Entertainment': '#ff4d4d',
+      'Utilities': '#4d94ff',
+      'Software': '#47d147',
+      'Other': '#ff944d',
+      // Default fallback color
+      'default': '#808080'
+    };
+
+    const getEventColor = (category) => {
+      if (!category) return categoryColors.default;
+      
+      if (typeof category === 'object' && category.colorCode) {
+        return category.colorCode;
+      }
+      
+      const categoryName = typeof category === 'string' ? category : (category.name || '');
+      return categoryColors[categoryName] || categoryColors.default;
+    }
 
     /**
      * Generate recurring calendar events from subscription data
@@ -238,6 +236,8 @@ const getEventColor = (category) => {
       const endDate = new Date();
       endDate.setMonth(endDate.getMonth() + 12); // Show next 12 months
 
+      const categoryColor = getEventColor(subscription.category);
+
       let currentDate = new Date(startDate);
       while (currentDate <= endDate) {
         events.push({
@@ -249,10 +249,10 @@ const getEventColor = (category) => {
             subscriptionId: subscription.id,
             amount: subscription.amount,
             billingCycle: subscription.billingCycle,
-            isRecurring: true
+            isRecurring: true,
           },
-          backgroundColor: getEventColor(subscription.category?.name),
-          borderColor: getEventColor(subscription.category?.name)
+          backgroundColor: categoryColors.default,
+          borderColor: categoryColor
         });
 
         // Add months based on billing cycle
@@ -275,9 +275,23 @@ const getEventColor = (category) => {
       return events;
     };
 
-    const calendarEvents = computed(() => 
+    const calendarEvents = computed(() =>
       subscriptions.value.flatMap(sub => generateRecurringEvents(sub))
     )
+
+    // Extract unique categories from subscriptions for legend
+    const uniqueCategories = computed(() => {
+      const categoryMap = new Map();
+      
+      subscriptions.value.forEach(sub => {
+        if (sub.category?.name) {
+          console.log(sub.category.name, getEventColor(sub.category));
+          categoryMap.set(sub.category.name, getEventColor(sub.category));
+        }
+      });
+      
+      return Array.from(categoryMap).map(([name, color]) => ({ name, color }));
+    });
 
     /**
      * Handle calendar event click
@@ -351,25 +365,25 @@ const getEventColor = (category) => {
     // Get appropriate icon for billing cycle
     const getBillingCycleIcon = (billingCycle) => {
       if (!billingCycle) return 'fas fa-question-circle';
-      
+
       const cycle = billingCycle.toLowerCase();
       if (cycle.includes('month')) return 'fas fa-sync-alt';
       if (cycle.includes('quarter')) return 'fas fa-calendar-alt';
       if (cycle.includes('year') || cycle.includes('annual')) return 'fas fa-calendar-check';
       return 'fas fa-clock';
     }
-    
+
     // Get appropriate badge class for billing cycle
     const getBillingCycleBadgeClass = (billingCycle) => {
       if (!billingCycle) return 'bg-secondary';
-      
+
       const cycle = billingCycle.toLowerCase();
       if (cycle.includes('month')) return 'bg-primary';
       if (cycle.includes('quarter')) return 'bg-info';
       if (cycle.includes('year') || cycle.includes('annual')) return 'bg-success';
       return 'bg-secondary';
     }
-    
+
     // Set calendar view
     const setCalendarView = (view) => {
       if (fullCalendar.value) {
@@ -425,8 +439,8 @@ const getEventColor = (category) => {
                 <i class="${getBillingCycleIcon(arg.event.extendedProps.billingCycle)} me-1"></i>
                 ${arg.event.extendedProps.billingCycle ? arg.event.extendedProps.billingCycle : ''}
               </span>
-              ${updating.value && arg.event.id === editEvent.value.id ? 
-                '<div class="spinner-border spinner-border-sm text-white mt-1" role="status"></div>' : ''}
+              ${updating.value && arg.event.id === editEvent.value.id ?
+            '<div class="spinner-border spinner-border-sm text-white mt-1" role="status"></div>' : ''}
             </div>
           </div>
         `
@@ -451,7 +465,8 @@ const getEventColor = (category) => {
       setCalendarView,
       currentView,
       getBillingCycleIcon,
-      getBillingCycleBadgeClass
+      getBillingCycleBadgeClass,
+      uniqueCategories
     }
   }
 }
@@ -535,9 +550,11 @@ const getEventColor = (category) => {
   0% {
     opacity: 0.6;
   }
+
   50% {
     opacity: 1;
   }
+
   100% {
     opacity: 0.6;
   }
@@ -610,7 +627,8 @@ const getEventColor = (category) => {
   opacity: 0.8;
 }
 
-:deep(.fc-prev-button), :deep(.fc-next-button) {
+:deep(.fc-prev-button),
+:deep(.fc-next-button) {
   background-color: white !important;
   border-color: #e9ecef !important;
   color: var(--bs-primary) !important;
@@ -714,25 +732,25 @@ const getEventColor = (category) => {
   :deep(.fc-toolbar-title) {
     font-size: 1.2rem !important;
   }
-  
+
   .header-container {
     flex-direction: column;
     align-items: flex-start;
   }
-  
+
   .header-container .btn-group {
     margin-top: 1rem;
     align-self: flex-end;
   }
-  
+
   :deep(.fc-daygrid-day) {
     min-height: 80px;
   }
-  
+
   :deep(.fc-daygrid-day-events) {
     margin-bottom: 5px !important;
   }
-  
+
   :deep(.fc-event) {
     margin-left: 4px !important;
     margin-right: 4px !important;
