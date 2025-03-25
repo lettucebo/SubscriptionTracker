@@ -4,10 +4,10 @@
     <div class="header-container mb-4 p-3 bg-gradient rounded shadow-sm">
       <div class="d-flex align-items-center">
         <div class="calendar-icon-wrapper me-3">
-          <i class="fas fa-calendar-alt"></i>
+          <i class="fas fa-calendar"></i>
         </div>
         <div>
-          <h1 class="mb-0 fw-bold">Calendar View</h1>
+          <h1 class="mb-0">Calendar View</h1>
           <p class="text-muted mb-0 d-none d-md-block">
             <i class="fas fa-info-circle me-1"></i>
             Track your subscription payments at a glance
@@ -200,29 +200,54 @@ export default {
       }
     }
 
-    const refreshCalendar = () => {
-      fetchEvents()
+    const refreshCalendar = async () => {
+      loading.value = true
+      error.value = null
+      try {
+        await fetchCategories()
+        await fetchEvents()
+      } catch (err) {
+        error.value = 'Failed to refresh calendar. Please try again.'
+        console.error('Error refreshing calendar:', err)
+      } finally {
+        loading.value = false
+      }
     }
 
-    // Define standard colors for category types
-    const categoryColors = {
-      'Entertainment': '#ff4d4d',
-      'Utilities': '#4d94ff',
-      'Software': '#47d147',
-      'Other': '#ff944d',
-      // Default fallback color
-      'default': '#808080'
-    };
+    const categories = ref([]);
+    
+    /**
+     * Fetch categories from API
+     * @async
+     */
+    const fetchCategories = async () => {
+      try {
+        const response = await axios.get(`${config.baseUrl}/api/category`)
+        categories.value = response.data
+      } catch (err) {
+        console.error('Error fetching categories:', err)
+      }
+    }
 
     const getEventColor = (category) => {
-      if (!category) return categoryColors.default;
+      if (!category) return '#808080'; // Default gray color
       
-      if (typeof category === 'object' && category.colorCode) {
-        return category.colorCode;
+      // If we have a direct colorCode, use it
+      if (typeof category === 'object') {
+        if (category.colorCode) {
+          return category.colorCode;
+        }
+        
+        // Find matching category from fetched categories
+        if (category.id) {
+          const match = categories.value.find(c => c.id === category.id);
+          if (match?.colorCode) {
+            return match.colorCode;
+          }
+        }
       }
       
-      const categoryName = typeof category === 'string' ? category : (category.name || '');
-      return categoryColors[categoryName] || categoryColors.default;
+      return '#808080'; // Fallback to default gray
     }
 
     /**
@@ -251,19 +276,20 @@ export default {
             billingCycle: subscription.billingCycle,
             isRecurring: true,
           },
-          backgroundColor: categoryColors.default,
+          backgroundColor: categoryColor,
           borderColor: categoryColor
         });
 
         // Add months based on billing cycle
-        switch (subscription.billingCycle) {
-          case 'Monthly'.toLowerCase():
+        const cycle = subscription.billingCycle?.toLowerCase();
+        switch (cycle) {
+          case 'monthly':
             currentDate.setMonth(currentDate.getMonth() + 1);
             break;
-          case 'Quarterly'.toLowerCase():
+          case 'quarterly':
             currentDate.setMonth(currentDate.getMonth() + 3);
             break;
-          case 'Yearly'.toLowerCase():
+          case 'yearly':
             currentDate.setFullYear(currentDate.getFullYear() + 1);
             break;
           default:
@@ -447,8 +473,9 @@ export default {
       })
     }))
 
-    onMounted(() => {
-      fetchEvents()
+    onMounted(async () => {
+      await fetchCategories()
+      await fetchEvents()
     })
 
     return {
@@ -466,7 +493,8 @@ export default {
       currentView,
       getBillingCycleIcon,
       getBillingCycleBadgeClass,
-      uniqueCategories
+      uniqueCategories,
+      fetchCategories
     }
   }
 }
@@ -493,7 +521,7 @@ export default {
 /* Header with gradient */
 .bg-gradient {
   background: linear-gradient(135deg, var(--bs-primary) 0%, #7366ff 100%);
-  color: white;
+  /* color: white; */
 }
 
 /* Calendar icon in header */
@@ -510,7 +538,6 @@ export default {
 
 .calendar-icon-wrapper i {
   font-size: 24px;
-  color: white;
 }
 
 /* Calendar container styling */
