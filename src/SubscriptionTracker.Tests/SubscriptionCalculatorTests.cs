@@ -9,7 +9,7 @@ namespace SubscriptionTracker.Tests
     public class SubscriptionCalculatorTests
     {
         [DataTestMethod]
-        [DataRow("yearly", 120, 0.1, 9.0)]
+        [DynamicData(nameof(GetYearlyTestData), DynamicDataSourceType.Method)]
         public void CalculateEffectiveMonthlyPrice_ForYearly_ReturnsCorrectPrice(string billingCycle, decimal amount, decimal discountRate, decimal expectedMonthlyPrice)
         {
             // Act
@@ -19,7 +19,7 @@ namespace SubscriptionTracker.Tests
         }
 
         [DataTestMethod]
-        [DataRow("monthly", 15)]
+        [DynamicData(nameof(GetMonthlyTestData), DynamicDataSourceType.Method)]
         public void CalculateEffectiveMonthlyPrice_ForMonthly_ReturnsSameAmount(string billingCycle, decimal amount)
         {
             // Act
@@ -88,7 +88,7 @@ namespace SubscriptionTracker.Tests
         // Additional test cases for increased coverage
 
         [DataTestMethod]
-        [DataRow("yearly", 240, 0.2, 16.0)] // Additional test for yearly cycle with different parameters
+        [DynamicData(nameof(GetYearlyAdditionalTestData), DynamicDataSourceType.Method)]
         public void CalculateEffectiveMonthlyPrice_ForYearly_AdditionalTest(string billingCycle, decimal amount, decimal discountRate, decimal expectedMonthlyPrice)
         {
             // Act
@@ -98,7 +98,7 @@ namespace SubscriptionTracker.Tests
         }
 
         [DataTestMethod]
-        [DataRow("monthly", 50)] // Additional test for monthly cycle
+        [DynamicData(nameof(GetMonthlyAdditionalTestData), DynamicDataSourceType.Method)]
         public void CalculateEffectiveMonthlyPrice_ForMonthly_AdditionalTest(string billingCycle, decimal amount)
         {
             // Act
@@ -117,6 +117,26 @@ namespace SubscriptionTracker.Tests
             var result = SubscriptionCalculator.CalculateRemainingDays(today, pastDate, "monthly");
             // Assert (negative difference)
             result.Should().Be(-5);
+        }
+
+        public static IEnumerable<object[]> GetYearlyTestData()
+        {
+            yield return new object[] { "yearly", 120M, 0.1M, 9.0M };
+        }
+
+        public static IEnumerable<object[]> GetMonthlyTestData()
+        {
+            yield return new object[] { "monthly", 15M };
+        }
+
+        public static IEnumerable<object[]> GetYearlyAdditionalTestData()
+        {
+            yield return new object[] { "yearly", 240M, 0.2M, 16.0M };
+        }
+
+        public static IEnumerable<object[]> GetMonthlyAdditionalTestData()
+        {
+            yield return new object[] { "monthly", 50M };
         }
     }
 }
