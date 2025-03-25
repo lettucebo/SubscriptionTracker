@@ -1,6 +1,3 @@
-using System;
-using SubscriptionTracker.Service.Models;
-
 namespace SubscriptionTracker.Service.Services
 {
     public class SubscriptionCalculator
