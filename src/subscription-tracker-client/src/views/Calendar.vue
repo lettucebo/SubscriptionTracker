@@ -222,15 +222,10 @@ export default {
       fetchEvents()
     }
 
-    const getEventColor = (category) => {
-      const colors = {
-        'Entertainment': '#ff4d4d',
-        'Utilities': '#4d94ff',
-        'Software': '#47d147',
-        'Other': '#ff944d'
-      }
-      return colors[category] || '#808080'
-    }
+const getEventColor = (category) => {
+  if (!category) return '#808080';
+  return category.colorCode || '#808080';
+}
 
     /**
      * Generate recurring calendar events from subscription data

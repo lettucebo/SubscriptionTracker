@@ -35,6 +35,10 @@ namespace SubscriptionTracker.Service.Data
             // Configure Category entity
             modelBuilder.Entity<Category>(entity =>
             {
+                entity.Property(c => c.ColorCode)
+                    .HasMaxLength(7)
+                    .HasDefaultValue("#3A86FF");
+
                 entity.Property(c => c.Name)
                     .HasMaxLength(50)
                     .IsRequired();
@@ -73,11 +77,11 @@ namespace SubscriptionTracker.Service.Data
 
             // Seed categories
             modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Entertainment", Description = "Streaming and entertainment services" },
-                new Category { Id = 2, Name = "Music", Description = "Music streaming services" },
-                new Category { Id = 3, Name = "Shopping", Description = "Shopping and delivery services" },
-                new Category { Id = 4, Name = "Productivity", Description = "Work and productivity tools" },
-                new Category { Id = 5, Name = "Design", Description = "Design and creative tools" }
+                new Category { Id = 1, Name = "Entertainment", Description = "Streaming and entertainment services", ColorCode = "#E63946" },
+                new Category { Id = 2, Name = "Music", Description = "Music streaming services", ColorCode = "#6A4C93" },
+                new Category { Id = 3, Name = "Shopping", Description = "Shopping and delivery services", ColorCode = "#F28C28" },
+                new Category { Id = 4, Name = "Productivity", Description = "Work and productivity tools", ColorCode = "#70B77E" },
+                new Category { Id = 5, Name = "Design", Description = "Design and creative tools", ColorCode = "#3A86FF" }
             );
 
             // Seed 10 sample subscriptions
