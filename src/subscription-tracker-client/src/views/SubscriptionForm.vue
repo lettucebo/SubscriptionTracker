@@ -266,6 +266,11 @@ export default {
       set: (val) => subscription.value.discountRate = val / 100
     })
 
+    /**
+     * Handle form submission
+     * @async
+     * @returns {Promise<void>}
+     */
     const submitForm = async () => {
       showError.value = true
       
