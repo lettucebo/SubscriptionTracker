@@ -1,0 +1,90 @@
+name: Release Deployment
+
+on:
+  push:
+    tags:
+      - 'v*'  # Trigger on any tag that starts with 'v'
+
+jobs:
+  build-and-deploy:
+    name: Build and Deploy Applications
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Extract tag version
+        id: get_version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      # Setup .NET for backend build
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v3
+        with:
+          dotnet-version: 8.0.x
+
+      # Setup Node.js for frontend build
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: 'src/subscription-tracker-client/package-lock.json'
+
+      # Build backend
+      - name: Build backend
+        run: |
+          dotnet restore src/SubscriptionTracker.sln
+          dotnet build src/SubscriptionTracker.sln --configuration Release --no-restore
+          dotnet publish src/SubscriptionTracker.Api/SubscriptionTracker.Api.csproj -c Release -o ./publish/api
+
+      # Build frontend
+      - name: Build frontend
+        run: |
+          cd src/subscription-tracker-client
+          npm ci
+          npm run build
+
+      # Login to Azure
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}
+
+      # Set environment variables
+      - name: Set environment variables
+        id: set_variables
+        run: |
+          echo "RESOURCE_GROUP=SubTracker" >> $GITHUB_OUTPUT
+          echo "WEBAPP_NAME=subtracker-app" >> $GITHUB_OUTPUT
+          echo "STATIC_WEBAPP_NAME=subtracker-stapp" >> $GITHUB_OUTPUT
+
+      # Deploy backend to Azure Web App
+      - name: Deploy backend to Azure Web App
+        uses: azure/webapps-deploy@v2
+        with:
+          app-name: ${{ steps.set_variables.outputs.WEBAPP_NAME }}
+          package: ./publish/api
+
+      # Deploy frontend to Azure Static Web App
+      - name: Deploy frontend to Static Web App
+        run: |
+          # Zip the frontend build output
+          cd src/subscription-tracker-client/dist
+          zip -r ../../../frontend-${{ steps.get_version.outputs.VERSION }}.zip .
+          cd ../../../
+
+          # Deploy to Static Web App using Azure CLI
+          az staticwebapp deploy \
+            --name ${{ steps.set_variables.outputs.STATIC_WEBAPP_NAME }} \
+            --source-path frontend-${{ steps.get_version.outputs.VERSION }}.zip \
+            --resource-group ${{ steps.set_variables.outputs.RESOURCE_GROUP }}
+
+      # Post-deployment verification
+      - name: Post-deployment verification
+        run: |
+          echo "Deployment completed successfully!"
+          echo "Version deployed: ${{ steps.get_version.outputs.VERSION }}"
+          echo "Backend deployed to: ${{ steps.set_variables.outputs.WEBAPP_NAME }}"
+          echo "Frontend deployed to: ${{ steps.set_variables.outputs.STATIC_WEBAPP_NAME }}"
