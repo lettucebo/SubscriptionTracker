@@ -1,7 +1,7 @@
 # 訂閱服務追蹤系統
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
-![Build](https://github.com/lettucebo/SubscriptionTracker/actions/workflows/dotnetbuild.yml/badge.svg)
+![Build](https://github.com/lettucebo/SubscriptionTracker/actions/workflows/build.yml/badge.svg)
 
 ## 系統設計目標
 整合 ASP.NET Core 後端與 Vue 3 前端，實現以下核心功能：
