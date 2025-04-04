@@ -50,8 +50,8 @@
     </div>
 
     <div v-else>
-      <div class="card shadow border-0 rounded-3 mb-4">
-        <div class="card-header bg-transparent border-0 pt-3">
+      <div class="card shadow border-0 rounded-3 mb-4" :class="{ 'dark-card': $root.darkMode }">
+        <div class="card-header bg-transparent border-0 pt-3" :class="{ 'dark-card-header': $root.darkMode }">
           <div class="d-flex justify-content-between align-items-center mx-2">
             <div class="calendar-legend d-none d-md-flex">
               <span v-for="category in uniqueCategories" :key="category.name" class="legend-item me-3">
@@ -61,7 +61,7 @@
             </div>
           </div>
         </div>
-        <div class="card-body p-0 p-md-3">
+        <div class="card-body p-0 p-md-3" :class="{ 'dark-card-body': $root.darkMode }">
           <FullCalendar ref="fullCalendar" :options="calendarOptions" class="calendar-container" />
         </div>
       </div>
@@ -70,15 +70,15 @@
     <!-- Edit Subscription Modal with enhanced styling -->
     <div class="modal fade" :class="{ show: isModalOpen, 'd-block': isModalOpen }" tabindex="-1">
       <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content shadow border-0 rounded-3 overflow-hidden">
-          <div class="modal-header bg-gradient text-white">
+        <div class="modal-content shadow border-0 rounded-3 overflow-hidden" :class="{ 'dark-modal-content': $root.darkMode }">
+          <div class="modal-header bg-gradient text-white" :class="{ 'dark-modal-header': $root.darkMode }">
             <h5 class="modal-title d-flex align-items-center">
               <i class="fas fa-edit me-2"></i>
               Edit Subscription
             </h5>
             <button type="button" class="btn-close btn-close-white" @click="closeModal"></button>
           </div>
-          <div class="modal-body p-4">
+          <div class="modal-body p-4" :class="{ 'dark-modal-body': $root.darkMode }">
             <div v-if="error" class="alert alert-danger mb-3 rounded-3 border-start border-danger border-5">
               <div class="d-flex">
                 <i class="fas fa-exclamation-triangle me-2 mt-1"></i>
@@ -86,7 +86,7 @@
               </div>
             </div>
 
-            <div class="subscription-details mb-4 p-3 rounded-3 bg-light">
+            <div class="subscription-details mb-4 p-3 rounded-3" :class="{ 'bg-light': !$root.darkMode, 'dark-subscription-details': $root.darkMode }">
               <h6 class="text-primary mb-2">
                 <i class="fas fa-tag me-2"></i>
                 {{ editEvent.title || 'Subscription Details' }}
@@ -123,7 +123,7 @@
               </div>
             </div>
           </div>
-          <div class="modal-footer bg-light">
+          <div class="modal-footer" :class="{ 'bg-light': !$root.darkMode, 'dark-modal-footer': $root.darkMode }">
             <button type="button" class="btn btn-outline-secondary rounded-pill" @click="closeModal"
               :disabled="updating">
               <i class="fas fa-times me-1"></i>
@@ -215,7 +215,7 @@ export default {
     }
 
     const categories = ref([]);
-    
+
     /**
      * Fetch categories from API
      * @async
@@ -231,13 +231,13 @@ export default {
 
     const getEventColor = (category) => {
       if (!category) return '#808080'; // Default gray color
-      
+
       // If we have a direct colorCode, use it
       if (typeof category === 'object') {
         if (category.colorCode) {
           return category.colorCode;
         }
-        
+
         // Find matching category from fetched categories
         if (category.id) {
           const match = categories.value.find(c => c.id === category.id);
@@ -246,7 +246,7 @@ export default {
           }
         }
       }
-      
+
       return '#808080'; // Fallback to default gray
     }
 
@@ -308,14 +308,14 @@ export default {
     // Extract unique categories from subscriptions for legend
     const uniqueCategories = computed(() => {
       const categoryMap = new Map();
-      
+
       subscriptions.value.forEach(sub => {
         if (sub.category?.name) {
           console.log(sub.category.name, getEventColor(sub.category));
           categoryMap.set(sub.category.name, getEventColor(sub.category));
         }
       });
-      
+
       return Array.from(categoryMap).map(([name, color]) => ({ name, color }));
     });
 
@@ -500,7 +500,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .calendar-view {
   margin-top: 2rem;
   padding: 0 1rem;
@@ -521,7 +521,11 @@ export default {
 /* Header with gradient */
 .bg-gradient {
   background: linear-gradient(135deg, var(--bs-primary) 0%, #7366ff 100%);
-  /* color: white; */
+  color: white;
+}
+
+.dark-mode .bg-gradient {
+  background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
 }
 
 /* Calendar icon in header */
@@ -545,6 +549,12 @@ export default {
   background-color: white;
   padding: 1rem;
   border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .calendar-container {
+  background-color: var(--bs-dark-surface);
+  color: #e0e0e0;
 }
 
 /* Color legend styling */
@@ -558,6 +568,11 @@ export default {
   align-items: center;
   font-size: 0.875rem;
   color: #6c757d;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .legend-item {
+  color: #adb5bd;
 }
 
 .color-dot {
@@ -594,6 +609,32 @@ export default {
   --fc-event-border-color: transparent;
   --fc-list-event-hover-bg-color: rgba(var(--bs-primary-rgb), 0.1);
   --fc-page-bg-color: transparent;
+}
+
+.dark-mode :deep(.fc) {
+  --fc-border-color: #444;
+  --fc-today-bg-color: rgba(var(--bs-primary-rgb), 0.2);
+  --fc-event-border-color: transparent;
+  --fc-list-event-hover-bg-color: rgba(var(--bs-primary-rgb), 0.2);
+  --fc-page-bg-color: transparent;
+}
+
+.dark-mode :deep(.fc-day) {
+  background-color: var(--bs-dark-surface);
+}
+
+.dark-mode :deep(.fc-col-header-cell) {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.dark-mode :deep(.fc-daygrid-day-number) {
+  color: #e0e0e0;
+}
+
+.dark-mode :deep(.fc-toolbar-title) {
+  color: #e0e0e0;
 }
 
 :deep(.fc-event) {
@@ -667,10 +708,23 @@ export default {
   justify-content: center !important;
   padding: 0 !important;
   font-size: 0.8rem !important;
+  transition: background-color 0.3s ease, border-color 0.3s ease !important;
+}
+
+.dark-mode :deep(.fc-prev-button),
+.dark-mode :deep(.fc-next-button) {
+  background-color: var(--bs-dark-surface) !important;
+  border-color: var(--bs-dark-border) !important;
+  color: var(--bs-dark-text) !important;
 }
 
 :deep(.fc-day-other) {
   background-color: #f8f9fa;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode :deep(.fc-day-other) {
+  background-color: rgba(0, 0, 0, 0.3);
 }
 
 :deep(.fc-day-today) {
@@ -695,6 +749,11 @@ export default {
   font-weight: 500;
   color: #495057;
   font-size: 0.9rem;
+  transition: color 0.3s ease;
+}
+
+.dark-mode :deep(.fc-daygrid-day-number) {
+  color: var(--bs-dark-text);
 }
 
 :deep(.fc-daygrid-day-top) {
@@ -705,6 +764,11 @@ export default {
 :deep(.fc-col-header-cell) {
   background-color: rgba(var(--bs-primary-rgb), 0.05);
   padding: 10px 0;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode :deep(.fc-col-header-cell) {
+  background-color: rgba(0, 0, 0, 0.2);
 }
 
 :deep(.fc-col-header-cell-cushion) {
@@ -748,6 +812,12 @@ export default {
 .subscription-details {
   border-left: 4px solid var(--bs-primary);
   background-color: #f8f9fa;
+  transition: background-color 0.3s ease, border-color 0.3s ease;
+}
+
+.dark-mode .subscription-details {
+  background-color: rgba(255, 255, 255, 0.05);
+  border-left: 4px solid rgb(var(--bs-primary-rgb));
 }
 
 @media (max-width: 768px) {
@@ -792,6 +862,55 @@ export default {
 
 .rounded-pill {
   transition: all 0.2s ease;
+}
+
+/* Dark mode card styles */
+.dark-card {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-card-header {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-card-body {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+}
+
+/* Dark mode modal styles */
+.dark-modal-content {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-modal-header {
+  border-color: #444 !important;
+}
+
+.dark-modal-body {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-modal-footer {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-subscription-details {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .legend-item {
+  color: #e0e0e0 !important;
 }
 
 .rounded-pill:hover {
