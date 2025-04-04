@@ -1,0 +1,181 @@
+/**
+ * Dark mode overrides with high specificity
+ * These styles will take precedence over Bootstrap's styles
+ */
+
+/* Table styles - with extremely high specificity */
+html body.dark-mode div.subscriptions div.table-responsive table.table,
+html body.dark-mode div.categories table.categories-table {
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+  background-color: var(--bs-dark-surface) !important;
+}
+
+html body.dark-mode div.subscriptions div.table-responsive table.table thead,
+html body.dark-mode div.subscriptions div.table-responsive table.table thead.table-light,
+html body.dark-mode div.subscriptions div.table-responsive table.table thead tr,
+html body.dark-mode div.categories table.categories-table thead,
+html body.dark-mode div.categories table.categories-table thead.table-light,
+html body.dark-mode div.categories table.categories-table thead tr {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+html body.dark-mode div.subscriptions div.table-responsive table.table th,
+html body.dark-mode div.categories table.categories-table th {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+html body.dark-mode div.subscriptions div.table-responsive table.table td,
+html body.dark-mode div.categories table.categories-table td {
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+  background-color: transparent !important;
+}
+
+html body.dark-mode div.subscriptions div.table-responsive table.table tbody tr,
+html body.dark-mode div.categories table.categories-table tbody tr {
+  background-color: var(--bs-dark-surface) !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+html body.dark-mode div.subscriptions div.table-responsive table.table tbody tr:hover,
+html body.dark-mode div.categories table.categories-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+html body.dark-mode div.subscriptions div.table-responsive table.table tbody tr:nth-of-type(odd),
+html body.dark-mode div.categories table.categories-table tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.2) !important;
+}
+
+/* Badge styles */
+html body.dark-mode .badge.bg-secondary,
+html body.dark-mode div.subscriptions table.table .badge.bg-secondary {
+  background-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+html body.dark-mode .badge.bg-info,
+html body.dark-mode div.subscriptions table.table .badge.bg-info {
+  background-color: #0dcaf0 !important;
+  color: #000 !important;
+}
+
+html body.dark-mode .badge.bg-success,
+html body.dark-mode div.subscriptions table.table .badge.bg-success {
+  background-color: #198754 !important;
+  color: #fff !important;
+}
+
+html body.dark-mode .badge.bg-warning,
+html body.dark-mode div.subscriptions table.table .badge.bg-warning {
+  background-color: #ffc107 !important;
+  color: #000 !important;
+}
+
+/* Category badges */
+html body.dark-mode div.subscriptions table.table span.badge[class*="bg-"] {
+  color: #000 !important;
+  font-weight: 500 !important;
+}
+
+/* Modal styles */
+html body.dark-mode .modal-content,
+html body.dark-mode div.categories .modal-content {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+html body.dark-mode .modal-header,
+html body.dark-mode div.categories .modal-header {
+  border-color: #444 !important;
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+html body.dark-mode .modal-footer,
+html body.dark-mode div.categories .modal-footer {
+  border-color: #444 !important;
+  background-color: #2d2d2d !important;
+}
+
+html body.dark-mode .modal-body,
+html body.dark-mode div.categories .modal-body {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+}
+
+html body.dark-mode .btn-close,
+html body.dark-mode div.categories .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+/* Form controls */
+body.dark-mode .form-control,
+html body.dark-mode div.categories .form-control {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+body.dark-mode .form-control:focus {
+  background-color: #333 !important;
+  border-color: rgb(var(--bs-primary-rgb)) !important;
+}
+
+/* Calendar styles */
+html body.dark-mode div.calendar-view .fc-toolbar-title {
+  color: #e0e0e0 !important;
+}
+
+html body.dark-mode div.calendar-view .fc-col-header-cell {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+html body.dark-mode div.calendar-view .fc-daygrid-day {
+  background-color: var(--bs-dark-surface) !important;
+  border-color: #444 !important;
+}
+
+html body.dark-mode div.calendar-view .fc-daygrid-day-number {
+  color: #e0e0e0 !important;
+}
+
+html body.dark-mode div.calendar-view .fc-button-primary {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+html body.dark-mode div.calendar-view .fc-button-primary:hover {
+  background-color: #444 !important;
+}
+
+html body.dark-mode div.calendar-view .fc-button-active {
+  background-color: var(--bs-primary) !important;
+}
+
+/* Card styles */
+body.dark-mode .card {
+  background-color: var(--bs-dark-surface) !important;
+  border-color: #2d2d2d !important;
+  color: var(--bs-dark-text) !important;
+}
+
+/* Text styles */
+body.dark-mode .text-muted {
+  color: #adb5bd !important;
+}
+
+/* Border styles */
+body.dark-mode .border {
+  border-color: #2d2d2d !important;
+}

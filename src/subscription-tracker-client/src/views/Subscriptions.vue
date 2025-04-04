@@ -13,10 +13,10 @@
     </div>
 
     <div class="mb-3">
-      <input 
-        type="text" 
-        v-model="searchQuery" 
-        class="form-control" 
+      <input
+        type="text"
+        v-model="searchQuery"
+        class="form-control"
         placeholder="Search subscriptions..."
         @input="filterSubscriptions"
       >
@@ -37,47 +37,47 @@
     </div>
 
     <div v-else class="table-responsive">
-      <table class="table table-hover border">
-      <thead class="table-light">
+      <table class="table table-hover border subscription-table">
+      <thead class="table-light subscription-table-header" :class="{ 'dark-header': $root.darkMode }">
         <tr>
-          <th @click="sort('name')" class="sortable">
+          <th @click="sort('name')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
             Name <i :class="getSortIconClass('name')"></i>
           </th>
-          <th @click="sort('billingCycle')" class="sortable">
+          <th @click="sort('billingCycle')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
             Billing Cycle <i :class="getSortIconClass('billingCycle')"></i>
           </th>
-          <th @click="sort('amount')" class="sortable">
+          <th @click="sort('amount')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
             Amount <i :class="getSortIconClass('amount')"></i>
           </th>
-          <th @click="sort('effectiveMonthlyPrice')" class="sortable">
+          <th @click="sort('effectiveMonthlyPrice')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
             Monthly Cost <i :class="getSortIconClass('effectiveMonthlyPrice')"></i>
           </th>
-          <th @click="sort('startDate')" class="sortable">
+          <th @click="sort('startDate')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
             Date Range <i :class="getSortIconClass('startDate')"></i>
           </th>
-          <th @click="sort('category.name')" class="sortable">
+          <th @click="sort('category.name')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
             Category <i :class="getSortIconClass('category.name')"></i>
           </th>
-          <th>Status</th>
-          <th>Actions</th>
+          <th :class="{ 'dark-th': $root.darkMode }">Status</th>
+          <th :class="{ 'dark-th': $root.darkMode }">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="sub in filteredSubscriptions" :key="sub.id">
-          <td>
+        <tr v-for="sub in filteredSubscriptions" :key="sub.id" :class="{ 'dark-row': $root.darkMode }">
+          <td :class="{ 'dark-cell': $root.darkMode }">
             <div class="d-flex align-items-center">
               <span class="subscription-name">{{ sub.name }}</span>
             </div>
           </td>
-          <td class="text-capitalize">
+          <td class="text-capitalize" :class="{ 'dark-cell': $root.darkMode }">
             <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
           </td>
-          <td>
+          <td :class="{ 'dark-cell': $root.darkMode }">
             <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
             ${{ formatCurrency(sub.amount) }}
           </td>
-          <td>${{ formatCurrency(sub.effectiveMonthlyPrice) }}</td>
-          <td>
+          <td :class="{ 'dark-cell': $root.darkMode }">${{ formatCurrency(sub.effectiveMonthlyPrice) }}</td>
+          <td :class="{ 'dark-cell': $root.darkMode }">
             <div class="small">
               {{ formatDate(sub.startDate) }}
               <br>
@@ -86,31 +86,31 @@
               </span>
             </div>
           </td>
-          <td>
+          <td :class="{ 'dark-cell': $root.darkMode }">
             <span class="badge bg-info">
               {{ sub.category?.name }}
             </span>
           </td>
-          <td>
-            <span 
-              class="badge" 
+          <td :class="{ 'dark-cell': $root.darkMode }">
+            <span
+              class="badge"
               :class="getStatusClass(sub)"
               :title="getStatusTitle(sub)"
             >
               {{ getStatusText(sub) }}
             </span>
           </td>
-          <td>
+          <td :class="{ 'dark-cell': $root.darkMode }">
             <div class="btn-group">
-              <router-link 
-                :to="`/subscription-form/${sub.id}`" 
+              <router-link
+                :to="`/subscription-form/${sub.id}`"
                 class="btn btn-sm btn-outline-primary"
                 title="Edit"
               >
                 <i class="fas fa-pen-to-square"></i>
               </router-link>
-              <button 
-                @click="deleteSubscription(sub.id)" 
+              <button
+                @click="deleteSubscription(sub.id)"
                 class="btn btn-sm btn-outline-danger"
                 title="Delete"
               >
@@ -214,7 +214,7 @@ export default {
      */
     filterSubscriptions() {
       const query = this.searchQuery.toLowerCase()
-      this.filteredSubscriptions = this.subscriptions.filter(sub => 
+      this.filteredSubscriptions = this.subscriptions.filter(sub =>
         sub.name.toLowerCase().includes(query) ||
         (sub.category?.name || '').toLowerCase().includes(query) ||
         sub.billingCycle.toLowerCase().includes(query)
@@ -226,15 +226,15 @@ export default {
      * @param {string} key - Column key to sort by
      */
     sort(key) {
-      this.sortOrder = this.sortKey === key ? 
+      this.sortOrder = this.sortKey === key ?
         this.sortOrder === 'asc' ? 'desc' : 'asc' : 'asc'
       this.sortKey = key
-      
+
       this.filteredSubscriptions.sort((a, b) => {
         let comparison = 0
         const aVal = this.getSortValue(a, key)
         const bVal = this.getSortValue(b, key)
-        
+
         if (aVal > bVal) comparison = 1
         if (aVal < bVal) comparison = -1
         return this.sortOrder === 'desc' ? comparison * -1 : comparison
@@ -331,7 +331,7 @@ export default {
 }
 </script>
 
-<style scoped>
+<style>
 .subscriptions {
   margin-top: 2rem;
   padding: 0 1rem;
@@ -345,9 +345,13 @@ export default {
 .sortable {
   cursor: pointer;
   user-select: none;
+  transition: background-color 0.3s ease;
 }
 .sortable:hover {
   background-color: rgba(0, 0, 0, 0.05);
+}
+.dark-mode .sortable:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 .subscription-name {
   font-weight: 500;
@@ -355,6 +359,10 @@ export default {
 .table-responsive {
   border-radius: 0.25rem;
   box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  transition: box-shadow 0.3s ease;
+}
+.dark-mode .table-responsive {
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
 }
 .table {
   margin-bottom: 0;
@@ -365,6 +373,105 @@ th {
 .btn-group {
   display: flex;
   gap: 0.25rem;
+}
+
+/* Dark mode specific styles */
+.dark-mode .table-light,
+.dark-mode .subscription-table-header {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+/* Direct style overrides for dark mode */
+.dark-mode .subscription-table {
+  color: #e0e0e0 !important;
+  background-color: var(--bs-dark-surface) !important;
+}
+
+.dark-header {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-row {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-row:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark-cell {
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+  background-color: transparent !important;
+}
+
+.dark-th {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-mode .subscription-table th {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-mode .subscription-table td {
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-mode .subscription-table tr {
+  background-color: var(--bs-dark-surface) !important;
+}
+
+.dark-mode .subscription-table tr:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+:deep(.dark-mode .table-hover tbody tr:hover) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+  color: #e0e0e0 !important;
+}
+
+:deep(.dark-mode .badge.bg-secondary) {
+  background-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+:deep(.dark-mode .text-muted) {
+  color: #adb5bd !important;
+}
+
+:deep(.dark-mode .subscription-table) {
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+:deep(.dark-mode .subscription-table th) {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+:deep(.dark-mode .subscription-table td) {
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+:deep(.dark-mode .subscription-table tr) {
+  background-color: var(--bs-dark-surface) !important;
+  border-color: #444 !important;
+}
+
+:deep(.dark-mode .subscription-table tr:hover) {
+  background-color: rgba(255, 255, 255, 0.05) !important;
 }
 @media (max-width: 768px) {
   .table-responsive {

@@ -28,7 +28,7 @@
             </div>
           </div>
         </div>
-        
+
         <div class="col-md-6 col-lg-3">
           <div class="stat-card">
             <div class="stat-card-body">
@@ -180,7 +180,7 @@ export default {
         const categorySubscriptions = subscriptions.value.filter(sub => {
           return sub.category?.id === category.id
         })
-        
+
         const monthlyTotal = categorySubscriptions.reduce((total, sub) => {
           if (sub.billingCycle === 'yearly') {
             return total + ((sub.amount * (1 - (sub.discountRate || 0))) / 12)
@@ -231,12 +231,14 @@ export default {
   background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
   border-radius: 1rem;
   margin-bottom: 3rem;
+  transition: background 0.3s ease, color 0.3s ease;
 }
 
 .hero-section h1 {
   font-size: 2.5rem;
   margin-bottom: 1rem;
   color: #2c3e50;
+  transition: color 0.3s ease;
 }
 
 .hero-section .lead {
@@ -244,13 +246,26 @@ export default {
   color: #6c757d;
   max-width: 600px;
   margin: 0 auto;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .hero-section {
+  background: linear-gradient(135deg, #1e1e1e 0%, #121212 100%);
+}
+
+.dark-mode .hero-section h1 {
+  color: var(--bs-dark-text);
+}
+
+.dark-mode .hero-section .lead {
+  color: #adb5bd;
 }
 
 .stat-card {
   background: white;
   border-radius: 1rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
-  transition: transform 0.2s;
+  transition: transform 0.2s, background-color 0.3s ease, color 0.3s ease;
   height: 100%;
 }
 
@@ -266,6 +281,7 @@ export default {
   font-size: 1rem;
   color: #6c757d;
   margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
 }
 
 .stat-card-number {
@@ -273,18 +289,42 @@ export default {
   font-weight: bold;
   color: #2c3e50;
   margin: 0;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .stat-card {
+  background-color: var(--bs-dark-surface);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode .stat-card-title {
+  color: #adb5bd;
+}
+
+.dark-mode .stat-card-number {
+  color: var(--bs-dark-text);
 }
 
 .card {
   border-radius: 1rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
   height: 100%;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease, border-color 0.3s ease;
+}
+
+.dark-mode .card {
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
 }
 
 .card-title {
   font-size: 1.25rem;
   color: #2c3e50;
   margin-bottom: 1.5rem;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .card-title {
+  color: var(--bs-dark-text);
 }
 
 .category-list {
@@ -300,11 +340,21 @@ export default {
   padding: 0.75rem;
   background: #f8f9fa;
   border-radius: 0.5rem;
+  transition: background-color 0.3s ease;
+}
+
+.dark-mode .category-item {
+  background: rgba(255, 255, 255, 0.05);
 }
 
 .category-count {
   font-weight: 500;
   color: #6c757d;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .category-count {
+  color: #adb5bd;
 }
 
 .quick-actions {

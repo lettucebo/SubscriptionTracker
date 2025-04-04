@@ -7,24 +7,24 @@
       </button>
     </div>
 
-    <table class="table table-hover">
-      <thead>
-        <tr>
-          <th><i class="fas fa-tag me-2"></i>Name</th>
-          <th><i class="fas fa-info me-2"></i>Description</th>
-          <th><i class="fas fa-palette me-2"></i>Color</th>
-          <th>Actions</th>
+    <table class="table table-hover categories-table">
+      <thead class="table-light categories-table-header" :class="{ 'dark-header': $root.darkMode }">
+        <tr :class="{ 'dark-row': $root.darkMode }">
+          <th :class="{ 'dark-th': $root.darkMode }"><i class="fas fa-tag me-2"></i>Name</th>
+          <th :class="{ 'dark-th': $root.darkMode }"><i class="fas fa-info me-2"></i>Description</th>
+          <th :class="{ 'dark-th': $root.darkMode }"><i class="fas fa-palette me-2"></i>Color</th>
+          <th :class="{ 'dark-th': $root.darkMode }">Actions</th>
         </tr>
       </thead>
       <tbody>
-        <tr v-for="category in categories" :key="category.id">
-          <td>{{ category.name }}</td>
-          <td>{{ category.description }}</td>
-          <td>
+        <tr v-for="category in categories" :key="category.id" :class="{ 'dark-row': $root.darkMode }">
+          <td :class="{ 'dark-cell': $root.darkMode }">{{ category.name }}</td>
+          <td :class="{ 'dark-cell': $root.darkMode }">{{ category.description }}</td>
+          <td :class="{ 'dark-cell': $root.darkMode }">
             <div class="color-preview" :style="{'background-color': category.colorCode}"></div>
             {{ category.colorCode }}
           </td>
-          <td>
+          <td :class="{ 'dark-cell': $root.darkMode }">
             <button @click="editCategory(category)" class="btn btn-sm btn-warning me-2">
               <i class="fas fa-pen-to-square me-1"></i>Edit
             </button>
@@ -39,44 +39,44 @@
     <!-- Create/Edit Modal -->
     <div v-if="showCreateForm || editingCategory" class="modal" style="display: block">
       <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
+        <div class="modal-content" :class="{ 'dark-modal': $root.darkMode }">
+          <div class="modal-header" :class="{ 'dark-modal-header': $root.darkMode }">
             <h5 class="modal-title">
               <i class="fas" :class="editingCategory ? 'fa-pen me-2' : 'fa-folder me-2'"></i>
               {{ editingCategory ? 'Edit Category' : 'New Category' }}
             </h5>
             <button type="button" class="btn-close" aria-label="Close" @click="closeModal"></button>
           </div>
-          <div class="modal-body">
+          <div class="modal-body" :class="{ 'dark-modal-body': $root.darkMode }">
             <form @submit.prevent="submitForm">
-              <div class="form-group">
+              <div class="form-group" :class="{ 'dark-form-group': $root.darkMode }">
                 <label><i class="fas fa-tag me-2"></i>Name</label>
                 <input v-model="formData.name" type="text" class="form-control" required>
               </div>
-              <div class="form-group">
+              <div class="form-group" :class="{ 'dark-form-group': $root.darkMode }">
                 <label><i class="fas fa-info me-2"></i>Description</label>
                 <textarea v-model="formData.description" class="form-control"></textarea>
               </div>
-              <div class="form-group">
+              <div class="form-group" :class="{ 'dark-form-group': $root.darkMode }">
                 <label><i class="fas fa-palette me-2"></i>Color</label>
                 <div class="color-picker-container">
-                  <input 
-                    v-model="formData.colorCode" 
-                    type="color" 
+                  <input
+                    v-model="formData.colorCode"
+                    type="color"
                     class="form-control color-input"
                   >
                   <div class="color-suggestions">
-                    <div 
-                      v-for="color in suggestedColors" 
-                      :key="color" 
-                      class="color-suggestion" 
+                    <div
+                      v-for="color in suggestedColors"
+                      :key="color"
+                      class="color-suggestion"
                       :style="{'background-color': color}"
                       @click="formData.colorCode = color"
                     ></div>
                   </div>
                 </div>
               </div>
-              <div class="modal-footer">
+              <div class="modal-footer" :class="{ 'dark-modal-footer': $root.darkMode }">
                 <button type="button" class="btn btn-secondary" @click="closeModal">
                   <i class="fas fa-times me-2"></i>Cancel
                 </button>
@@ -159,8 +159,8 @@ export default {
     closeModal() {
       this.showCreateForm = false;
       this.editingCategory = null;
-      this.formData = { 
-        name: '', 
+      this.formData = {
+        name: '',
         description: '',
         colorCode: '#3A86FF'
       };
@@ -169,7 +169,12 @@ export default {
 };
 </script>
 
-<style scoped>
+<style>
+.categories {
+  margin-top: 2rem;
+  padding: 0 1rem;
+}
+
 .modal {
   background-color: rgba(0, 0, 0, 0.5);
 }
@@ -213,5 +218,98 @@ export default {
 .color-suggestion:hover {
   transform: scale(1.1);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+/* Dark mode styles */
+.dark-header {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-row {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-row:hover {
+  background-color: rgba(255, 255, 255, 0.05) !important;
+}
+
+.dark-cell {
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+  background-color: transparent !important;
+}
+
+.dark-th {
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-mode .categories-table {
+  color: #e0e0e0 !important;
+  background-color: var(--bs-dark-surface) !important;
+  border-color: #444 !important;
+}
+
+.dark-mode .modal-content,
+.dark-modal {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+  border-color: #444 !important;
+}
+
+.dark-mode .modal-header,
+.dark-modal-header {
+  border-color: #444 !important;
+  background-color: #2d2d2d !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .modal-footer,
+.dark-modal-footer {
+  border-color: #444 !important;
+  background-color: #2d2d2d !important;
+}
+
+.dark-mode .modal-body,
+.dark-modal-body {
+  background-color: var(--bs-dark-surface) !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .btn-close,
+.dark-modal .btn-close {
+  filter: invert(1) grayscale(100%) brightness(200%);
+}
+
+.dark-mode .form-control {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .form-label,
+.dark-form-group label {
+  color: #e0e0e0 !important;
+}
+
+.dark-form-group input,
+.dark-form-group textarea,
+.dark-form-group select {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .color-preview {
+  border-color: rgba(255, 255, 255, 0.2) !important;
+}
+
+.dark-mode .color-suggestion {
+  border-color: rgba(255, 255, 255, 0.2) !important;
 }
 </style>

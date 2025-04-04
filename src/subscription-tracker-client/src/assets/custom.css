@@ -3,21 +3,21 @@
   --bs-primary-rgb: 13, 110, 253;
   --bs-primary-lighter: #e6f0ff;
   --bs-primary-darker: #0257d5;
-  
+
   /* Calendar event colors */
   --calendar-entertainment: #ff4d4d;
   --calendar-utilities: #4d94ff;
   --calendar-software: #47d147;
   --calendar-other: #ff944d;
-  
+
   /* Animation durations */
   --transition-speed: 0.2s;
-  
+
   /* Custom shadows */
   --shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .075);
   --shadow-md: 0 .5rem 1rem rgba(0, 0, 0, .15);
   --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .175);
-  
+
   /* Custom border radiuses */
   --border-radius-sm: 0.25rem;
   --border-radius-md: 0.5rem;
@@ -26,16 +26,43 @@
   --border-radius-pill: 50rem;
 }
 
-/* Optional: Dark mode variables (can be activated with a class on the body) */
+/* Dark mode variables (activated with a class on the body) */
 .dark-mode {
+  /* Primary colors in dark mode */
   --bs-primary-rgb: 82, 161, 255;
   --bs-primary-lighter: #1e293b;
   --bs-primary-darker: #90caf9;
-  
-  /* Other dark mode colors */
+
+  /* Core dark mode colors */
   --bs-dark-bg: #121212;
   --bs-dark-surface: #1e1e1e;
   --bs-dark-text: #e0e0e0;
+  --bs-dark-border: #2d2d2d;
+  --bs-dark-input-bg: #2d2d2d;
+  --bs-dark-input-border: #444;
+  --bs-dark-hover: #333;
+
+  /* Bootstrap overrides for dark mode */
+  --bs-table-bg: var(--bs-dark-surface);
+  --bs-table-color: var(--bs-dark-text);
+  --bs-table-border-color: #444;
+  --bs-table-striped-bg: rgba(255, 255, 255, 0.02);
+  --bs-table-striped-color: var(--bs-dark-text);
+  --bs-table-hover-bg: rgba(255, 255, 255, 0.05);
+  --bs-table-hover-color: var(--bs-dark-text);
+  --bs-table-active-bg: rgba(255, 255, 255, 0.1);
+  --bs-table-active-color: var(--bs-dark-text);
+
+  /* Calendar event colors in dark mode */
+  --calendar-entertainment: #ff6666;
+  --calendar-utilities: #66a3ff;
+  --calendar-software: #66cc66;
+  --calendar-other: #ffaa66;
+
+  /* Custom shadows for dark mode */
+  --shadow-sm: 0 .125rem .25rem rgba(0, 0, 0, .2);
+  --shadow-md: 0 .5rem 1rem rgba(0, 0, 0, .4);
+  --shadow-lg: 0 1rem 3rem rgba(0, 0, 0, .5);
 }
 
 /* Bootstrap components overrides */
@@ -113,4 +140,89 @@
   -webkit-text-fill-color: transparent;
   background-clip: text;
   text-fill-color: transparent;
+}
+
+/* Dark mode specific component styles */
+
+/* Buttons in dark mode */
+.dark-mode .btn-outline-secondary {
+  border-color: #6c757d;
+  color: #adb5bd;
+}
+
+.dark-mode .btn-outline-secondary:hover {
+  background-color: #6c757d;
+  color: #e0e0e0;
+}
+
+/* Calendar specific dark mode styles */
+.dark-mode :deep(.fc) {
+  --fc-border-color: #444;
+  --fc-page-bg-color: transparent;
+  --fc-neutral-bg-color: rgba(255, 255, 255, 0.05);
+  --fc-list-event-hover-bg-color: rgba(var(--bs-primary-rgb), 0.2);
+  --fc-today-bg-color: rgba(var(--bs-primary-rgb), 0.15);
+}
+
+.dark-mode :deep(.fc-theme-bootstrap5 .fc-scrollgrid) {
+  border-color: #444;
+}
+
+.dark-mode :deep(.fc-col-header-cell) {
+  background-color: rgba(0, 0, 0, 0.2);
+}
+
+.dark-mode :deep(.fc-day) {
+  background-color: var(--bs-dark-surface);
+}
+
+.dark-mode :deep(.fc-day-other) {
+  background-color: rgba(0, 0, 0, 0.3);
+}
+
+.dark-mode :deep(.fc-daygrid-day-number) {
+  color: var(--bs-dark-text);
+}
+
+/* Form controls in dark mode */
+.dark-mode .form-select {
+  background-color: var(--bs-dark-input-bg);
+  border-color: var(--bs-dark-input-border);
+  color: var(--bs-dark-text);
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 16 16'%3e%3cpath fill='none' stroke='%23adb5bd' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' d='m2 5 6 6 6-6'/%3e%3c/svg%3e");
+}
+
+.dark-mode .form-check-input {
+  background-color: var(--bs-dark-input-bg);
+  border-color: var(--bs-dark-input-border);
+}
+
+.dark-mode .form-check-input:checked {
+  background-color: rgb(var(--bs-primary-rgb));
+  border-color: rgb(var(--bs-primary-rgb));
+}
+
+/* Alerts in dark mode */
+.dark-mode .alert-success {
+  background-color: rgba(25, 135, 84, 0.2);
+  border-color: rgba(25, 135, 84, 0.3);
+  color: #75b798;
+}
+
+.dark-mode .alert-danger {
+  background-color: rgba(220, 53, 69, 0.2);
+  border-color: rgba(220, 53, 69, 0.3);
+  color: #ea868f;
+}
+
+.dark-mode .alert-warning {
+  background-color: rgba(255, 193, 7, 0.2);
+  border-color: rgba(255, 193, 7, 0.3);
+  color: #ffda6a;
+}
+
+.dark-mode .alert-info {
+  background-color: rgba(13, 202, 240, 0.2);
+  border-color: rgba(13, 202, 240, 0.3);
+  color: #6edff6;
 }

@@ -17,10 +17,10 @@
                     <span class="input-group-text">
                     <i class="fas fa-tag"></i>
                     </span>
-                    <input 
-                      type="text" 
-                      id="name" 
-                      class="form-control" 
+                    <input
+                      type="text"
+                      id="name"
+                      class="form-control"
                       v-model="subscription.name"
                       required
                       :class="{ 'is-invalid': showError && !subscription.name }"
@@ -39,9 +39,9 @@
                     <span class="input-group-text">
                       <i class="fas fa-folder-open"></i>
                     </span>
-                    <select 
-                      id="category" 
-                      class="form-select" 
+                    <select
+                      id="category"
+                      class="form-select"
                       v-model="subscription.categoryId"
                       required
                       :class="{ 'is-invalid': showError && !subscription.categoryId }"
@@ -63,10 +63,10 @@
                   <label for="amount" class="form-label">Amount <span class="text-danger">*</span></label>
                   <div class="input-group">
                     <span class="input-group-text">$</span>
-                    <input 
-                      type="number" 
-                      id="amount" 
-                      class="form-control" 
+                    <input
+                      type="number"
+                      id="amount"
+                      class="form-control"
                       v-model.number="subscription.amount"
                       step="0.01"
                       required
@@ -86,9 +86,9 @@
                     <span class="input-group-text">
                       <i class="bi bi-calendar"></i>
                     </span>
-                    <select 
-                      id="billingCycle" 
-                      class="form-select" 
+                    <select
+                      id="billingCycle"
+                      class="form-select"
                       v-model="subscription.billingCycle"
                       required
                       :class="{ 'is-invalid': showError && !subscription.billingCycle }"
@@ -111,10 +111,10 @@
                     <span class="input-group-text">
                       <i class="bi bi-calendar-date"></i>
                     </span>
-                    <input 
-                      type="date" 
-                      id="startDate" 
-                      class="form-control" 
+                    <input
+                      type="date"
+                      id="startDate"
+                      class="form-control"
                       v-model="subscription.startDate"
                       required
                       :class="{ 'is-invalid': showError && !subscription.startDate }"
@@ -133,10 +133,10 @@
                     <span class="input-group-text">
                       <i class="bi bi-calendar-x"></i>
                     </span>
-                    <input 
-                      type="date" 
-                      id="endDate" 
-                      class="form-control" 
+                    <input
+                      type="date"
+                      id="endDate"
+                      class="form-control"
                       v-model="subscription.endDate"
                       :min="subscription.startDate"
                     >
@@ -149,9 +149,9 @@
                 <div class="form-group">
                   <label for="discountRate" class="form-label">Yearly Discount</label>
                   <div class="input-group">
-                    <input 
-                      type="number" 
-                      id="discountRate" 
+                    <input
+                      type="number"
+                      id="discountRate"
                       class="form-control"
                       v-model.number="discountRatePercentage"
                       step="1"
@@ -211,7 +211,7 @@ export default {
       try {
         const response = await axios.get(`${config.baseUrl}/api/category`)
         categories.value = response.data
-        
+
         // If editing and the subscription's category was soft-deleted
         if (subscriptionCategoryId && !categories.value.find(c => c.id === subscriptionCategoryId)) {
           try {
@@ -250,7 +250,7 @@ export default {
 
     const effectiveMonthlyPrice = computed(() => {
       if (!subscription.value.amount) return '0.00';
-      
+
       switch (subscription.value.billingCycle?.toLowerCase()) {
         case 'yearly':
           return (Math.round((subscription.value.amount * (1 - (subscription.value.discountRate || 0))) / 12 * 100) / 100).toFixed(2);
@@ -273,7 +273,7 @@ export default {
      */
     const submitForm = async () => {
       showError.value = true
-      
+
       // Basic form validation
       if (!subscription.value.name ||
           !subscription.value.categoryId ||
@@ -296,12 +296,12 @@ export default {
       }
     }
 
-    return { 
+    return {
       subscription,
-      categories, 
+      categories,
       isEdit,
-      showError, 
-      submitForm, 
+      showError,
+      submitForm,
       effectiveMonthlyPrice,
       discountRatePercentage,
       loadCategories
@@ -328,12 +328,23 @@ export default {
 .header-section h1 {
   color: #2c3e50;
   margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .header-section h1 {
+  color: var(--bs-dark-text);
 }
 
 .form-card {
   background: white;
   border-radius: 1rem;
   box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.08);
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+}
+
+.dark-mode .form-card {
+  background-color: var(--bs-dark-surface);
+  box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.2);
 }
 
 .form-group {
@@ -344,6 +355,11 @@ export default {
   font-weight: 500;
   color: #2c3e50;
   margin-bottom: 0.5rem;
+  transition: color 0.3s ease;
+}
+
+.dark-mode .form-label {
+  color: #e0e0e0;
 }
 
 .input-group {
@@ -354,6 +370,13 @@ export default {
 .input-group-text {
   background-color: #f8f9fa;
   border-color: #dee2e6;
+  transition: background-color 0.3s ease, border-color 0.3s ease, color 0.3s ease;
+}
+
+.dark-mode .input-group-text {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #e0e0e0;
 }
 
 .form-control, .form-select {
@@ -389,7 +412,7 @@ export default {
     flex-direction: column;
     gap: 0.5rem;
   }
-  
+
   .btn {
     width: 100%;
     justify-content: center;
