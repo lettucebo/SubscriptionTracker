@@ -1,0 +1,21 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "location": {
+      "value": "japaneast"
+    },
+    "environmentName": {
+      "value": "prod"
+    },
+    "sqlAdminLogin": {
+      "value": "sqladmin"
+    },
+    "sqlAdminPassword": {
+      "value": "P@ssw0rd" // Fill this in before deployment or use Azure Key Vault reference
+    },
+    "resourceNamePrefix": {
+      "value": "SubTracker"
+    }
+  }
+}
