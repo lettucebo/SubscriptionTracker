@@ -49,12 +49,12 @@ namespace SubscriptionTracker.Service.Models
         /// Gets or sets the subscription start date.
         /// </summary>
         [Required]
-        public DateTime StartDate { get; set; }
+        public DateOnly StartDate { get; set; }
 
         /// <summary>
         /// Gets or sets the subscription end date (optional).
         /// </summary>
-        public DateTime? EndDate { get; set; }
+        public DateOnly? EndDate { get; set; }
 
         /// <summary>
         /// Gets or sets the category ID of the subscription.

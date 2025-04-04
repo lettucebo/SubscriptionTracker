@@ -51,8 +51,8 @@ namespace SubscriptionTracker.Tests
         public void CalculateRemainingDays_WithEndDate_ReturnsDaysDifference()
         {
             // Arrange
-            var today = DateTime.Today;
-            var endDate = today.AddDays(10);
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var endDate = DateOnly.FromDateTime(DateTime.Today.AddDays(10));
             // Act
             var result = SubscriptionCalculator.CalculateRemainingDays(today, endDate, "monthly");
             // Assert
@@ -66,10 +66,10 @@ namespace SubscriptionTracker.Tests
         public void CalculateRemainingDays_ForYearly_NoEndDate_ReturnsDaysUntilNextYear()
         {
             // Arrange
-            var startDate = DateTime.Today;
+            var startDate = DateOnly.FromDateTime(DateTime.Today);
             // Act
             var result = SubscriptionCalculator.CalculateRemainingDays(startDate, null, "yearly");
-            var expected = (startDate.AddYears(1) - DateTime.Today).Days;
+            var expected = DateOnly.FromDateTime(DateTime.Today.AddYears(1)).DayNumber - startDate.DayNumber;
             // Assert
             result.Should().Be(expected);
         }
@@ -81,10 +81,10 @@ namespace SubscriptionTracker.Tests
         public void CalculateRemainingDays_ForMonthly_NoEndDate_ReturnsDaysUntilNextMonth()
         {
             // Arrange
-            var startDate = DateTime.Today;
+            var startDate = DateOnly.FromDateTime(DateTime.Today);
             // Act
             var result = SubscriptionCalculator.CalculateRemainingDays(startDate, null, "monthly");
-            var expected = (startDate.AddMonths(1) - DateTime.Today).Days;
+            var expected = DateOnly.FromDateTime(DateTime.Today.AddMonths(1)).DayNumber - startDate.DayNumber;
             // Assert
             result.Should().Be(expected);
         }
@@ -96,7 +96,7 @@ namespace SubscriptionTracker.Tests
         public void CalculateRemainingDays_InvalidBillingCycle_NoEndDate_ReturnsZero()
         {
             // Arrange
-            var startDate = DateTime.Today;
+            var startDate = DateOnly.FromDateTime(DateTime.Today);
             // Act
             var result = SubscriptionCalculator.CalculateRemainingDays(startDate, null, "invalid");
             // Assert
@@ -138,8 +138,8 @@ namespace SubscriptionTracker.Tests
         public void CalculateRemainingDays_WithPastEndDate_ReturnsNegativeDays()
         {
             // Arrange
-            var today = DateTime.Today;
-            var pastDate = today.AddDays(-5);
+            var today = DateOnly.FromDateTime(DateTime.Today);
+            var pastDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-5));
             // Act
             var result = SubscriptionCalculator.CalculateRemainingDays(today, pastDate, "monthly");
             // Assert (negative difference)
