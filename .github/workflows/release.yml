@@ -16,7 +16,7 @@ jobs:
 
       - name: Extract tag version
         id: get_version
-        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+        run: echo "VERSION=${GITHUB_REF#refs/tags/}" >> $GITHUB_OUTPUT
 
       # Setup .NET for backend build
       - name: Setup .NET
@@ -70,15 +70,18 @@ jobs:
       # Deploy frontend to Azure Static Web App
       - name: Deploy frontend to Static Web App
         run: |
+          # Create directory for frontend zip if it doesn't exist
+          mkdir -p frontend-output
+
           # Zip the frontend build output
           cd src/subscription-tracker-client/dist
-          zip -r ../../../frontend-${{ steps.get_version.outputs.VERSION }}.zip .
+          zip -r ../../../frontend-output/frontend-${{ steps.get_version.outputs.VERSION }}.zip .
           cd ../../../
 
           # Deploy to Static Web App using Azure CLI
           az staticwebapp deploy \
             --name ${{ steps.set_variables.outputs.STATIC_WEBAPP_NAME }} \
-            --source-path frontend-${{ steps.get_version.outputs.VERSION }}.zip \
+            --source-path frontend-output/frontend-${{ steps.get_version.outputs.VERSION }}.zip \
             --resource-group ${{ steps.set_variables.outputs.RESOURCE_GROUP }}
 
       # Post-deployment verification
