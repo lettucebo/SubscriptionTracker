@@ -1,0 +1,12 @@
+{
+  "routes": [
+    {
+      "route": "*",
+      "methods": [
+        "get",
+        "post"
+      ],
+      "statusCode": 404
+    }
+  ]
+}
