@@ -325,9 +325,16 @@ export default {
      */
     const handleEventClick = (info) => {
       const subscriptionId = info.event.extendedProps.subscriptionId || info.event.id;
+      // Format the date as YYYY-MM-DD to ensure consistent display
+      const eventDate = info.event.start;
+      const year = eventDate.getFullYear();
+      const month = String(eventDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are 0-indexed
+      const day = String(eventDate.getDate()).padStart(2, '0');
+      const formattedDate = `${year}-${month}-${day}`;
+
       editEvent.value = {
         id: subscriptionId,
-        startDate: info.event.start.toISOString().split('T')[0],
+        startDate: formattedDate,
         title: info.event.title,
         amount: info.event.extendedProps.amount || 0,
         billingCycle: info.event.extendedProps.billingCycle || ''
@@ -353,9 +360,25 @@ export default {
       editEvent.value.id = subscriptionId;
 
       try {
-        await axios.put(`${config.baseUrl}/api/subscription/${subscriptionId}/dates`, {
-          startDate: info.event.start.toISOString()
-        })
+        // Get the date from the event and format it as YYYY-MM-DD
+        const eventDate = info.event.start;
+        const year = eventDate.getFullYear();
+        const month = String(eventDate.getMonth() + 1).padStart(2, '0'); // Add 1 because months are 0-indexed
+        const day = String(eventDate.getDate()).padStart(2, '0');
+
+        // Create a date string in ISO format with time set to midnight UTC
+        const dateString = `${year}-${month}-${day}T00:00:00.000Z`;
+
+        // Send the date as a JSON string with proper content type header
+        await axios.put(
+          `${config.baseUrl}/api/subscription/${subscriptionId}/dates`,
+          JSON.stringify(dateString),
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        )
         await fetchEvents()
       } catch (err) {
         error.value = 'Failed to update subscription dates'
@@ -375,9 +398,23 @@ export default {
       error.value = null
 
       try {
-        await axios.put(`${config.baseUrl}/api/subscription/${editEvent.value.id}/dates`, {
-          startDate: editEvent.value.startDate
-        })
+        // Parse the date string directly without timezone conversion
+        // This ensures the date is treated as-is without any timezone adjustments
+        const dateString = editEvent.value.startDate + 'T00:00:00.000Z';
+
+        // We'll send this exact date string to the server
+        // The Z suffix ensures it's treated as UTC time
+
+        // Send the date as a JSON string with proper content type header
+        await axios.put(
+          `${config.baseUrl}/api/subscription/${editEvent.value.id}/dates`,
+          JSON.stringify(dateString),
+          {
+            headers: {
+              'Content-Type': 'application/json'
+            }
+          }
+        )
         closeModal()
         await fetchEvents()
       } catch (err) {
