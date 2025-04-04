@@ -31,7 +31,7 @@ namespace SubscriptionTracker.Service.Data
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
-            
+
             // Configure Category entity
             modelBuilder.Entity<Category>(entity =>
             {
@@ -49,7 +49,7 @@ namespace SubscriptionTracker.Service.Data
                 // Soft delete configuration
                 entity.Property(c => c.IsDelete)
                     .HasDefaultValue(false);
-                
+
                 entity.Property(c => c.DeleteAt)
                     .IsRequired(false);
             });
@@ -65,14 +65,21 @@ namespace SubscriptionTracker.Service.Data
             {
                 entity.Property(s => s.Amount)
                     .HasColumnType("decimal(18,2)");
-                
+
                 entity.Property(s => s.BillingCycle)
                     .HasMaxLength(10)
                     .IsRequired();
-                
+
                 entity.Property(s => s.DiscountRate)
                     .HasColumnType("decimal(3,2)")
                     .HasDefaultValue(0m);
+
+                entity.Property(s => s.IsShared)
+                    .HasDefaultValue(false);
+
+                entity.Property(s => s.ContactInfo)
+                    .HasMaxLength(500)
+                    .IsRequired(false);
             });
 
             // Seed categories
@@ -86,28 +93,32 @@ namespace SubscriptionTracker.Service.Data
 
             // Seed 10 sample subscriptions
             modelBuilder.Entity<Subscription>().HasData(
-                new Subscription { 
-                    Id = 1, 
-                    Name = "Netflix", 
+                new Subscription {
+                    Id = 1,
+                    Name = "Netflix",
                     Amount = 15.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-30),
                     EndDate = DateTime.Today.AddDays(335),
-                    CategoryId = 1 // Entertainment
+                    CategoryId = 1, // Entertainment
+                    IsShared = true,
+                    ContactInfo = "Family plan shared with parents and siblings"
                 },
-                new Subscription { 
-                    Id = 2, 
-                    Name = "Spotify", 
+                new Subscription {
+                    Id = 2,
+                    Name = "Spotify",
                     Amount = 9.99m,
-                    BillingCycle = "monthly", 
+                    BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-15),
-                    CategoryId = 2 // Music
+                    CategoryId = 2, // Music
+                    IsShared = true,
+                    ContactInfo = "Family plan with roommates, contact: John (john@example.com)"
                 },
-                new Subscription { 
-                    Id = 3, 
-                    Name = "Amazon Prime", 
+                new Subscription {
+                    Id = 3,
+                    Name = "Amazon Prime",
                     Amount = 139.0m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.17m,
@@ -115,9 +126,9 @@ namespace SubscriptionTracker.Service.Data
                     EndDate = DateTime.Today.AddDays(305),
                     CategoryId = 3 // Shopping
                 },
-                new Subscription { 
-                    Id = 4, 
-                    Name = "Adobe Creative Cloud", 
+                new Subscription {
+                    Id = 4,
+                    Name = "Adobe Creative Cloud",
                     Amount = 52.99m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.15m,
@@ -125,36 +136,36 @@ namespace SubscriptionTracker.Service.Data
                     EndDate = DateTime.Today.AddDays(275),
                     CategoryId = 4 // Productivity
                 },
-                new Subscription { 
-                    Id = 5, 
-                    Name = "HBO Max", 
+                new Subscription {
+                    Id = 5,
+                    Name = "HBO Max",
                     Amount = 14.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-20),
                     CategoryId = 1 // Entertainment
                 },
-                new Subscription { 
-                    Id = 6, 
-                    Name = "Disney+", 
+                new Subscription {
+                    Id = 6,
+                    Name = "Disney+",
                     Amount = 7.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-10),
                     CategoryId = 1 // Entertainment
                 },
-                new Subscription { 
-                    Id = 7, 
-                    Name = "Apple Music", 
+                new Subscription {
+                    Id = 7,
+                    Name = "Apple Music",
                     Amount = 9.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
                     StartDate = DateTime.Today.AddDays(-25),
                     CategoryId = 2 // Music
                 },
-                new Subscription { 
-                    Id = 8, 
-                    Name = "Microsoft 365", 
+                new Subscription {
+                    Id = 8,
+                    Name = "Microsoft 365",
                     Amount = 6.99m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.1m,
@@ -162,9 +173,9 @@ namespace SubscriptionTracker.Service.Data
                     EndDate = DateTime.Today.AddDays(185),
                     CategoryId = 4 // Productivity
                 },
-                new Subscription { 
-                    Id = 9, 
-                    Name = "Dropbox", 
+                new Subscription {
+                    Id = 9,
+                    Name = "Dropbox",
                     Amount = 11.99m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.2m,
@@ -172,9 +183,9 @@ namespace SubscriptionTracker.Service.Data
                     EndDate = DateTime.Today.AddDays(365),
                     CategoryId = 4 // Productivity
                 },
-                new Subscription { 
-                    Id = 10, 
-                    Name = "Canva Pro", 
+                new Subscription {
+                    Id = 10,
+                    Name = "Canva Pro",
                     Amount = 12.95m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,

@@ -26,9 +26,9 @@ namespace SubscriptionTracker.Service.Models
         /// </summary>
         [Required]
     public decimal Amount { get; set; }
-    
+
     [Obsolete("Fee has been replaced by Amount")]
-    public decimal Fee { 
+    public decimal Fee {
         get => Amount;
         set => Amount = value;
     }
@@ -66,5 +66,14 @@ namespace SubscriptionTracker.Service.Models
         /// </summary>
         public Category Category { get; set; } = null!;
 
+        /// <summary>
+        /// Gets or sets a value indicating whether the subscription is shared with others.
+        /// </summary>
+        public bool IsShared { get; set; } = false;
+
+        /// <summary>
+        /// Gets or sets the contact information for shared subscriptions.
+        /// </summary>
+        public string? ContactInfo { get; set; }
     }
 }

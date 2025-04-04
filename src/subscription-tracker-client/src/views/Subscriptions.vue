@@ -58,6 +58,9 @@
           <th @click="sort('category.name')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
             Category <i :class="getSortIconClass('category.name')"></i>
           </th>
+          <th @click="sort('isShared')" class="sortable" :class="{ 'dark-th': $root.darkMode }">
+            Sharing <i :class="getSortIconClass('isShared')"></i>
+          </th>
           <th :class="{ 'dark-th': $root.darkMode }">Status</th>
           <th :class="{ 'dark-th': $root.darkMode }">Actions</th>
         </tr>
@@ -89,6 +92,14 @@
           <td :class="{ 'dark-cell': $root.darkMode }">
             <span class="badge bg-info">
               {{ sub.category?.name }}
+            </span>
+          </td>
+          <td :class="{ 'dark-cell': $root.darkMode }">
+            <span v-if="sub.isShared" class="badge bg-success" :title="sub.contactInfo">
+              <i class="fas fa-users me-1"></i> Shared
+            </span>
+            <span v-else class="badge bg-secondary">
+              <i class="fas fa-user me-1"></i> Personal
             </span>
           </td>
           <td :class="{ 'dark-cell': $root.darkMode }">
