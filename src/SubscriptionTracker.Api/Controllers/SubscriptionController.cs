@@ -57,7 +57,7 @@ namespace SubscriptionTracker.Api.Controllers
         [Produces("application/json")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         public async Task<IActionResult> GetSubscriptions(
-            [FromQuery] 
+            [FromQuery]
             int? categoryId = null)
         {
             var query = _context.Subscriptions
@@ -80,6 +80,8 @@ namespace SubscriptionTracker.Api.Controllers
                 s.EndDate,
                 s.BillingCycle,
                 s.DiscountRate,
+                s.IsShared,
+                s.ContactInfo,
                 Category = new
                 {
                     s.Category.Id,
@@ -112,7 +114,7 @@ namespace SubscriptionTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSubscription(
-            [FromRoute] 
+            [FromRoute]
             int id)
         {
             var subscription = await _context.Subscriptions
@@ -131,6 +133,8 @@ namespace SubscriptionTracker.Api.Controllers
                 subscription.EndDate,
                 subscription.BillingCycle,
                 subscription.DiscountRate,
+                subscription.IsShared,
+                subscription.ContactInfo,
                 Category = new
                 {
                     subscription.Category.Id,
@@ -142,7 +146,7 @@ namespace SubscriptionTracker.Api.Controllers
                 EffectiveMonthlyPrice = SubscriptionCalculator.CalculateEffectiveMonthlyPrice(
                     subscription.BillingCycle, subscription.Amount, subscription.DiscountRate)
             };
-            
+
             return Ok(result);
         }
 
@@ -162,7 +166,7 @@ namespace SubscriptionTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateSubscription(
-            [FromBody] 
+            [FromBody]
             Subscription subscription)
         {
             if (!ModelState.IsValid)
@@ -215,9 +219,9 @@ namespace SubscriptionTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> UpdateSubscription(
-            [FromRoute] 
+            [FromRoute]
             int id,
-            [FromBody] 
+            [FromBody]
             Subscription subscription)
         {
             if (id != subscription.Id)
@@ -260,7 +264,7 @@ namespace SubscriptionTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status204NoContent)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<IActionResult> DeleteSubscription(
-            [FromRoute] 
+            [FromRoute]
             int id)
         {
             var subscription = await _context.Subscriptions.FindAsync(id);

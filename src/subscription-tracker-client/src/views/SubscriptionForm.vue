@@ -167,6 +167,42 @@
               </div>
             </div>
 
+            <hr class="my-4">
+            <h5 class="mb-3">Sharing Options</h5>
+            <div class="row g-4">
+              <div class="col-md-6">
+                <div class="form-group">
+                  <div class="form-check form-switch">
+                    <input
+                      type="checkbox"
+                      id="isShared"
+                      class="form-check-input"
+                      v-model="subscription.isShared"
+                    >
+                    <label for="isShared" class="form-check-label">This subscription is shared with others</label>
+                  </div>
+                </div>
+              </div>
+
+              <div class="col-md-12" v-if="subscription.isShared">
+                <div class="form-group">
+                  <label for="contactInfo" class="form-label">Contact Information</label>
+                  <div class="input-group">
+                    <span class="input-group-text">
+                      <i class="fas fa-users"></i>
+                    </span>
+                    <textarea
+                      id="contactInfo"
+                      class="form-control"
+                      v-model="subscription.contactInfo"
+                      placeholder="Enter contact information for shared subscription (e.g., names, emails, phone numbers)"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                </div>
+              </div>
+            </div>
+
             <div class="form-actions mt-4">
               <router-link to="/subscriptions" class="btn btn-outline-secondary me-2">
                 Cancel
@@ -199,7 +235,9 @@ export default {
       discountRate: 0,
       startDate: '',
       endDate: null,
-      categoryId: null
+      categoryId: null,
+      isShared: false,
+      contactInfo: ''
     })
     const isEdit = ref(false)
     const showError = ref(false)
