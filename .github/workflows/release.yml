@@ -3,7 +3,7 @@ name: Release Deployment
 on:
   push:
     tags:
-      - 'v*'  # Trigger on any tag that starts with 'v'
+      - '*'  # Trigger on any tag that starts with 'v'
 
 jobs:
   build-and-deploy:
