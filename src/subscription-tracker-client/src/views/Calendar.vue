@@ -87,12 +87,12 @@
             </div>
 
             <div class="subscription-details mb-4 p-3 rounded-3" :class="{ 'bg-light': !$root.darkMode, 'dark-subscription-details': $root.darkMode }">
-              <h6 class="text-primary mb-2">
+              <h6 class="mb-2" :class="{ 'text-primary': !$root.darkMode, 'text-info': $root.darkMode }">
                 <i class="fas fa-tag me-2"></i>
                 {{ editEvent.title || 'Subscription Details' }}
               </h6>
               <div class="d-flex justify-content-between">
-                <div class="text-muted">
+                <div :class="{ 'text-muted': !$root.darkMode, 'text-light': $root.darkMode }">
                   <i class="fas fa-dollar-sign me-1"></i>
                   {{ editEvent.amount ? editEvent.amount.toFixed(2) : '0.00' }}
                 </div>
@@ -107,18 +107,18 @@
 
             <div class="mb-4">
               <label class="form-label fw-bold">
-                <i class="far fa-calendar-alt me-2 text-primary"></i>
+                <i class="far fa-calendar-alt me-2" :class="{ 'text-primary': !$root.darkMode, 'text-info': $root.darkMode }"></i>
                 Start Date
               </label>
-              <div class="input-group input-group-lg shadow-sm">
-                <span class="input-group-text bg-light border-end-0">
-                  <i class="fas fa-calendar-day text-primary"></i>
+              <div class="input-group shadow-sm date-input-group">
+                <span class="input-group-text" :class="{ 'bg-light': !$root.darkMode, 'bg-dark': $root.darkMode }">
+                  <i class="fas fa-calendar-day" :class="{ 'text-primary': !$root.darkMode, 'text-info': $root.darkMode }"></i>
                 </span>
-                <input type="date" class="form-control border-start-0" v-model="editEvent.startDate"
+                <input type="date" class="form-control" v-model="editEvent.startDate"
                   :disabled="updating">
               </div>
-              <div class="form-text mt-2">
-                <i class="fas fa-info-circle me-1 text-primary"></i>
+              <div class="form-text mt-2" :class="{ 'dark-form-text': $root.darkMode }">
+                <i class="fas fa-info-circle me-1" :class="{ 'text-primary': !$root.darkMode, 'text-info': $root.darkMode }"></i>
                 Changing this date will affect future billing cycles
               </div>
             </div>
@@ -907,6 +907,7 @@ export default {
 .dark-subscription-details {
   background-color: #2d2d2d !important;
   color: #e0e0e0 !important;
+  border-left: 4px solid rgb(var(--bs-primary-rgb)) !important;
 }
 
 .dark-mode .legend-item {
@@ -931,5 +932,59 @@ export default {
 /* Style placeholders in form controls */
 ::placeholder {
   opacity: 0.5;
+}
+
+/* Date input styling */
+.date-input-group {
+  border-radius: 0.375rem;
+  overflow: hidden;
+}
+
+.date-input-group .input-group-text {
+  border-top-right-radius: 0;
+  border-bottom-right-radius: 0;
+  border-right: 0;
+}
+
+.date-input-group .form-control {
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  border-left: 0;
+  padding: 0.5rem 1rem;
+}
+
+.dark-mode .date-input-group .input-group-text {
+  background-color: #2d2d2d;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+.dark-mode .date-input-group .form-control {
+  background-color: #333;
+  border-color: #444;
+  color: #e0e0e0;
+}
+
+/* Fix date input appearance in different browsers */
+input[type="date"]::-webkit-calendar-picker-indicator {
+  background-color: transparent;
+  cursor: pointer;
+  padding: 5px;
+  margin-right: 5px;
+  opacity: 0.7;
+}
+
+.dark-mode input[type="date"]::-webkit-calendar-picker-indicator {
+  filter: invert(1);
+}
+
+/* Dark mode form text */
+.dark-form-text {
+  color: #adb5bd !important;
+}
+
+/* Dark mode form label */
+.dark-mode .form-label {
+  color: #e0e0e0 !important;
 }
 </style>
