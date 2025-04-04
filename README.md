@@ -1,6 +1,7 @@
 # 訂閱服務追蹤系統
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
+![Build](https://github.com/lettucebo/SubscriptionTracker/actions/workflows/dotnetbuild.yml/badge.svg)
 
 ## 系統設計目標
 整合 ASP.NET Core 後端與 Vue 3 前端，實現以下核心功能：
@@ -17,14 +18,14 @@ graph TD
     A --> C[Vue Router]
     A --> D[Bootstrap 5]
     A --> E[Axios]
-    
+
     F[後端架構] --> G[ASP.NET Core 8]
     F --> H[EF Core In-Memory]
     F --> I[Swagger UI]
-    
+
     J[測試架構] --> K[MSTest]
     J --> L[Moq]
-    
+
     B --> M[元件化開發]
     G --> N[分層架構]
 ```
@@ -110,6 +111,15 @@ subscription-tracker/
 # 執行後端單元測試
 dotnet test SubscriptionTracker.Tests
 ```
+
+## 持續整合 (CI/CD)
+本專案使用 GitHub Actions 進行持續整合，確保程式碼品質與自動化測試：
+
+- **後端 CI**: 自動建置 .NET 專案並執行單元測試
+- **前端 CI**: 自動建置 Vue.js 專案並執行程式碼檢查
+- **合併 CI**: 同時執行前後端的建置與測試流程
+
+詳細配置請參閱 [.github/workflows](.github/workflows) 目錄。
 
 ## 授權條款
 MIT License - 詳見 [LICENSE](LICENSE) 文件
