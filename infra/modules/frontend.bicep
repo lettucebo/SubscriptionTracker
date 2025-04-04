@@ -12,10 +12,10 @@ param staticWebAppName string
 
 // ========== Resources ==========
 
-// Static Web App for client (Free tier)
+// Static Web App for client (Free tier, Non Regional)
 resource staticWebApp 'Microsoft.Web/staticSites@2022-09-01' = {
   name: staticWebAppName
-  location: location
+  location: 'westus2' // Fixed location for Non Regional deployment
   sku: {
     name: 'Free'
     tier: 'Free'
@@ -29,6 +29,9 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-09-01' = {
     buildProperties: {
       skipGithubActionWorkflowGeneration: true
     }
+    deploymentProperties: {
+      deploymentTarget: 'global' // Enables Non Regional deployment
+    }
   }
 }
 
@@ -36,3 +39,4 @@ resource staticWebApp 'Microsoft.Web/staticSites@2022-09-01' = {
 
 @description('The URL of the deployed Static Web App')
 output staticWebAppUrl string = staticWebApp.properties.defaultHostname
+

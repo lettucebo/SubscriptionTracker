@@ -13,7 +13,7 @@ param location string = 'japaneast'
   'test'
   'prod'
 ])
-param environmentName string = 'dev'
+param environmentName string = 'prod'
 
 @description('SQL Server administrator login')
 param sqlAdminLogin string
@@ -28,14 +28,14 @@ param resourceNamePrefix string = 'subtracker'
 // ========== Variables ==========
 
 // Resource naming
-var resourceSuffix = '${resourceNamePrefix}-${environmentName}'
-var staticWebAppName = 'stapp-${resourceSuffix}'
-var webAppName = 'app-${resourceSuffix}'
-var appServicePlanName = 'plan-${resourceSuffix}'
-var sqlServerName = 'sql-${resourceSuffix}'
-var sqlDatabaseName = 'sqldb-${resourceSuffix}'
-var vnetName = 'vnet-${resourceSuffix}'
-var privateEndpointName = 'pe-sql-${resourceSuffix}'
+var resourceSuffix = toLower('${resourceNamePrefix}')
+var staticWebAppName = '${resourceSuffix}-stapp'
+var webAppName = '${resourceSuffix}-app'
+var appServicePlanName = '${resourceSuffix}-plan'
+var sqlServerName = '${resourceSuffix}-sql'
+var sqlDatabaseName = '${resourceSuffix}-sqldb'
+var vnetName = '${resourceSuffix}-vnet'
+var privateEndpointName = '${resourceSuffix}-pe-sql'
 
 // ========== Module Deployments ==========
 
@@ -100,3 +100,4 @@ output sqlServerName string = databaseModule.outputs.sqlServerName
 
 @description('The name of the SQL Database')
 output sqlDatabaseName string = databaseModule.outputs.sqlDatabaseName
+
