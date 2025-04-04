@@ -3,7 +3,9 @@ name: Release Deployment
 on:
   push:
     tags:
-      - '*'  # Trigger on any tag that starts with 'v'
+      - '*'  # Trigger on any tag
+  workflow_dispatch:
+
 
 jobs:
   build-and-deploy:
@@ -70,19 +72,21 @@ jobs:
       # Deploy frontend to Azure Static Web App
       - name: Deploy frontend to Static Web App
         run: |
-          # Create directory for frontend zip if it doesn't exist
-          mkdir -p frontend-output
-
-          # Zip the frontend build output
-          cd src/subscription-tracker-client/dist
-          zip -r ../../../frontend-output/frontend-${{ steps.get_version.outputs.VERSION }}.zip .
-          cd ../../../
-
-          # Deploy to Static Web App using Azure CLI
-          az staticwebapp deploy \
+          # Get the deployment token for the Static Web App
+          DEPLOYMENT_TOKEN=$(az staticwebapp secrets list \
             --name ${{ steps.set_variables.outputs.STATIC_WEBAPP_NAME }} \
-            --source-path frontend-output/frontend-${{ steps.get_version.outputs.VERSION }}.zip \
-            --resource-group ${{ steps.set_variables.outputs.RESOURCE_GROUP }}
+            --resource-group ${{ steps.set_variables.outputs.RESOURCE_GROUP }} \
+            --query properties.apiKey -o tsv)
+
+          # Install the Static Web Apps CLI
+          npm install -g @azure/static-web-apps-cli
+
+          # Deploy using SWA CLI
+          cd src/subscription-tracker-client/dist
+          swa deploy \
+            --app-location . \
+            --deployment-token $DEPLOYMENT_TOKEN \
+            --env production
 
       # Post-deployment verification
       - name: Post-deployment verification
