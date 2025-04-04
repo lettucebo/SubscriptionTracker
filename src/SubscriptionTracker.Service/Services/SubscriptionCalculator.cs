@@ -1,3 +1,5 @@
+using System;
+
 namespace SubscriptionTracker.Service.Services
 {
     /// <summary>
@@ -23,7 +25,7 @@ namespace SubscriptionTracker.Service.Services
         /// </list>
         /// </param>
         /// <param name="amount">Base subscription amount in local currency (positive value)</param>
-        /// <param name="discountRate">Annual discount rate 
+        /// <param name="discountRate">Annual discount rate
         /// <list type="bullet">
         /// <item><description>Range: 0.0 (0%) to 1.0 (100%)</description></item>
         /// <item><description>Example: 0.2 represents 20% discount</description></item>
@@ -88,21 +90,23 @@ namespace SubscriptionTracker.Service.Services
         /// </remarks>
         /// <example>
         /// <code>
-        /// var daysLeft = CalculateRemainingDays(new DateTime(2025,1,1), null, "yearly");
+        /// var daysLeft = CalculateRemainingDays(new DateOnly(2025,1,1), null, "yearly");
         /// // Returns days between today and 2026-01-01
         /// </code>
         /// </example>
-        public static int CalculateRemainingDays(DateTime startDate, DateTime? endDate, string billingCycle)
+        public static int CalculateRemainingDays(DateOnly startDate, DateOnly? endDate, string billingCycle)
         {
+            var today = DateOnly.FromDateTime(DateTime.Today);
+
             if (endDate.HasValue)
             {
-                return (endDate.Value - DateTime.Today).Days;
+                return endDate.Value.DayNumber - today.DayNumber;
             }
 
             return billingCycle.ToLower() switch
             {
-                "yearly" => (startDate.AddYears(1) - DateTime.Today).Days,
-                "monthly" => (startDate.AddMonths(1) - DateTime.Today).Days,
+                "yearly" => DateOnly.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue).AddYears(1)).DayNumber - today.DayNumber,
+                "monthly" => DateOnly.FromDateTime(startDate.ToDateTime(TimeOnly.MinValue).AddMonths(1)).DayNumber - today.DayNumber,
                 _ => 0
             };
         }

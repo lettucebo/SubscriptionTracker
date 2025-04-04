@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SubscriptionTracker.Service.Models;
+using System;
 
 namespace SubscriptionTracker.Service.Data
 {
@@ -80,6 +81,19 @@ namespace SubscriptionTracker.Service.Data
                 entity.Property(s => s.ContactInfo)
                     .HasMaxLength(500)
                     .IsRequired(false);
+
+                // Configure DateOnly properties
+                entity.Property(s => s.StartDate)
+                    .HasConversion(
+                        d => d.ToDateTime(TimeOnly.MinValue),
+                        d => DateOnly.FromDateTime(d))
+                    .HasColumnType("date");  // 明確指定使用 SQL Server 的 date 型態
+
+                entity.Property(s => s.EndDate)
+                    .HasConversion(
+                        d => d.HasValue ? d.Value.ToDateTime(TimeOnly.MinValue) : (DateTime?)null,
+                        d => d.HasValue ? DateOnly.FromDateTime(d.Value) : null)
+                    .HasColumnType("date");  // 明確指定使用 SQL Server 的 date 型態
             });
 
             // Seed categories
@@ -99,8 +113,8 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 15.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
-                    StartDate = DateTime.Today.AddDays(-30),
-                    EndDate = DateTime.Today.AddDays(335),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-30)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(335)),
                     CategoryId = 1, // Entertainment
                     IsShared = true,
                     ContactInfo = "Family plan shared with parents and siblings"
@@ -111,7 +125,7 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 9.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
-                    StartDate = DateTime.Today.AddDays(-15),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-15)),
                     CategoryId = 2, // Music
                     IsShared = true,
                     ContactInfo = "Family plan with roommates, contact: John (john@example.com)"
@@ -122,8 +136,8 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 139.0m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.17m,
-                    StartDate = DateTime.Today.AddDays(-60),
-                    EndDate = DateTime.Today.AddDays(305),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-60)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(305)),
                     CategoryId = 3 // Shopping
                 },
                 new Subscription {
@@ -132,8 +146,8 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 52.99m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.15m,
-                    StartDate = DateTime.Today.AddDays(-90),
-                    EndDate = DateTime.Today.AddDays(275),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-90)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(275)),
                     CategoryId = 4 // Productivity
                 },
                 new Subscription {
@@ -142,7 +156,7 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 14.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
-                    StartDate = DateTime.Today.AddDays(-20),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-20)),
                     CategoryId = 1 // Entertainment
                 },
                 new Subscription {
@@ -151,7 +165,7 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 7.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
-                    StartDate = DateTime.Today.AddDays(-10),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-10)),
                     CategoryId = 1 // Entertainment
                 },
                 new Subscription {
@@ -160,7 +174,7 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 9.99m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
-                    StartDate = DateTime.Today.AddDays(-25),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-25)),
                     CategoryId = 2 // Music
                 },
                 new Subscription {
@@ -169,8 +183,8 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 6.99m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.1m,
-                    StartDate = DateTime.Today.AddDays(-180),
-                    EndDate = DateTime.Today.AddDays(185),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-180)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(185)),
                     CategoryId = 4 // Productivity
                 },
                 new Subscription {
@@ -179,8 +193,8 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 11.99m,
                     BillingCycle = "yearly",
                     DiscountRate = 0.2m,
-                    StartDate = DateTime.Today.AddDays(-365),
-                    EndDate = DateTime.Today.AddDays(365),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-365)),
+                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(365)),
                     CategoryId = 4 // Productivity
                 },
                 new Subscription {
@@ -189,7 +203,7 @@ namespace SubscriptionTracker.Service.Data
                     Amount = 12.95m,
                     BillingCycle = "monthly",
                     DiscountRate = 0.0m,
-                    StartDate = DateTime.Today.AddDays(-5),
+                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-5)),
                     CategoryId = 5 // Design
                 }
             );

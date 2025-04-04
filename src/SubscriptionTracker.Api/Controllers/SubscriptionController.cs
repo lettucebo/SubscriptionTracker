@@ -305,7 +305,7 @@ namespace SubscriptionTracker.Api.Controllers
                 return NotFound();
             }
 
-            subscription.StartDate = startDate;
+            subscription.StartDate = DateOnly.FromDateTime(startDate);
 
             try
             {
