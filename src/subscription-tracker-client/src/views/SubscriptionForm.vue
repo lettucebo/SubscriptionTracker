@@ -417,13 +417,29 @@ export default {
   color: #e0e0e0;
 }
 
+.dark-mode .form-control::placeholder {
+  color: #aaa;
+  opacity: 0.7;
+}
+
 .form-control, .form-select {
   border-color: #dee2e6;
+}
+
+.dark-mode .form-control, .dark-mode .form-select {
+  background-color: #333;
+  border-color: #555;
+  color: #e0e0e0;
 }
 
 .form-control:focus, .form-select:focus {
   border-color: #86b7fe;
   box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.25);
+}
+
+.dark-mode .form-control:focus, .dark-mode .form-select:focus {
+  border-color: #0d6efd;
+  box-shadow: 0 0 0 0.25rem rgba(13, 110, 253, 0.5);
 }
 
 .form-actions {
