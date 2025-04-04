@@ -19,10 +19,10 @@ namespace SubscriptionTracker.Service.Data
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
-            {
-                optionsBuilder.UseSqlServer("Server=(localdb)\\mssqllocaldb;Database=SubscriptionTracker;Trusted_Connection=True;");
-            }
+            // This method is called if the context is used without being configured
+            // The actual connection string is provided in Program.cs from user secrets
+            // We don't provide a fallback here to avoid hardcoding sensitive information
+            // Design-time tools should use the connection string from user secrets
         }
 
         /// <summary>
@@ -67,6 +67,10 @@ namespace SubscriptionTracker.Service.Data
                 entity.Property(s => s.Amount)
                     .HasColumnType("decimal(18,2)");
 
+                // Configure the obsolete Fee property to avoid warnings
+                entity.Property(s => s.Fee)
+                    .HasColumnType("decimal(18,2)");
+
                 entity.Property(s => s.BillingCycle)
                     .HasMaxLength(10)
                     .IsRequired();
@@ -96,117 +100,7 @@ namespace SubscriptionTracker.Service.Data
                     .HasColumnType("date");  // 明確指定使用 SQL Server 的 date 型態
             });
 
-            // Seed categories
-            modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "Entertainment", Description = "Streaming and entertainment services", ColorCode = "#E63946" },
-                new Category { Id = 2, Name = "Music", Description = "Music streaming services", ColorCode = "#6A4C93" },
-                new Category { Id = 3, Name = "Shopping", Description = "Shopping and delivery services", ColorCode = "#F28C28" },
-                new Category { Id = 4, Name = "Productivity", Description = "Work and productivity tools", ColorCode = "#70B77E" },
-                new Category { Id = 5, Name = "Design", Description = "Design and creative tools", ColorCode = "#3A86FF" }
-            );
-
-            // Seed 10 sample subscriptions
-            modelBuilder.Entity<Subscription>().HasData(
-                new Subscription {
-                    Id = 1,
-                    Name = "Netflix",
-                    Amount = 15.99m,
-                    BillingCycle = "monthly",
-                    DiscountRate = 0.0m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-30)),
-                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(335)),
-                    CategoryId = 1, // Entertainment
-                    IsShared = true,
-                    ContactInfo = "Family plan shared with parents and siblings"
-                },
-                new Subscription {
-                    Id = 2,
-                    Name = "Spotify",
-                    Amount = 9.99m,
-                    BillingCycle = "monthly",
-                    DiscountRate = 0.0m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-15)),
-                    CategoryId = 2, // Music
-                    IsShared = true,
-                    ContactInfo = "Family plan with roommates, contact: John (john@example.com)"
-                },
-                new Subscription {
-                    Id = 3,
-                    Name = "Amazon Prime",
-                    Amount = 139.0m,
-                    BillingCycle = "yearly",
-                    DiscountRate = 0.17m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-60)),
-                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(305)),
-                    CategoryId = 3 // Shopping
-                },
-                new Subscription {
-                    Id = 4,
-                    Name = "Adobe Creative Cloud",
-                    Amount = 52.99m,
-                    BillingCycle = "yearly",
-                    DiscountRate = 0.15m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-90)),
-                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(275)),
-                    CategoryId = 4 // Productivity
-                },
-                new Subscription {
-                    Id = 5,
-                    Name = "HBO Max",
-                    Amount = 14.99m,
-                    BillingCycle = "monthly",
-                    DiscountRate = 0.0m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-20)),
-                    CategoryId = 1 // Entertainment
-                },
-                new Subscription {
-                    Id = 6,
-                    Name = "Disney+",
-                    Amount = 7.99m,
-                    BillingCycle = "monthly",
-                    DiscountRate = 0.0m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-10)),
-                    CategoryId = 1 // Entertainment
-                },
-                new Subscription {
-                    Id = 7,
-                    Name = "Apple Music",
-                    Amount = 9.99m,
-                    BillingCycle = "monthly",
-                    DiscountRate = 0.0m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-25)),
-                    CategoryId = 2 // Music
-                },
-                new Subscription {
-                    Id = 8,
-                    Name = "Microsoft 365",
-                    Amount = 6.99m,
-                    BillingCycle = "yearly",
-                    DiscountRate = 0.1m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-180)),
-                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(185)),
-                    CategoryId = 4 // Productivity
-                },
-                new Subscription {
-                    Id = 9,
-                    Name = "Dropbox",
-                    Amount = 11.99m,
-                    BillingCycle = "yearly",
-                    DiscountRate = 0.2m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-365)),
-                    EndDate = DateOnly.FromDateTime(DateTime.Today.AddDays(365)),
-                    CategoryId = 4 // Productivity
-                },
-                new Subscription {
-                    Id = 10,
-                    Name = "Canva Pro",
-                    Amount = 12.95m,
-                    BillingCycle = "monthly",
-                    DiscountRate = 0.0m,
-                    StartDate = DateOnly.FromDateTime(DateTime.Today.AddDays(-5)),
-                    CategoryId = 5 // Design
-                }
-            );
+            // Seed data removed to allow manual data entry
         }
     }
 }

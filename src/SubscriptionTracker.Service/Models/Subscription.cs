@@ -25,13 +25,14 @@ namespace SubscriptionTracker.Service.Models
         /// Gets or sets the billing amount.
         /// </summary>
         [Required]
-    public decimal Amount { get; set; }
+        public decimal Amount { get; set; }
 
-    [Obsolete("Fee has been replaced by Amount")]
-    public decimal Fee {
-        get => Amount;
-        set => Amount = value;
-    }
+        [Obsolete("Fee has been replaced by Amount")]
+        public decimal Fee
+        {
+            get => Amount;
+            set => Amount = value;
+        }
 
         /// <summary>
         /// Gets or sets the billing cycle (monthly/yearly).

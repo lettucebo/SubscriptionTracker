@@ -12,9 +12,9 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container using MVC pattern.
 builder.Services.AddControllersWithViews();
 
-// Configure the in-memory database.
+// Configure SQL Server database.
 builder.Services.AddDbContext<SubscriptionTracker.Service.Data.SubscriptionDbContext>(options =>
-    options.UseInMemoryDatabase("SubscriptionDB"));
+    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
 // Configure Swagger/OpenAPI.
 builder.Services.AddEndpointsApiExplorer();
@@ -27,12 +27,12 @@ builder.Services.AddSwaggerGen(options =>
         Version = "v1",
         Description = "API for tracking subscription services."
     });
-    
+
     // 加入 XML 註解支援
     var xmlFile = $"{Assembly.GetExecutingAssembly().GetName().Name}.xml";
     var xmlPath = Path.Combine(AppContext.BaseDirectory, xmlFile);
     options.IncludeXmlComments(xmlPath);
-    
+
     // 啟用範例功能
     options.ExampleFilters();
 });
@@ -51,7 +51,8 @@ using (var scope = app.Services.CreateScope())
 {
     var services = scope.ServiceProvider;
     var context = services.GetRequiredService<SubscriptionDbContext>();
-    context.Database.EnsureCreated();
+    // Apply any pending migrations
+    context.Database.Migrate();
 }
 
 // Home redirect to Swagger
