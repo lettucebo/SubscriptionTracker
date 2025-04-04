@@ -1,4 +1,4 @@
-name: Combined CI
+name: Build
 
 on:
   push:
