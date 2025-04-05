@@ -94,6 +94,10 @@ export const apiService = {
     return apiClient.delete(`/api/subscription/${id}`);
   },
 
+  async updateSubscriptionDates(id, startDate) {
+    return apiClient.put(`/api/subscription/${id}/dates`, startDate);
+  },
+
   // Category endpoints
   async getCategories() {
     return apiClient.get('/api/category');

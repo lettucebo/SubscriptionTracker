@@ -137,8 +137,7 @@
 </template>
 
 <script>
-import axios from 'axios'
-import { config } from '@/config'
+import { apiService } from '@/services/apiService'
 
 export default {
   name: "SubscriptionsPage",
@@ -192,7 +191,7 @@ export default {
       this.loading = true
       this.error = null
       try {
-        const response = await axios.get(`${config.baseUrl}/api/subscription`)
+        const response = await apiService.getSubscriptions()
         this.subscriptions = response.data
         this.filterSubscriptions()
       } catch (error) {
@@ -211,7 +210,7 @@ export default {
     async deleteSubscription(id) {
       if (confirm('Are you sure you want to delete this subscription?')) {
         try {
-          await axios.delete(`${config.baseUrl}/api/subscription/${id}`)
+          await apiService.deleteSubscription(id)
           this.fetchSubscriptions()
         } catch (error) {
           this.error = "Failed to delete subscription. Please try again."

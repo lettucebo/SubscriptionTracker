@@ -220,10 +220,9 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { ref, onMounted, computed } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
-import { config } from '@/config'
+import { apiService } from '@/services/apiService'
 
 export default {
   name: "SubscriptionFormPage",
@@ -247,13 +246,13 @@ export default {
 
     const loadCategories = async (subscriptionCategoryId = null) => {
       try {
-        const response = await axios.get(`${config.baseUrl}/api/category`)
+        const response = await apiService.getCategories()
         categories.value = response.data
 
         // If editing and the subscription's category was soft-deleted
         if (subscriptionCategoryId && !categories.value.find(c => c.id === subscriptionCategoryId)) {
           try {
-            const categoryResponse = await axios.get(`${config.baseUrl}/api/category/${subscriptionCategoryId}`)
+            const categoryResponse = await apiService.getCategory(subscriptionCategoryId)
             if (categoryResponse.data) {
               categories.value = [...categories.value, categoryResponse.data]
             }
@@ -270,7 +269,7 @@ export default {
       if (route.params.id) {
         isEdit.value = true
         try {
-          const response = await axios.get(`${config.baseUrl}/api/subscription/${route.params.id}`)
+          const response = await apiService.getSubscription(route.params.id)
           subscription.value = {
             ...response.data,
             startDate: response.data.startDate?.substr(0, 10),
@@ -323,9 +322,9 @@ export default {
 
       try {
         if (isEdit.value) {
-          await axios.put(`${config.baseUrl}/api/subscription/${subscription.value.id}`, subscription.value)
+          await apiService.updateSubscription(subscription.value.id, subscription.value)
         } else {
-          await axios.post(`${config.baseUrl}/api/subscription`, subscription.value)
+          await apiService.createSubscription(subscription.value)
         }
         router.push('/subscriptions')
       } catch (error) {
