@@ -1,3 +1,3 @@
 export const config = {
-  baseUrl: 'https://localhost:7052'
+  baseUrl: process.env.VUE_APP_API_BASE_URL || 'https://localhost:7052'
 }
