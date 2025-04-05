@@ -13,17 +13,33 @@ and this project adheres to [Conventional Commits](https://www.conventionalcommi
 - Login/logout functionality with user profile display
 - Route protection with authentication guards
 - User management service for handling user creation and retrieval
+- Sharing option for subscriptions with contact information field
 
 ### Changed
 - Updated data models to include user ownership
 - Modified API endpoints to filter data by the current user
 - Enhanced frontend components to support authenticated requests
 - Improved security with proper token handling and validation
+- Renamed SubscriptionDTO to SubscriptionViewModel for better naming convention
+- Refactored API service integration across multiple components
+
+### Fixed
+- Resolved 400 error when creating new categories
+- Fixed subscription creation error by adding proper DTO handling
+- Enhanced user management integration with frontend components
+- Updated frontend build process to correctly use API_URL in config.js
+- Simplified frontend deployment process using Azure Static Web Apps action
+
+### CI/CD
+- Streamlined tag handling in deployment workflows
+- Updated frontend deployment to use Static Web Apps CLI
+- Improved token masking for secure deployments
 
 ### Database
 - Added User entity with Entra ID integration
 - Created foreign key relationships between users and their data
 - Added database migration script for seamless updates
+- Ensured DateOnly properties use proper 'date' data type in SQL Server
 
 ## [1.4.0] - 2025-04-05
 ### Added
