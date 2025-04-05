@@ -41,6 +41,11 @@ initTheme()
 
 // Initialize authentication service
 authService.initialize().then(() => {
+  console.log('Authentication service initialized');
   // Mount application to DOM element after auth initialization
   app.mount('#app') // CSS selector matching index.html mount point
+}).catch(error => {
+  console.error('Failed to initialize authentication service:', error);
+  // Mount the application anyway to allow the user to see the login page
+  app.mount('#app')
 })

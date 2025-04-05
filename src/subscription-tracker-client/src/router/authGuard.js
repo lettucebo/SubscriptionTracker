@@ -16,13 +16,18 @@ export const authGuard = async (to, from, next) => {
       // Check if user is authenticated
       const isAuthenticated = await authService.isAuthenticated();
       if (!isAuthenticated) {
+        // Store the current path for redirect after login
+        const redirectPath = to.fullPath;
+        console.log(`User not authenticated. Redirecting to login with redirect=${redirectPath}`);
+
         // Redirect to login page if not authenticated
         next({
           name: 'Login',
-          query: { redirect: to.fullPath }
+          query: { redirect: redirectPath }
         });
       } else {
         // Continue to the route if authenticated
+        console.log('User is authenticated. Proceeding to requested route.');
         next();
       }
     } catch (error) {

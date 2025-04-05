@@ -81,8 +81,16 @@ export default {
         if (isAuthenticated) {
           // Get redirect URL from query params or default to home
           const redirectPath = router.currentRoute.value.query.redirect || '/';
-          // Redirect to the requested page if already authenticated
-          router.push(redirectPath);
+
+          // Handle the case where redirectPath might start with a slash
+          // This ensures we navigate correctly within the app
+          if (redirectPath.startsWith('/')) {
+            // Use router.push for internal navigation
+            router.push(redirectPath);
+          } else {
+            // For external or absolute paths, use window.location
+            window.location.href = redirectPath;
+          }
         }
       } catch (error) {
         console.error('Authentication check error:', error);

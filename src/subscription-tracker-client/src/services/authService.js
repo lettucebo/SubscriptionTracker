@@ -7,10 +7,15 @@ const msalConfig = {
     authority: 'https://login.microsoftonline.com/87befcf7-8c47-4964-9582-2942bfc01159',
     redirectUri: window.location.origin,
     postLogoutRedirectUri: window.location.origin,
+    navigateToLoginRequestUrl: true
   },
   cache: {
     cacheLocation: 'localStorage',
-    storeAuthStateInCookie: false,
+    storeAuthStateInCookie: true,
+  },
+  system: {
+    navigateFrameWait: 0,
+    asyncPopups: false
   }
 };
 
@@ -55,6 +60,15 @@ export const authService = {
 
       // If response is not null, user is authenticated
       if (response !== null) {
+        console.log('Authentication successful, redirecting to home');
+        // Check if we have a redirect URL in the query parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const redirectPath = urlParams.get('redirect');
+
+        // If we have a redirect path and we're on the login page, navigate to the redirect path
+        if (redirectPath && window.location.pathname.includes('/login')) {
+          window.location.href = redirectPath;
+        }
         return this.getAccount();
       }
       return null;
