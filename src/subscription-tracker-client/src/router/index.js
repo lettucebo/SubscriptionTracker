@@ -4,6 +4,8 @@ import Subscriptions from '../views/Subscriptions.vue'
 import SubscriptionForm from '../views/SubscriptionForm.vue'
 import Calendar from '../views/Calendar.vue'
 import Categories from '../views/Categories.vue'
+import Login from '../views/Login.vue'
+import { authGuard } from './authGuard'
 
 /**
  * Defines all application routes and their corresponding components
@@ -18,6 +20,16 @@ import Categories from '../views/Categories.vue'
  */
 const routes = [
   /**
+   * Login page for authentication
+   * @memberof routes
+   * @name Login
+   */
+  {
+    path: '/login',
+    name: 'Login',
+    component: Login
+  },
+  /**
    * Application dashboard with key metrics and quick actions
    * @memberof routes
    * @name Home
@@ -25,7 +37,8 @@ const routes = [
   {
     path: '/',
     name: 'Home',
-    component: Home
+    component: Home,
+    meta: { requiresAuth: true }
   },
   /**
    * Calendar visualization of subscription periods and renewals
@@ -35,7 +48,8 @@ const routes = [
   {
     path: '/calendar',
     name: 'Calendar',
-    component: Calendar
+    component: Calendar,
+    meta: { requiresAuth: true }
   },
   /**
    * Primary interface for managing subscription entries
@@ -46,7 +60,8 @@ const routes = [
   {
     path: '/subscriptions',
     name: 'Subscriptions',
-    component: Subscriptions
+    component: Subscriptions,
+    meta: { requiresAuth: true }
   },
   /**
    * Category configuration and organization interface
@@ -57,7 +72,8 @@ const routes = [
   {
     path: '/categories',
     name: 'Categories',
-    component: Categories
+    component: Categories,
+    meta: { requiresAuth: true }
   },
   /**
    * Subscription creation form with validation
@@ -68,7 +84,8 @@ const routes = [
   {
     path: '/subscription-form',
     name: 'CreateSubscription',
-    component: SubscriptionForm
+    component: SubscriptionForm,
+    meta: { requiresAuth: true }
   },
   /**
    * Subscription editing form with existing data loading
@@ -80,7 +97,8 @@ const routes = [
   {
     path: '/subscription-form/:id',
     name: 'EditSubscription',
-    component: SubscriptionForm
+    component: SubscriptionForm,
+    meta: { requiresAuth: true }
   }
 ]
 
@@ -95,5 +113,8 @@ const router = createRouter({
   history: createWebHistory(),
   routes
 })
+
+// Add global navigation guard
+router.beforeEach(authGuard);
 
 export default router

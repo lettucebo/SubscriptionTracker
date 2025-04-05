@@ -18,8 +18,9 @@ import 'bootstrap/dist/js/bootstrap.bundle.min.js'     // Bootstrap JS with Popp
 // Application styling
 import './assets/custom.css' // Custom CSS variables and overrides
 
-// Theme service
+// Services
 import { initTheme } from './services/themeService'
+import { authService } from './services/authService'
 
 /**
  * Initialize Vue application instance with core configurations
@@ -38,5 +39,8 @@ app.use(router) // Vue Router for SPA navigation (v4.0.12)
 // Initialize theme based on user preference
 initTheme()
 
-// Mount application to DOM element
-app.mount('#app') // CSS selector matching index.html mount point
+// Initialize authentication service
+authService.initialize().then(() => {
+  // Mount application to DOM element after auth initialization
+  app.mount('#app') // CSS selector matching index.html mount point
+})

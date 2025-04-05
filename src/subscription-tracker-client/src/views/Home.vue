@@ -93,9 +93,8 @@
 </template>
 
 <script>
-import axios from 'axios'
 import { ref, computed, onMounted } from 'vue'
-import { config } from '@/config'
+import { apiService } from '@/services/apiService'
 
 export default {
   name: "HomePage",
@@ -117,8 +116,8 @@ export default {
     const fetchData = async () => {
       try {
         const [subsResponse, catsResponse] = await Promise.all([
-          axios.get(`${config.baseUrl}/api/subscription`),
-          axios.get(`${config.baseUrl}/api/category`)
+          apiService.getSubscriptions(),
+          apiService.getCategories()
         ])
         subscriptions.value = subsResponse.data
         categories.value = catsResponse.data

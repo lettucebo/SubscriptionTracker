@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
@@ -30,17 +31,21 @@ namespace SubscriptionTracker.Api.Controllers
     /// </remarks>
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class SubscriptionController : ControllerBase
     {
         private readonly SubscriptionDbContext _context;
+        private readonly IUserService _userService;
 
         /// <summary>
         /// Initializes a new instance of the SubscriptionController class.
         /// </summary>
         /// <param name="context">The database context for subscriptions.</param>
-        public SubscriptionController(SubscriptionDbContext context)
+        /// <param name="userService">The user service.</param>
+        public SubscriptionController(SubscriptionDbContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         /// <summary>
@@ -60,8 +65,12 @@ namespace SubscriptionTracker.Api.Controllers
             [FromQuery]
             int? categoryId = null)
         {
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
             var query = _context.Subscriptions
                 .Include(s => s.Category)
+                .Where(s => s.UserId == currentUser.Id)
                 .AsQueryable();
 
             if (categoryId.HasValue)
@@ -117,9 +126,12 @@ namespace SubscriptionTracker.Api.Controllers
             [FromRoute]
             int id)
         {
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
             var subscription = await _context.Subscriptions
                 .Include(s => s.Category)
-                .FirstOrDefaultAsync(s => s.Id == id);
+                .FirstOrDefaultAsync(s => s.Id == id && s.UserId == currentUser.Id);
             if (subscription == null)
             {
                 return NotFound();
@@ -173,6 +185,12 @@ namespace SubscriptionTracker.Api.Controllers
             {
                 return BadRequest(ModelState);
             }
+
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            // Associate the subscription with the current user
+            subscription.UserId = currentUser.Id;
 
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
@@ -229,6 +247,21 @@ namespace SubscriptionTracker.Api.Controllers
                 return BadRequest("Subscription id mismatch.");
             }
 
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            // Check if the subscription belongs to the current user
+            var existingSubscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.Id == id && s.UserId == currentUser.Id);
+
+            if (existingSubscription == null)
+            {
+                return NotFound();
+            }
+
+            // Ensure the user ID doesn't change
+            subscription.UserId = currentUser.Id;
+
             _context.Entry(subscription).State = EntityState.Modified;
 
             try
@@ -237,7 +270,7 @@ namespace SubscriptionTracker.Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SubscriptionExists(id))
+                if (!(await SubscriptionExists(id)))
                 {
                     return NotFound();
                 }
@@ -267,7 +300,13 @@ namespace SubscriptionTracker.Api.Controllers
             [FromRoute]
             int id)
         {
-            var subscription = await _context.Subscriptions.FindAsync(id);
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            // Find the subscription and ensure it belongs to the current user
+            var subscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.Id == id && s.UserId == currentUser.Id);
+
             if (subscription == null)
             {
                 return NotFound();
@@ -299,7 +338,13 @@ namespace SubscriptionTracker.Api.Controllers
             [FromRoute] int id,
             [FromBody] DateTime startDate)
         {
-            var subscription = await _context.Subscriptions.FindAsync(id);
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            // Find the subscription and ensure it belongs to the current user
+            var subscription = await _context.Subscriptions
+                .FirstOrDefaultAsync(s => s.Id == id && s.UserId == currentUser.Id);
+
             if (subscription == null)
             {
                 return NotFound();
@@ -313,7 +358,7 @@ namespace SubscriptionTracker.Api.Controllers
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!SubscriptionExists(id))
+                if (!await SubscriptionExists(id))
                 {
                     return NotFound();
                 }
@@ -333,9 +378,10 @@ namespace SubscriptionTracker.Api.Controllers
         /// <remarks>
         /// Internal helper method used for concurrency checks
         /// </remarks>
-        private bool SubscriptionExists(int id)
+        private async Task<bool> SubscriptionExists(int id)
         {
-            return _context.Subscriptions.Any(s => s.Id == id);
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+            return await _context.Subscriptions.AnyAsync(s => s.Id == id && s.UserId == currentUser.Id);
         }
     }
 }

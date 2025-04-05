@@ -5,6 +5,26 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.0] - 2025-04-06
+### Added
+- Authentication system using Entra ID (formerly Azure AD)
+- User-specific data isolation for subscriptions and categories
+- JWT-based communication between frontend and backend
+- Login/logout functionality with user profile display
+- Route protection with authentication guards
+- User management service for handling user creation and retrieval
+
+### Changed
+- Updated data models to include user ownership
+- Modified API endpoints to filter data by the current user
+- Enhanced frontend components to support authenticated requests
+- Improved security with proper token handling and validation
+
+### Database
+- Added User entity with Entra ID integration
+- Created foreign key relationships between users and their data
+- Added database migration script for seamless updates
+
 ## [1.4.0] - 2025-04-05
 ### Added
 - Dark mode support with automatic system preference detection

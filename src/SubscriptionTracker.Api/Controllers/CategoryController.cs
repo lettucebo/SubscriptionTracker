@@ -1,19 +1,24 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
+using SubscriptionTracker.Service.Services;
 
 namespace SubscriptionTracker.Api.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Authorize]
     public class CategoryController : ControllerBase
     {
         private readonly SubscriptionDbContext _context;
+        private readonly IUserService _userService;
 
-        public CategoryController(SubscriptionDbContext context)
+        public CategoryController(SubscriptionDbContext context, IUserService userService)
         {
             _context = context;
+            _userService = userService;
         }
 
         /// <summary>
@@ -26,8 +31,11 @@ namespace SubscriptionTracker.Api.Controllers
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Category>>> GetCategories()
         {
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
             return await _context.Categories
-                .Where(c => !c.IsDelete)
+                .Where(c => !c.IsDelete && c.UserId == currentUser.Id)
                 .ToListAsync();
         }
 
@@ -43,7 +51,11 @@ namespace SubscriptionTracker.Api.Controllers
         [HttpGet("{id}")]
         public async Task<ActionResult<Category>> GetCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == currentUser.Id && !c.IsDelete);
 
             if (category == null)
             {
@@ -65,6 +77,12 @@ namespace SubscriptionTracker.Api.Controllers
         [HttpPost]
         public async Task<ActionResult<Category>> CreateCategory(Category category)
         {
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            // Associate the category with the current user
+            category.UserId = currentUser.Id;
+
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
 
@@ -96,11 +114,18 @@ namespace SubscriptionTracker.Api.Controllers
                 return BadRequest("ID mismatch");
             }
 
-            var existingCategory = await _context.Categories.FindAsync(id);
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            var existingCategory = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == currentUser.Id && !c.IsDelete);
             if (existingCategory == null)
             {
                 return NotFound();
             }
+
+            // Ensure the user ID doesn't change
+            category.UserId = currentUser.Id;
 
             // Explicitly update allowed fields
             existingCategory.Name = category.Name;
@@ -113,7 +138,7 @@ namespace SubscriptionTracker.Api.Controllers
             }
             catch (DbUpdateConcurrencyException ex)
             {
-                if (!CategoryExists(id))
+                if (!(await CategoryExists(id)))
                 {
                     return NotFound();
                 }
@@ -140,7 +165,11 @@ namespace SubscriptionTracker.Api.Controllers
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteCategory(int id)
         {
-            var category = await _context.Categories.FindAsync(id);
+            // Get the current user
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == id && c.UserId == currentUser.Id && !c.IsDelete);
             if (category == null)
             {
                 return NotFound();
@@ -160,9 +189,10 @@ namespace SubscriptionTracker.Api.Controllers
         /// <returns>
         /// True if exists, False otherwise
         /// </returns>
-        private bool CategoryExists(int id)
+        private async Task<bool> CategoryExists(int id)
         {
-            return _context.Categories.Any(e => e.Id == id);
+            var currentUser = await _userService.GetCurrentUserAsync(User);
+            return await _context.Categories.AnyAsync(c => c.Id == id && c.UserId == currentUser.Id && !c.IsDelete);
         }
     }
 }

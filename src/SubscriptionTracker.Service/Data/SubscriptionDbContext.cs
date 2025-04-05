@@ -11,6 +11,7 @@ namespace SubscriptionTracker.Service.Data
     {
         public DbSet<Subscription> Subscriptions { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<User> Users { get; set; }
 
         public SubscriptionDbContext(DbContextOptions<SubscriptionDbContext> options)
             : base(options)
@@ -55,12 +56,45 @@ namespace SubscriptionTracker.Service.Data
                     .IsRequired(false);
             });
 
+            // Configure User entity
+            modelBuilder.Entity<User>(entity =>
+            {
+                entity.Property(u => u.ObjectId)
+                    .HasMaxLength(128)
+                    .IsRequired();
+
+                entity.Property(u => u.DisplayName)
+                    .HasMaxLength(100)
+                    .IsRequired();
+
+                entity.Property(u => u.Email)
+                    .HasMaxLength(256)
+                    .IsRequired();
+
+                entity.HasIndex(u => u.ObjectId)
+                    .IsUnique();
+
+                entity.HasIndex(u => u.Email);
+            });
+
             // Configure Subscription entity
             modelBuilder.Entity<Subscription>()
                 .HasOne(s => s.Category)
                 .WithMany()
                 .HasForeignKey(s => s.CategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
+
+            modelBuilder.Entity<Subscription>()
+                .HasOne(s => s.User)
+                .WithMany(u => u.Subscriptions)
+                .HasForeignKey(s => s.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
+
+            modelBuilder.Entity<Category>()
+                .HasOne(c => c.User)
+                .WithMany(u => u.Categories)
+                .HasForeignKey(c => c.UserId)
+                .OnDelete(DeleteBehavior.Cascade);
 
             modelBuilder.Entity<Subscription>(entity =>
             {

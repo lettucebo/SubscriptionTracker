@@ -1,11 +1,16 @@
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using Microsoft.Identity.Web;
 using Microsoft.OpenApi.Models;
 using System.Reflection;
+using System.Security.Claims;
 using Swashbuckle.AspNetCore.Filters;
 using SubscriptionTracker.Service.Data;
+using SubscriptionTracker.Service.Models;
+using SubscriptionTracker.Service.Services;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -35,6 +40,32 @@ builder.Services.AddSwaggerGen(options =>
 
     // 啟用範例功能
     options.ExampleFilters();
+
+    // Configure Swagger to use JWT Bearer Authentication
+    options.AddSecurityDefinition("oauth2", new OpenApiSecurityScheme
+    {
+        Type = SecuritySchemeType.OAuth2,
+        Flows = new OpenApiOAuthFlows
+        {
+            Implicit = new OpenApiOAuthFlow
+            {
+                AuthorizationUrl = new Uri($"{builder.Configuration["AzureAd:Instance"]}{builder.Configuration["AzureAd:TenantId"]}/oauth2/v2.0/authorize"),
+                TokenUrl = new Uri($"{builder.Configuration["AzureAd:Instance"]}{builder.Configuration["AzureAd:TenantId"]}/oauth2/v2.0/token"),
+                Scopes = { { "api://bff69ff1-dbac-43ef-88a1-f2a0c9aba3dc/access_as_user", "Access the API as a user" } }
+            }
+        }
+    });
+
+    options.AddSecurityRequirement(new OpenApiSecurityRequirement
+    {
+        {
+            new OpenApiSecurityScheme
+            {
+                Reference = new OpenApiReference { Type = ReferenceType.SecurityScheme, Id = "oauth2" }
+            },
+            new[] { "api://bff69ff1-dbac-43ef-88a1-f2a0c9aba3dc/access_as_user" }
+        }
+    });
 });
 
 // Configure CORS policy.
@@ -43,6 +74,14 @@ builder.Services.AddCors(options =>
     options.AddPolicy("AllowAll", policy =>
         policy.AllowAnyOrigin().AllowAnyHeader().AllowAnyMethod());
 });
+
+// Configure Entra ID authentication
+builder.Services
+    .AddAuthentication(JwtBearerDefaults.AuthenticationScheme)
+    .AddMicrosoftIdentityWebApi(builder.Configuration.GetSection("AzureAd"));
+
+// Add user service
+builder.Services.AddScoped<IUserService, UserService>();
 
 var app = builder.Build();
 
@@ -82,6 +121,7 @@ app.UseStaticFiles();
 app.UseRouting();
 app.UseCors("AllowAll");
 
+app.UseAuthentication();
 app.UseAuthorization();
 
 // Configure route for MVC.

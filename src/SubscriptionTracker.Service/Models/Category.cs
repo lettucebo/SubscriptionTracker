@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SubscriptionTracker.Service.Models
 {
@@ -41,5 +42,16 @@ namespace SubscriptionTracker.Service.Models
         /// Gets or sets the deletion timestamp.
         /// </summary>
         public DateTime? DeleteAt { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user ID who created this category.
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user who created this category.
+        /// </summary>
+        [ForeignKey("UserId")]
+        public User User { get; set; } = null!;
     }
 }
