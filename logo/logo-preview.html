@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SubscriptionTracker Logo Preview</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .logo-container {
+            margin: 20px 0;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+        }
+        h1 {
+            color: #0d6efd;
+        }
+        .logo-row {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        .logo-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .logo-caption {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #666;
+        }
+        .color-palette {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        .color-swatch {
+            width: 80px;
+            height: 80px;
+            border-radius: 8px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            color: white;
+            font-size: 12px;
+            text-align: center;
+        }
+        .dark-text {
+            color: #333;
+        }
+    </style>
+</head>
+<body>
+    <h1>SubscriptionTracker Logo Preview</h1>
+    
+    <div class="logo-container">
+        <h2>Logo Variations</h2>
+        
+        <div class="logo-row">
+            <div class="logo-item">
+                <img src="logo.svg" alt="SubscriptionTracker Logo" width="200">
+                <div class="logo-caption">Main Logo (SVG)</div>
+            </div>
+            
+            <div class="logo-item">
+                <img src="logo-with-text.svg" alt="SubscriptionTracker Logo with Text" width="400">
+                <div class="logo-caption">Logo with Text (SVG)</div>
+            </div>
+        </div>
+        
+        <div class="logo-row">
+            <div class="logo-item">
+                <img src="favicon.svg" alt="SubscriptionTracker Favicon" width="64">
+                <div class="logo-caption">Favicon (SVG, 64x64)</div>
+            </div>
+        </div>
+        
+        <h2>Color Palette</h2>
+        <p>The logo uses the following colors from the application's design system:</p>
+        
+        <div class="color-palette">
+            <div class="color-swatch" style="background-color: #0d6efd;">
+                Primary<br>#0d6efd<br>RGB(13,110,253)
+            </div>
+            <div class="color-swatch" style="background-color: #f8f9fa; color: #333;">
+                <span class="dark-text">Background</span><br>
+                <span class="dark-text">#f8f9fa</span><br>
+                <span class="dark-text">RGB(248,249,250)</span>
+            </div>
+            <div class="color-swatch" style="background-color: white; color: #333;">
+                <span class="dark-text">White</span><br>
+                <span class="dark-text">#ffffff</span><br>
+                <span class="dark-text">RGB(255,255,255)</span>
+            </div>
+            <div class="color-swatch" style="background-color: #e6e6e6; color: #333;">
+                <span class="dark-text">Light Gray</span><br>
+                <span class="dark-text">#e6e6e6</span><br>
+                <span class="dark-text">RGB(230,230,230)</span>
+            </div>
+        </div>
+    </div>
+    
+    <h2>Design Rationale</h2>
+    <p>The logo for SubscriptionTracker incorporates several key elements that represent the application's purpose:</p>
+    <ul>
+        <li><strong>Calendar Icon:</strong> Represents the time-based nature of subscriptions and the calendar view feature</li>
+        <li><strong>Checkmark:</strong> Symbolizes task completion and tracking</li>
+        <li><strong>Recurring Symbol:</strong> Indicates the recurring nature of subscription payments</li>
+        <li><strong>Color Scheme:</strong> Uses the application's existing Bootstrap primary blue (#0d6efd) for brand consistency</li>
+        <li><strong>Clean Design:</strong> Simple, modern aesthetic that works well at various sizes</li>
+    </ul>
+    
+    <h2>Usage Guidelines</h2>
+    <p>The logo is provided in several formats:</p>
+    <ul>
+        <li><strong>SVG:</strong> Vector format for scalable usage in web and print</li>
+        <li><strong>Favicon:</strong> Simplified version for browser tabs and bookmarks</li>
+    </ul>
+    <p>For best results:</p>
+    <ul>
+        <li>Maintain the aspect ratio when resizing</li>
+        <li>Use the version without text when space is limited</li>
+        <li>Use the favicon for browser tabs and app icons</li>
+        <li>Maintain adequate spacing around the logo (at least half the logo's height)</li>
+    </ul>
+</body>
+</html>
