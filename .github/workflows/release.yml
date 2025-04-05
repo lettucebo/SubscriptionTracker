@@ -43,12 +43,16 @@ jobs:
 
       # Build frontend
       - name: Build frontend
+        env:
+          API_URL: ${{ vars.API_URL }}
         run: |
           cd src/subscription-tracker-client
           # Replace baseUrl in config.js with API_URL
-          echo "export const config = {
-  baseUrl: '${{ vars.API_URL }}'
-}" > src/config.js
+          cat > src/config.js << EOF
+          export const config = {
+            baseUrl: "${API_URL}"
+          }
+          EOF
           npm ci
           npm run build
 
