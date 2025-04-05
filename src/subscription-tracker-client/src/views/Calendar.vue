@@ -144,8 +144,7 @@
 
 <script>
 import { ref, onMounted, computed } from 'vue'
-import axios from 'axios'
-import { config } from '@/config'
+import { apiService } from '@/services/apiService'
 import FullCalendar from '@fullcalendar/vue3'
 import dayGridPlugin from '@fullcalendar/daygrid'
 import interactionPlugin from '@fullcalendar/interaction'
@@ -190,7 +189,7 @@ export default {
       loading.value = true
       error.value = null
       try {
-        const response = await axios.get(`${config.baseUrl}/api/subscription`)
+        const response = await apiService.getSubscriptions()
         subscriptions.value = response.data
       } catch (err) {
         error.value = 'Failed to load subscriptions. Please try again later.'
@@ -222,7 +221,7 @@ export default {
      */
     const fetchCategories = async () => {
       try {
-        const response = await axios.get(`${config.baseUrl}/api/category`)
+        const response = await apiService.getCategories()
         categories.value = response.data
       } catch (err) {
         console.error('Error fetching categories:', err)
@@ -370,15 +369,7 @@ export default {
         const dateString = `${year}-${month}-${day}T00:00:00.000Z`;
 
         // Send the date as a JSON string with proper content type header
-        await axios.put(
-          `${config.baseUrl}/api/subscription/${subscriptionId}/dates`,
-          JSON.stringify(dateString),
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        await apiService.updateSubscriptionDates(subscriptionId, dateString)
         await fetchEvents()
       } catch (err) {
         error.value = 'Failed to update subscription dates'
@@ -406,15 +397,7 @@ export default {
         // The Z suffix ensures it's treated as UTC time
 
         // Send the date as a JSON string with proper content type header
-        await axios.put(
-          `${config.baseUrl}/api/subscription/${editEvent.value.id}/dates`,
-          JSON.stringify(dateString),
-          {
-            headers: {
-              'Content-Type': 'application/json'
-            }
-          }
-        )
+        await apiService.updateSubscriptionDates(editEvent.value.id, dateString)
         closeModal()
         await fetchEvents()
       } catch (err) {

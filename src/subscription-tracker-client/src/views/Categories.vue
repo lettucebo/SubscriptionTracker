@@ -94,8 +94,7 @@
 </template>
 
 <script>
-import axios from 'axios';
-import { config } from '@/config';
+import { apiService } from '@/services/apiService';
 
 export default {
   name: 'CategoriesManagement',
@@ -123,7 +122,7 @@ export default {
   methods: {
     async fetchCategories() {
       try {
-        const response = await axios.get(`${config.baseUrl}/api/category`);
+        const response = await apiService.getCategories();
         this.categories = response.data;
       } catch (error) {
         console.error('Error fetching categories:', error);
@@ -136,7 +135,7 @@ export default {
     async deleteCategory(id) {
       if (confirm('Are you sure you want to delete this category?')) {
         try {
-          await axios.delete(`${config.baseUrl}/api/category/${id}`);
+          await apiService.deleteCategory(id);
           await this.fetchCategories();
         } catch (error) {
           console.error('Error deleting category:', error);
@@ -146,9 +145,9 @@ export default {
     async submitForm() {
       try {
         if (this.editingCategory) {
-          await axios.put(`${config.baseUrl}/api/category/${this.editingCategory.id}`, this.formData);
+          await apiService.updateCategory(this.editingCategory.id, this.formData);
         } else {
-          await axios.post(`${config.baseUrl}/api/category`, this.formData);
+          await apiService.createCategory(this.formData);
         }
         await this.fetchCategories();
         this.closeModal();

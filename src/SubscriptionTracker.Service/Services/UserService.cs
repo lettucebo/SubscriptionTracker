@@ -42,8 +42,10 @@ namespace SubscriptionTracker.Service.Services
                 throw new UnauthorizedAccessException("User object ID not found in claims");
             }
 
+            // Try to get the existing user first
             var user = await GetUserByObjectIdAsync(objectId);
 
+            // If user doesn't exist, create a new one
             if (user == null)
             {
                 // Create a new user
@@ -63,8 +65,24 @@ namespace SubscriptionTracker.Service.Services
                     CreatedAt = DateTime.UtcNow
                 };
 
-                _context.Users.Add(user);
-                await _context.SaveChangesAsync();
+                try
+                {
+                    _context.Users.Add(user);
+                    await _context.SaveChangesAsync();
+                }
+                catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key") == true)
+                {
+                    // If we get a duplicate key error, the user was created by another concurrent request
+                    // Just retrieve the existing user
+                    _context.Entry(user).State = EntityState.Detached;
+                    user = await GetUserByObjectIdAsync(objectId);
+
+                    if (user == null)
+                    {
+                        // This should not happen, but just in case
+                        throw new InvalidOperationException("Failed to retrieve user after duplicate key error", ex);
+                    }
+                }
             }
 
             return user;
@@ -73,14 +91,25 @@ namespace SubscriptionTracker.Service.Services
         /// <inheritdoc/>
         public async Task<User> GetUserByObjectIdAsync(string objectId)
         {
+            // Make sure to use AsNoTracking to avoid conflicts with tracked entities
             return await _context.Users
+                .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.ObjectId == objectId);
         }
 
         /// <inheritdoc/>
         public async Task<User> GetCurrentUserAsync(ClaimsPrincipal claimsPrincipal)
         {
-            return await GetOrCreateUserAsync(claimsPrincipal);
+            try
+            {
+                return await GetOrCreateUserAsync(claimsPrincipal);
+            }
+            catch (Exception ex)
+            {
+                // Log the exception
+                Console.Error.WriteLine($"Error getting current user: {ex.Message}");
+                throw;
+            }
         }
     }
 }
