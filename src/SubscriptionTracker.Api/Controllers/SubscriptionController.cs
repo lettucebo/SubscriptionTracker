@@ -4,6 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
+using SubscriptionTracker.Service.Models.DTOs;
 using SubscriptionTracker.Service.Services;
 using System;
 using System.Linq;
@@ -165,7 +166,7 @@ namespace SubscriptionTracker.Api.Controllers
         /// <summary>
         /// Creates a new subscription entry
         /// </summary>
-        /// <param name="subscription">
+        /// <param name="subscriptionDto">
         /// Subscription data including amount, billing cycle, and optional category
         /// </param>
         /// <returns>Newly created subscription with calculated metrics</returns>
@@ -179,7 +180,7 @@ namespace SubscriptionTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateSubscription(
             [FromBody]
-            Subscription subscription)
+            SubscriptionDTO subscriptionDto)
         {
             if (!ModelState.IsValid)
             {
@@ -189,11 +190,38 @@ namespace SubscriptionTracker.Api.Controllers
             // Get the current user
             var currentUser = await _userService.GetCurrentUserAsync(User);
 
-            // Associate the subscription with the current user
-            subscription.UserId = currentUser.Id;
+            // Get the category
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == subscriptionDto.CategoryId && c.UserId == currentUser.Id);
+
+            if (category == null)
+            {
+                ModelState.AddModelError("CategoryId", "Invalid category ID or category not found");
+                return BadRequest(ModelState);
+            }
+
+            // Create a new subscription entity from the DTO
+            var subscription = new Subscription
+            {
+                Name = subscriptionDto.Name,
+                Amount = subscriptionDto.Amount,
+                BillingCycle = subscriptionDto.BillingCycle,
+                DiscountRate = subscriptionDto.DiscountRate,
+                StartDate = subscriptionDto.StartDate,
+                EndDate = subscriptionDto.EndDate,
+                CategoryId = subscriptionDto.CategoryId,
+                IsShared = subscriptionDto.IsShared,
+                ContactInfo = subscriptionDto.ContactInfo,
+                UserId = currentUser.Id
+            };
 
             _context.Subscriptions.Add(subscription);
             await _context.SaveChangesAsync();
+
+            // Reload the subscription with the category included
+            subscription = await _context.Subscriptions
+                .Include(s => s.Category)
+                .FirstOrDefaultAsync(s => s.Id == subscription.Id);
 
             var result = new
             {
@@ -204,7 +232,9 @@ namespace SubscriptionTracker.Api.Controllers
                 subscription.EndDate,
                 subscription.BillingCycle,
                 subscription.DiscountRate,
-                Category = subscription.Category == null ? null : new
+                subscription.IsShared,
+                subscription.ContactInfo,
+                Category = new
                 {
                     subscription.Category.Id,
                     subscription.Category.Name,
@@ -223,7 +253,7 @@ namespace SubscriptionTracker.Api.Controllers
         /// Updates an existing subscription's details
         /// </summary>
         /// <param name="id">Subscription identifier to update</param>
-        /// <param name="subscription">Updated subscription data</param>
+        /// <param name="subscriptionDto">Updated subscription data</param>
         /// <returns>
         /// No content response if successful, error details otherwise
         /// </returns>
@@ -240,9 +270,9 @@ namespace SubscriptionTracker.Api.Controllers
             [FromRoute]
             int id,
             [FromBody]
-            Subscription subscription)
+            SubscriptionDTO subscriptionDto)
         {
-            if (id != subscription.Id)
+            if (id != subscriptionDto.Id)
             {
                 return BadRequest("Subscription id mismatch.");
             }
@@ -259,10 +289,26 @@ namespace SubscriptionTracker.Api.Controllers
                 return NotFound();
             }
 
-            // Ensure the user ID doesn't change
-            subscription.UserId = currentUser.Id;
+            // Get the category
+            var category = await _context.Categories
+                .FirstOrDefaultAsync(c => c.Id == subscriptionDto.CategoryId && c.UserId == currentUser.Id);
 
-            _context.Entry(subscription).State = EntityState.Modified;
+            if (category == null)
+            {
+                ModelState.AddModelError("CategoryId", "Invalid category ID or category not found");
+                return BadRequest(ModelState);
+            }
+
+            // Update the existing subscription with values from the DTO
+            existingSubscription.Name = subscriptionDto.Name;
+            existingSubscription.Amount = subscriptionDto.Amount;
+            existingSubscription.BillingCycle = subscriptionDto.BillingCycle;
+            existingSubscription.DiscountRate = subscriptionDto.DiscountRate;
+            existingSubscription.StartDate = subscriptionDto.StartDate;
+            existingSubscription.EndDate = subscriptionDto.EndDate;
+            existingSubscription.CategoryId = subscriptionDto.CategoryId;
+            existingSubscription.IsShared = subscriptionDto.IsShared;
+            existingSubscription.ContactInfo = subscriptionDto.ContactInfo;
 
             try
             {
