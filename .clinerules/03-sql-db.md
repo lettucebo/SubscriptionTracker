@@ -11,7 +11,7 @@
 - 欄位資料型態
 	- 使用強型別，舉例：勿使用varchar類型儲存數字等資料
 
-### 3. 相關規範
+## 2. 相關規範
 - 每個資料表都要有以下欄位：
     - `不論多細小的資料表都一定要有，除了多對多關聯資料表以外`
     - 如下範例 SQL: 
@@ -58,7 +58,7 @@
     - 作為關聯的欄位（外來鍵），均於欄位名稱最後面加上 Id 作為結尾，代表此欄位為外來鍵
     - 如：CreaterId（建立者）；關連至 Users 資料表
     
-- Bollean 值資料類型欄位
+- Boolean 值資料類型欄位
     - 以 Is 開頭，並於後面接上欄位名稱；使用 bit 做為資料型態，並一定要有預設值，不可為 Null
     <table>
     <tr>
@@ -86,7 +86,9 @@
 
 - 時間欄位
     - 時間欄位名稱均於名字後面加上Time做為區別
-    - 若欄位只單純儲存日期則於名字後面加上Date 做為區別
+        - 時間欄位資料型態一律使用 datetimeoffset(7)
+        - 預設值為 sysdatetimeoffset()
+    - 若欄位只單純儲存日期則於名字後面加上Date 做為區別，並使用 Date 資料型態
     <table>
     <tr>
         <th>欄位名稱</th>
@@ -97,17 +99,17 @@
     </tr>
     <tr>
         <td>CreatTime</td>
-        <td>datetime</td>
-        <td>(getdate())</td>
+        <td>datetimeoffset(7)</td>
+        <td>(sysdatetimeoffset())</td>
         <td>否</td>
         <td>建立時間</td>
     </tr>
     <tr>
-        <td>DeleteTime</td>
-        <td>datetime</td>
-        <td></td>
-        <td>是</td>
-        <td>刪除時間</td>
+        <td>ModifyTime</td>
+        <td>datetimeoffset(7)</td>
+        <td>(sysdatetimeoffset())</td>
+        <td>否</td>
+        <td>修改時間</td>
     </tr>
     <tr>
         <td>BirthDate</td>
