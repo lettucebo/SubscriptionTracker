@@ -77,9 +77,28 @@ jobs:
           app-name: ${{ steps.set_variables.outputs.WEBAPP_NAME }}
           package: ./publish/api
 
-      # Install PM2 globally
-      - name: Install PM2
-        run: npm install -g pm2
+      # Prepare frontend for deployment
+      - name: Prepare frontend for deployment
+        run: |
+          # Copy necessary files to the dist folder
+          cp src/subscription-tracker-client/public/web.config src/subscription-tracker-client/dist/
+          cp src/subscription-tracker-client/public/.deployment src/subscription-tracker-client/dist/
+          cp src/subscription-tracker-client/public/server.js src/subscription-tracker-client/dist/
+          cp src/subscription-tracker-client/public/package.json src/subscription-tracker-client/dist/
+
+      # Configure Azure Web App settings for frontend
+      - name: Configure Azure Web App settings
+        run: |
+          az webapp config set --resource-group ${{ steps.set_variables.outputs.RESOURCE_GROUP }} \
+            --name ${{ steps.set_variables.outputs.FRONTEND_WEBAPP_NAME }} \
+            --linux-fx-version "NODE|22-lts" \
+            --startup-file "server.js" \
+            --ftps-state Disabled
+
+          # Configure app settings
+          az webapp config appsettings set --resource-group ${{ steps.set_variables.outputs.RESOURCE_GROUP }} \
+            --name ${{ steps.set_variables.outputs.FRONTEND_WEBAPP_NAME }} \
+            --settings SCM_DO_BUILD_DURING_DEPLOYMENT=true
 
       # Deploy frontend to Azure Web App
       - name: Deploy frontend to Azure Web App
@@ -88,7 +107,6 @@ jobs:
         with:
           app-name: ${{ steps.set_variables.outputs.FRONTEND_WEBAPP_NAME }}
           package: ./src/subscription-tracker-client/dist
-          startup-command: "pm2 serve /home/site/wwwroot --no-daemon --spa"
 
       # Post-deployment verification
       - name: Post-deployment verification
