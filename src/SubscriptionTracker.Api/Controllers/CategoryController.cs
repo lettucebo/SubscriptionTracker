@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
+using SubscriptionTracker.Service.Models.DTOs;
 using SubscriptionTracker.Service.Services;
 
 namespace SubscriptionTracker.Api.Controllers
@@ -68,20 +69,26 @@ namespace SubscriptionTracker.Api.Controllers
         /// <summary>
         /// Creates a new category in the database
         /// </summary>
-        /// <param name="category">Category entity to create</param>
+        /// <param name="categoryDto">Category data to create</param>
         /// <returns>
         /// CreatedAtAction with the newly created category
         /// </returns>
         /// <response code="201">Returns the newly created category</response>
         /// <response code="400">If the category data is invalid</response>
         [HttpPost]
-        public async Task<ActionResult<Category>> CreateCategory(Category category)
+        public async Task<ActionResult<Category>> CreateCategory(CategoryDTO categoryDto)
         {
             // Get the current user
             var currentUser = await _userService.GetCurrentUserAsync(User);
 
-            // Associate the category with the current user
-            category.UserId = currentUser.Id;
+            // Create a new Category entity from the DTO
+            var category = new Category
+            {
+                Name = categoryDto.Name,
+                Description = categoryDto.Description,
+                ColorCode = categoryDto.ColorCode,
+                UserId = currentUser.Id
+            };
 
             _context.Categories.Add(category);
             await _context.SaveChangesAsync();
@@ -93,7 +100,7 @@ namespace SubscriptionTracker.Api.Controllers
         /// Updates an existing category
         /// </summary>
         /// <param name="id">ID of the category to update</param>
-        /// <param name="category">Updated Category entity</param>
+        /// <param name="categoryDto">Updated Category data</param>
         /// <returns>
         /// IActionResult indicating success or failure
         /// </returns>
@@ -102,14 +109,14 @@ namespace SubscriptionTracker.Api.Controllers
         /// <response code="404">If category not found</response>
         /// <response code="409">If concurrency conflict occurs</response>
         [HttpPut("{id}")]
-        public async Task<IActionResult> UpdateCategory(int id, [FromBody] Category category)
+        public async Task<IActionResult> UpdateCategory(int id, [FromBody] CategoryDTO categoryDto)
         {
             if (!ModelState.IsValid)
             {
                 return BadRequest(ModelState);
             }
 
-            if (id != category.Id)
+            if (id != categoryDto.Id)
             {
                 return BadRequest("ID mismatch");
             }
@@ -124,13 +131,10 @@ namespace SubscriptionTracker.Api.Controllers
                 return NotFound();
             }
 
-            // Ensure the user ID doesn't change
-            category.UserId = currentUser.Id;
-
-            // Explicitly update allowed fields
-            existingCategory.Name = category.Name;
-            existingCategory.Description = category.Description;
-            existingCategory.ColorCode = category.ColorCode;
+            // Update allowed fields from the DTO
+            existingCategory.Name = categoryDto.Name;
+            existingCategory.Description = categoryDto.Description;
+            existingCategory.ColorCode = categoryDto.ColorCode;
 
             try
             {
