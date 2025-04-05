@@ -28,9 +28,10 @@
             </li>
           </ul>
 
-          <!-- Theme toggle button -->
+          <!-- Theme toggle and login buttons -->
           <div class="d-flex align-items-center">
-            <ThemeToggle />
+            <ThemeToggle class="me-3" />
+            <LoginButton />
           </div>
         </div>
       </div>
@@ -43,6 +44,7 @@
 
 <script>
 import ThemeToggle from '@/components/ThemeToggle.vue';
+import LoginButton from '@/components/LoginButton.vue';
 import { initTheme } from '@/services/themeService';
 
 /**
@@ -57,7 +59,8 @@ export default {
   name: 'App',
 
   components: {
-    ThemeToggle
+    ThemeToggle,
+    LoginButton
   },
 
   /**

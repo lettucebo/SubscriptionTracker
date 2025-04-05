@@ -1,5 +1,6 @@
 using System;
 using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
 using Newtonsoft.Json;
 
 namespace SubscriptionTracker.Service.Models
@@ -76,5 +77,16 @@ namespace SubscriptionTracker.Service.Models
         /// Gets or sets the contact information for shared subscriptions.
         /// </summary>
         public string? ContactInfo { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user ID who owns this subscription.
+        /// </summary>
+        public int UserId { get; set; }
+
+        /// <summary>
+        /// Gets or sets the user who owns this subscription.
+        /// </summary>
+        [ForeignKey("UserId")]
+        public User User { get; set; } = null!;
     }
 }
