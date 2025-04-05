@@ -1,12 +1,12 @@
 using System;
 using System.ComponentModel.DataAnnotations;
 
-namespace SubscriptionTracker.Service.Models.DTOs
+namespace SubscriptionTracker.Service.Models.ViewModels
 {
     /// <summary>
-    /// Data Transfer Object for Subscription operations
+    /// ViewModel for Subscription operations
     /// </summary>
-    public class SubscriptionDTO
+    public class SubscriptionViewModel
     {
         /// <summary>
         /// Gets or sets the unique identifier for the subscription.

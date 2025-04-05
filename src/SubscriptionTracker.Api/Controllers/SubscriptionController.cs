@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 using Swashbuckle.AspNetCore.Annotations;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
-using SubscriptionTracker.Service.Models.DTOs;
+using SubscriptionTracker.Service.Models.ViewModels;
 using SubscriptionTracker.Service.Services;
 using System;
 using System.Linq;
@@ -166,7 +166,7 @@ namespace SubscriptionTracker.Api.Controllers
         /// <summary>
         /// Creates a new subscription entry
         /// </summary>
-        /// <param name="subscriptionDto">
+        /// <param name="subscriptionViewModel">
         /// Subscription data including amount, billing cycle, and optional category
         /// </param>
         /// <returns>Newly created subscription with calculated metrics</returns>
@@ -180,7 +180,7 @@ namespace SubscriptionTracker.Api.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> CreateSubscription(
             [FromBody]
-            SubscriptionDTO subscriptionDto)
+            SubscriptionViewModel subscriptionViewModel)
         {
             if (!ModelState.IsValid)
             {
@@ -192,7 +192,7 @@ namespace SubscriptionTracker.Api.Controllers
 
             // Get the category
             var category = await _context.Categories
-                .FirstOrDefaultAsync(c => c.Id == subscriptionDto.CategoryId && c.UserId == currentUser.Id);
+                .FirstOrDefaultAsync(c => c.Id == subscriptionViewModel.CategoryId && c.UserId == currentUser.Id);
 
             if (category == null)
             {
@@ -200,18 +200,18 @@ namespace SubscriptionTracker.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Create a new subscription entity from the DTO
+            // Create a new subscription entity from the ViewModel
             var subscription = new Subscription
             {
-                Name = subscriptionDto.Name,
-                Amount = subscriptionDto.Amount,
-                BillingCycle = subscriptionDto.BillingCycle,
-                DiscountRate = subscriptionDto.DiscountRate,
-                StartDate = subscriptionDto.StartDate,
-                EndDate = subscriptionDto.EndDate,
-                CategoryId = subscriptionDto.CategoryId,
-                IsShared = subscriptionDto.IsShared,
-                ContactInfo = subscriptionDto.ContactInfo,
+                Name = subscriptionViewModel.Name,
+                Amount = subscriptionViewModel.Amount,
+                BillingCycle = subscriptionViewModel.BillingCycle,
+                DiscountRate = subscriptionViewModel.DiscountRate,
+                StartDate = subscriptionViewModel.StartDate,
+                EndDate = subscriptionViewModel.EndDate,
+                CategoryId = subscriptionViewModel.CategoryId,
+                IsShared = subscriptionViewModel.IsShared,
+                ContactInfo = subscriptionViewModel.ContactInfo,
                 UserId = currentUser.Id
             };
 
@@ -253,7 +253,7 @@ namespace SubscriptionTracker.Api.Controllers
         /// Updates an existing subscription's details
         /// </summary>
         /// <param name="id">Subscription identifier to update</param>
-        /// <param name="subscriptionDto">Updated subscription data</param>
+        /// <param name="subscriptionViewModel">Updated subscription data</param>
         /// <returns>
         /// No content response if successful, error details otherwise
         /// </returns>
@@ -270,9 +270,9 @@ namespace SubscriptionTracker.Api.Controllers
             [FromRoute]
             int id,
             [FromBody]
-            SubscriptionDTO subscriptionDto)
+            SubscriptionViewModel subscriptionViewModel)
         {
-            if (id != subscriptionDto.Id)
+            if (id != subscriptionViewModel.Id)
             {
                 return BadRequest("Subscription id mismatch.");
             }
@@ -291,7 +291,7 @@ namespace SubscriptionTracker.Api.Controllers
 
             // Get the category
             var category = await _context.Categories
-                .FirstOrDefaultAsync(c => c.Id == subscriptionDto.CategoryId && c.UserId == currentUser.Id);
+                .FirstOrDefaultAsync(c => c.Id == subscriptionViewModel.CategoryId && c.UserId == currentUser.Id);
 
             if (category == null)
             {
@@ -299,16 +299,16 @@ namespace SubscriptionTracker.Api.Controllers
                 return BadRequest(ModelState);
             }
 
-            // Update the existing subscription with values from the DTO
-            existingSubscription.Name = subscriptionDto.Name;
-            existingSubscription.Amount = subscriptionDto.Amount;
-            existingSubscription.BillingCycle = subscriptionDto.BillingCycle;
-            existingSubscription.DiscountRate = subscriptionDto.DiscountRate;
-            existingSubscription.StartDate = subscriptionDto.StartDate;
-            existingSubscription.EndDate = subscriptionDto.EndDate;
-            existingSubscription.CategoryId = subscriptionDto.CategoryId;
-            existingSubscription.IsShared = subscriptionDto.IsShared;
-            existingSubscription.ContactInfo = subscriptionDto.ContactInfo;
+            // Update the existing subscription with values from the ViewModel
+            existingSubscription.Name = subscriptionViewModel.Name;
+            existingSubscription.Amount = subscriptionViewModel.Amount;
+            existingSubscription.BillingCycle = subscriptionViewModel.BillingCycle;
+            existingSubscription.DiscountRate = subscriptionViewModel.DiscountRate;
+            existingSubscription.StartDate = subscriptionViewModel.StartDate;
+            existingSubscription.EndDate = subscriptionViewModel.EndDate;
+            existingSubscription.CategoryId = subscriptionViewModel.CategoryId;
+            existingSubscription.IsShared = subscriptionViewModel.IsShared;
+            existingSubscription.ContactInfo = subscriptionViewModel.ContactInfo;
 
             try
             {
