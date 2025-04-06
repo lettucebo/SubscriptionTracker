@@ -16,8 +16,8 @@ param appServicePlanName string
 @description('Environment name (dev, test, prod)')
 param environmentName string
 
-@description('The fully qualified domain name of the SQL Server')
-param sqlServerFqdn string
+@description('The name of the SQL Server')
+param sqlServerName string
 
 @description('The name of the SQL Database')
 param sqlDatabaseName string
@@ -67,7 +67,8 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
       connectionStrings: [
         {
           name: 'DefaultConnection'
-          connectionString: 'Server=tcp:${sqlServerFqdn},1433;Initial Catalog=${sqlDatabaseName};Persist Security Info=False;User ID=${sqlAdminLogin};Password=${sqlAdminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
+          // Using private endpoint DNS name to ensure connection through private endpoint
+          connectionString: 'Server=tcp:${sqlServerName}.privatelink${environment().suffixes.sqlServerHostname},1433;Initial Catalog=${sqlDatabaseName};Persist Security Info=False;User ID=${sqlAdminLogin};Password=${sqlAdminPassword};MultipleActiveResultSets=False;Encrypt=True;TrustServerCertificate=False;Connection Timeout=30;'
           type: 'SQLAzure'
         }
       ]
