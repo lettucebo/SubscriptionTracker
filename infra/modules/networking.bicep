@@ -16,6 +16,8 @@ param vnetName string
 var vnetAddressPrefix = '10.0.0.0/16'
 var privateEndpointSubnetName = 'subnet-privateendpoints'
 var privateEndpointSubnetAddressPrefix = '10.0.0.0/24'
+var integrationSubnetName = 'subnet-integration'
+var integrationSubnetAddressPrefix = '10.0.1.0/24'
 
 // ========== Resources ==========
 
@@ -36,6 +38,20 @@ resource virtualNetwork 'Microsoft.Network/virtualNetworks@2023-05-01' = {
           addressPrefix: privateEndpointSubnetAddressPrefix
           privateEndpointNetworkPolicies: 'Disabled'
         }
+      },
+      {
+        name: integrationSubnetName
+        properties: {
+          addressPrefix: integrationSubnetAddressPrefix
+          delegations: [
+            {
+              name: 'delegation-to-webapp'
+              properties: {
+                serviceName: 'Microsoft.Web/serverFarms'
+              }
+            }
+          ]
+        }
       }
     ]
   }
@@ -48,3 +64,6 @@ output vnetId string = virtualNetwork.id
 
 @description('The ID of the subnet for private endpoints')
 output privateEndpointSubnetId string = virtualNetwork.properties.subnets[0].id
+
+@description('The ID of the subnet for VNet integration')
+output integrationSubnetId string = virtualNetwork.properties.subnets[1].id

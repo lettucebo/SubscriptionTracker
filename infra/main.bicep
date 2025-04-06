@@ -75,6 +75,7 @@ module backendModule 'modules/backend.bicep' = {
     sqlDatabaseName: sqlDatabaseName
     sqlAdminLogin: sqlAdminLogin
     sqlAdminPassword: sqlAdminPassword
+    integrationSubnetId: networkingModule.outputs.integrationSubnetId
   }
 }
 
@@ -85,6 +86,7 @@ module frontendModule 'modules/frontend.bicep' = {
     location: location
     frontendWebAppName: frontendWebAppName
     appServicePlanName: appServicePlanName
+    integrationSubnetId: networkingModule.outputs.integrationSubnetId
   }
   dependsOn: [
     backendModule // Ensure App Service Plan is created first

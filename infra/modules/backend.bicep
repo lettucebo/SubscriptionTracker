@@ -29,6 +29,9 @@ param sqlAdminLogin string
 @secure()
 param sqlAdminPassword string
 
+@description('The ID of the subnet for VNet integration')
+param integrationSubnetId string
+
 // ========== Resources ==========
 
 // App Service Plan (Linux, Basic tier)
@@ -51,6 +54,8 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
+    virtualNetworkSubnetId: integrationSubnetId
+    vnetRouteAllEnabled: true // Route all outbound traffic through VNet
     siteConfig: {
       linuxFxVersion: 'DOTNETCORE|8.0' // .NET 8.0 on Linux
       appSettings: [
