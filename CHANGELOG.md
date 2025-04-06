@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.1] - 2025-04-10
+### Changed
+- Migrated frontend from Azure Static Web App to Azure Web App for better integration
+- Updated App Service Plan to use Linux instead of Windows for both frontend and backend
+- Configured frontend to use Node.js 22 LTS runtime on Linux
+- Configured backend to use .NET Core 8.0 on Linux
+- Optimized infrastructure by sharing a single App Service Plan between frontend and backend
+
+### Security
+- Enabled VNet integration for both frontend and backend Web Apps
+- Configured all outbound traffic to route through VNet for enhanced security
+- Updated SQL Server connection string to use private endpoint DNS name
+- Improved network isolation with proper subnet delegation for Web App integration
+
+### Infrastructure
+- Added dedicated integration subnet with proper delegations for Web App VNet integration
+- Reorganized resource naming convention for better clarity (frontend/backend suffixes)
+- Enhanced deployment dependencies to ensure proper resource creation order
+
 ## [1.5.0] - 2025-04-06
 ### Added
 - Authentication system using Entra ID (formerly Azure AD)
