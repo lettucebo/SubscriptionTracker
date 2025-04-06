@@ -31,7 +31,7 @@ param sqlAdminPassword string
 
 // ========== Resources ==========
 
-// App Service Plan (Windows, Basic tier)
+// App Service Plan (Linux, Basic tier)
 resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
   name: appServicePlanName
   location: location
@@ -40,7 +40,7 @@ resource appServicePlan 'Microsoft.Web/serverfarms@2022-09-01' = {
     tier: 'Basic'
   }
   properties: {
-    reserved: false // Windows
+    reserved: true // Linux
   }
 }
 
@@ -52,7 +52,7 @@ resource webApp 'Microsoft.Web/sites@2022-09-01' = {
     serverFarmId: appServicePlan.id
     httpsOnly: true
     siteConfig: {
-      netFrameworkVersion: 'v8.0'
+      linuxFxVersion: 'DOTNETCORE|8.0' // .NET 8.0 on Linux
       appSettings: [
         {
           name: 'ASPNETCORE_ENVIRONMENT'

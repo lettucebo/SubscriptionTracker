@@ -29,8 +29,8 @@ param resourceNamePrefix string = 'subtracker'
 
 // Resource naming
 var resourceSuffix = toLower('${resourceNamePrefix}')
-var staticWebAppName = '${resourceSuffix}-stapp'
-var webAppName = '${resourceSuffix}-app'
+var frontendWebAppName = '${resourceSuffix}-app-frontend'
+var webAppName = '${resourceSuffix}-app-backend'
 var appServicePlanName = '${resourceSuffix}-plan'
 var sqlServerName = '${resourceSuffix}-sql'
 var sqlDatabaseName = '${resourceSuffix}-sqldb'
@@ -83,14 +83,18 @@ module frontendModule 'modules/frontend.bicep' = {
   name: 'frontendDeployment'
   params: {
     location: location
-    staticWebAppName: staticWebAppName
+    frontendWebAppName: frontendWebAppName
+    appServicePlanName: appServicePlanName
   }
+  dependsOn: [
+    backendModule // Ensure App Service Plan is created first
+  ]
 }
 
 // ========== Outputs ==========
 
-@description('The URL of the deployed Static Web App')
-output staticWebAppUrl string = frontendModule.outputs.staticWebAppUrl
+@description('The URL of the deployed Frontend Web App')
+output frontendWebAppUrl string = frontendModule.outputs.frontendWebAppUrl
 
 @description('The URL of the deployed Web App')
 output webAppUrl string = backendModule.outputs.webAppUrl

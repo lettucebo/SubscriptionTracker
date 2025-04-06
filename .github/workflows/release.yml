@@ -67,7 +67,7 @@ jobs:
         id: set_variables
         run: |
           echo "RESOURCE_GROUP=SubTracker" >> $GITHUB_OUTPUT
-          echo "WEBAPP_NAME=subtracker-app" >> $GITHUB_OUTPUT
+          echo "WEBAPP_NAME=subtracker-app-backend" >> $GITHUB_OUTPUT
           echo "FRONTEND_WEBAPP_NAME=subtracker-app-frontend" >> $GITHUB_OUTPUT
 
       # Deploy backend to Azure Web App
