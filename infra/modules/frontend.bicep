@@ -13,6 +13,9 @@ param frontendWebAppName string
 @description('The name of the App Service Plan')
 param appServicePlanName string
 
+@description('The ID of the subnet for VNet integration')
+param integrationSubnetId string
+
 // ========== Resources ==========
 
 // Reference to existing App Service Plan (shared with backend)
@@ -27,6 +30,8 @@ resource frontendWebApp 'Microsoft.Web/sites@2022-09-01' = {
   properties: {
     serverFarmId: appServicePlan.id
     httpsOnly: true
+    virtualNetworkSubnetId: integrationSubnetId
+    vnetRouteAllEnabled: true // Route all outbound traffic through VNet
     siteConfig: {
       linuxFxVersion: 'NODE|22-lts' // Node.js 22 LTS on Linux
       appSettings: [
