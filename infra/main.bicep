@@ -71,7 +71,7 @@ module backendModule 'modules/backend.bicep' = {
     webAppName: webAppName
     appServicePlanName: appServicePlanName
     environmentName: environmentName
-    sqlServerFqdn: databaseModule.outputs.sqlServerFqdn
+    sqlServerName: sqlServerName
     sqlDatabaseName: sqlDatabaseName
     sqlAdminLogin: sqlAdminLogin
     sqlAdminPassword: sqlAdminPassword
