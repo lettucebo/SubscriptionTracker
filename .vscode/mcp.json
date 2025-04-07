@@ -25,6 +25,32 @@
       "env": {
         "OAUTH_KEYS_PATH": "C:/Users/tzyu/Documents/Cline/MCP/google-calendar-mcp/gcp-oauth.keys.json"
       }
-    }
+    },
+    "spotify": {
+      "command": "node",
+      "args": [
+        "C:/Users/tzyu/Documents/Cline/MCP/mcp-spotify/build/index.js"
+      ],
+      "env": {
+        "SPOTIFY_CLIENT_ID": "d704a6e1bb974ba3a83ecc518987e910",
+        "SPOTIFY_CLIENT_SECRET": "5923f48ce0b446659053e858c3d53573"
+      }
+    },
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": {
+        "FIRECRAWL_API_KEY": "fc-8bd796e0baa84f6f808796c3c11ac937"
+      }
+    },
+    "sentry": {
+      "command": "C:/Users/tzyu/Documents/Cline/MCP/servers/src/sentry/env-sentry/Scripts/python",
+      "args": [
+        "-m",
+        "mcp_server_sentry",
+        "--auth-token",
+        "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"
+      ]
+    },
   }
 }
