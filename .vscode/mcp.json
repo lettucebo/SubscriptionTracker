@@ -52,5 +52,11 @@
         "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"
       ]
     },
+    "git": {
+      "command": "uvx",
+      "args": [
+        "mcp-server-git"
+      ]
+    },
   }
 }
