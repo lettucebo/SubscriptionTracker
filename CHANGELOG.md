@@ -5,7 +5,7 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
-## [1.5.2] - 2025-04-12
+## [1.5.2] - 2025-04-08
 ### Added
 - New Report page with subscription cost analytics and visualization
 - Tabbed interface for Report page with "Overview" and "Category Breakdown" sections
@@ -41,7 +41,7 @@ and this project adheres to [Conventional Commits](https://www.conventionalcommi
 - Improved typography with better spacing and formatting
 - Added new logo assets including SVG and PNG formats
 
-## [1.5.1] - 2025-04-10
+## [1.5.1] - 2025-04-07
 ### Changed
 - Migrated frontend from Azure Static Web App to Azure Web App for better integration
 - Updated App Service Plan to use Linux instead of Windows for both frontend and backend
