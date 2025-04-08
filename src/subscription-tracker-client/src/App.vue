@@ -185,6 +185,12 @@ body {
   color: rgb(var(--bs-primary-rgb));
 }
 
+/* Active link styles for dark mode */
+.dark-mode .router-link-active,
+.dark-mode .router-link-exact-active {
+  color: rgb(var(--bs-primary-rgb)) !important;
+}
+
 /* Dark mode styles for the entire app */
 .dark-mode {
   background-color: var(--bs-dark-bg) !important;
