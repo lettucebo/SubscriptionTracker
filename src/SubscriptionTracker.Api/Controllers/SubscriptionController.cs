@@ -96,7 +96,8 @@ namespace SubscriptionTracker.Api.Controllers
                 {
                     s.Category.Id,
                     s.Category.Name,
-                    s.Category.Description
+                    s.Category.Description,
+                    s.Category.ColorCode
                 },
                 RemainingDays = SubscriptionCalculator.CalculateRemainingDays(
                     s.StartDate, s.EndDate, s.BillingCycle),
@@ -152,7 +153,8 @@ namespace SubscriptionTracker.Api.Controllers
                 {
                     subscription.Category.Id,
                     subscription.Category.Name,
-                    subscription.Category.Description
+                    subscription.Category.Description,
+                    subscription.Category.ColorCode
                 },
                 RemainingDays = SubscriptionCalculator.CalculateRemainingDays(
                     subscription.StartDate, subscription.EndDate, subscription.BillingCycle),
@@ -238,7 +240,8 @@ namespace SubscriptionTracker.Api.Controllers
                 {
                     subscription.Category.Id,
                     subscription.Category.Name,
-                    subscription.Category.Description
+                    subscription.Category.Description,
+                    subscription.Category.ColorCode
                 },
                 RemainingDays = SubscriptionCalculator.CalculateRemainingDays(
                     subscription.StartDate, subscription.EndDate, subscription.BillingCycle),
