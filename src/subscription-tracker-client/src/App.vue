@@ -26,6 +26,9 @@
             <li class="nav-item">
               <router-link to="/calendar" class="nav-link">Calendar</router-link>
             </li>
+            <li class="nav-item">
+              <router-link to="/report" class="nav-link">Report</router-link>
+            </li>
           </ul>
 
           <!-- Theme toggle and login buttons -->
