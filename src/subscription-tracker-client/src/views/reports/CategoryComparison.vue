@@ -48,7 +48,7 @@
           </div>
 
           <div v-else-if="selectedCategories.length > 0" class="chart-container" style="position: relative; height: 400px;">
-            <canvas ref="comparisonChart"></canvas>
+            <canvas :key="'chart-' + chartType + '-' + selectedCategories.length" ref="comparisonChart"></canvas>
           </div>
         </div>
       </div>
@@ -262,14 +262,11 @@ export default {
       }
     };
 
-    // Update chart when selections change
+    // Update chart when selections change via UI
     const updateChart = () => {
-      // Use a longer timeout to ensure the DOM is fully updated
-      setTimeout(() => {
-        if (selectedCategories.value.length > 0 && !loading.value) {
-          initChart();
-        }
-      }, 500); // Increased timeout for better reliability
+      // This is now only used for UI events (checkbox changes, dropdown changes)
+      // The actual chart updates are handled by the watchers
+      // No need to do anything here as the watchers will handle it
     };
 
     // Initialize component
@@ -293,16 +290,51 @@ export default {
 
     // Watch for changes in chart type
     watch(chartType, () => {
-      if (!loading.value && selectedCategories.value.length > 0) {
-        updateChart();
+      // The canvas will be recreated automatically due to the :key binding
+      // Just make sure the chart instance is destroyed
+      if (chartInstance.value) {
+        try {
+          chartInstance.value.destroy();
+          chartInstance.value = null;
+        } catch (err) {
+          console.error('Error destroying chart:', err);
+        }
       }
+
+      // Wait for the next tick to ensure the new canvas is created
+      setTimeout(() => {
+        if (!loading.value && selectedCategories.value.length > 0) {
+          try {
+            initChart();
+          } catch (err) {
+            console.error('Error initializing chart after type change:', err);
+          }
+        }
+      }, 100);
     });
 
     // Watch for changes in selected categories
     watch(selectedCategories, () => {
-      if (!loading.value && selectedCategories.value.length > 0) {
-        updateChart();
+      // Destroy the existing chart
+      if (chartInstance.value) {
+        try {
+          chartInstance.value.destroy();
+          chartInstance.value = null;
+        } catch (err) {
+          console.error('Error destroying chart:', err);
+        }
       }
+
+      // Wait for the next tick to ensure the DOM is updated
+      setTimeout(() => {
+        if (!loading.value && selectedCategories.value.length > 0) {
+          try {
+            initChart();
+          } catch (err) {
+            console.error('Error initializing chart after category change:', err);
+          }
+        }
+      }, 100);
     });
 
     return {
