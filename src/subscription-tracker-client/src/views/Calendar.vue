@@ -8,14 +8,14 @@
         </div>
         <div>
           <h1 class="mb-0">Calendar View</h1>
-          <p class="text-muted mb-0 d-none d-md-block">
+          <p class="text-muted mb-0 d-none d-md-block light-text">
             <i class="fas fa-info-circle me-1"></i>
             Track your subscription payments at a glance
           </p>
         </div>
       </div>
       <div>
-        <button @click="refreshCalendar" class="btn btn-outline-primary btn-lg rounded-pill" :disabled="loading">
+        <button @click="refreshCalendar" class="btn btn-outline-primary btn-lg rounded-pill refresh-btn" :disabled="loading">
           <i class="fas fa-sync-alt me-1" :class="{ 'fa-spin': loading }"></i>
           <span class="ms-1 d-none d-md-inline">Refresh</span>
         </button>
@@ -533,26 +533,68 @@ export default {
   border-radius: 8px;
 }
 
-/* Make "Calendar View" heading black */
-.header-container h1.mb-0.fw-bold {
+/* Make "Calendar View" heading and text visible in light mode */
+.header-container h1.mb-0 {
   color: #000;
+}
+
+.header-container p.text-muted {
+  color: #333 !important;
+}
+
+.light-text {
+  color: #333 !important;
+}
+
+.light-text i {
+  color: #333 !important;
 }
 
 /* Header with gradient */
 .bg-gradient {
   background: linear-gradient(135deg, var(--bs-primary) 0%, #7366ff 100%);
-  color: white;
+  color: #000;
 }
 
 .dark-mode .bg-gradient {
   background: linear-gradient(135deg, #1e293b 0%, #0f172a 100%);
+  color: white;
+}
+
+.dark-mode .header-container h1.mb-0 {
+  color: white;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+}
+
+.dark-mode .calendar-icon-wrapper {
+  background-color: rgba(255, 255, 255, 0.2);
+}
+
+.dark-mode .calendar-icon-wrapper i {
+  color: white;
+}
+
+.dark-mode .light-text {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+.dark-mode .light-text i,
+.dark-mode p.text-muted i {
+  color: rgba(255, 255, 255, 1) !important;
+}
+
+.dark-mode p.text-muted {
+  color: rgba(255, 255, 255, 1) !important;
+  opacity: 1;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  font-weight: 500;
 }
 
 /* Calendar icon in header */
 .calendar-icon-wrapper {
   width: 48px;
   height: 48px;
-  background-color: rgba(255, 255, 255, 0.2);
+  background-color: rgba(0, 0, 0, 0.1);
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -562,6 +604,7 @@ export default {
 
 .calendar-icon-wrapper i {
   font-size: 24px;
+  color: #000;
 }
 
 /* Calendar container styling */
@@ -878,6 +921,19 @@ export default {
 .btn-outline-primary:hover {
   box-shadow: 0 4px 8px rgba(var(--bs-primary-rgb), 0.25);
   transform: translateY(-1px);
+}
+
+/* Refresh button in light mode */
+.refresh-btn {
+  background-color: white;
+  border-color: var(--bs-primary);
+  color: var(--bs-primary);
+}
+
+.dark-mode .refresh-btn {
+  background-color: transparent;
+  border-color: white;
+  color: white;
 }
 
 .rounded-pill {
