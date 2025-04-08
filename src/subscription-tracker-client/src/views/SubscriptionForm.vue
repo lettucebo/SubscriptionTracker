@@ -270,11 +270,14 @@ export default {
         isEdit.value = true
         try {
           const response = await apiService.getSubscription(route.params.id)
+          console.log('Subscription data from API:', response.data)
           subscription.value = {
             ...response.data,
+            categoryId: response.data.category?.id || response.data.categoryId,
             startDate: response.data.startDate?.substr(0, 10),
             endDate: response.data.endDate?.substr(0, 10)
           }
+          console.log('Processed subscription data:', subscription.value)
           await loadCategories(subscription.value.categoryId)
         } catch (error) {
           console.error("Error fetching subscription:", error)
