@@ -21,10 +21,19 @@
         <li class="nav-item">
           <a class="nav-link" :class="{ active: activeTab === 'categories' }" href="#" @click.prevent="activeTab = 'categories'">Category Breakdown</a>
         </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="{ active: activeTab === 'timeTrend' }" href="#" @click.prevent="activeTab = 'timeTrend'">Time Trend</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="{ active: activeTab === 'categoryComparison' }" href="#" @click.prevent="activeTab = 'categoryComparison'">Category Comparison</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="{ active: activeTab === 'lifecycle' }" href="#" @click.prevent="activeTab = 'lifecycle'">Subscription Lifecycle</a>
+        </li>
       </ul>
 
       <!-- Overview Tab -->
-      <div v-if="activeTab === 'overview'">
+      <div v-show="activeTab === 'overview'">
         <!-- Summary section -->
         <div class="card mb-4">
           <div class="card-body">
@@ -70,7 +79,7 @@
       </div>
 
       <!-- Category Breakdown Tab -->
-      <div v-if="activeTab === 'categories'">
+      <div v-show="activeTab === 'categories'">
         <div class="d-flex justify-content-between align-items-center mb-3">
           <h2>Category Breakdown</h2>
           <div class="d-flex gap-2">
@@ -118,6 +127,21 @@
           </div>
         </div>
       </div>
+
+      <!-- Time Trend Analysis Tab -->
+      <div v-show="activeTab === 'timeTrend'">
+        <TimeTrendAnalysis />
+      </div>
+
+      <!-- Category Comparison Tab -->
+      <div v-show="activeTab === 'categoryComparison'">
+        <CategoryComparison />
+      </div>
+
+      <!-- Subscription Lifecycle Tab -->
+      <div v-show="activeTab === 'lifecycle'">
+        <SubscriptionLifecycle />
+      </div>
     </div>
   </div>
 </template>
@@ -127,9 +151,17 @@
 import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { apiService } from '@/services/apiService';
+import TimeTrendAnalysis from './reports/TimeTrendAnalysis.vue';
+import CategoryComparison from './reports/CategoryComparison.vue';
+import SubscriptionLifecycle from './reports/SubscriptionLifecycle.vue';
 
 export default {
   name: 'ReportView',
+  components: {
+    TimeTrendAnalysis,
+    CategoryComparison,
+    SubscriptionLifecycle
+  },
   setup() {
     const router = useRouter();
     const subscriptions = ref([]);
@@ -337,12 +369,17 @@ export default {
 
     // Watch for tab changes
     watch(activeTab, (newTab) => {
-      if (newTab === 'overview') {
-        // Reinitialize chart when switching to overview tab
-        setTimeout(() => {
-          initChart();
-        }, 100);
-      }
+      // Use a longer timeout to ensure the DOM is fully updated
+      setTimeout(() => {
+        if (newTab === 'overview' && !loading.value) {
+          // Reinitialize chart when switching to overview tab
+          try {
+            initChart();
+          } catch (err) {
+            console.error('Error initializing chart on tab change:', err);
+          }
+        }
+      }, 300);
     });
 
     // Initialize component
