@@ -90,7 +90,7 @@
             </div>
           </td>
           <td :class="{ 'dark-cell': $root.darkMode }">
-            <span class="badge bg-info">
+            <span class="badge" :style="getCategoryBadgeStyle(sub.category?.colorCode)">
               {{ sub.category?.name }}
             </span>
           </td>
@@ -316,6 +316,51 @@ export default {
       if (!sub.endDate) return 'bg-success'
       return this.isExpiringSoon(sub) ? 'bg-warning' : 'bg-info'
     },
+
+    /**
+     * Get badge style based on category color
+     * @param {string} colorCode - Hex color code
+     * @returns {Object} Style object with background and text color
+     */
+    getCategoryBadgeStyle(colorCode) {
+      const defaultColor = '#17a2b8';
+      const color = colorCode || defaultColor;
+
+      // Calculate if the color is light or dark
+      const isLight = this.isLightColor(color);
+
+      return {
+        backgroundColor: color,
+        color: isLight ? '#000000' : '#ffffff',
+        textShadow: isLight ? '0 0 1px rgba(0,0,0,0.4)' : '0 0 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,1)',
+        border: this.$root.darkMode && isLight ? '1px solid rgba(0,0,0,0.2)' : 'none'
+      };
+    },
+
+    /**
+     * Determine if a color is light or dark
+     * @param {string} colorHex - Hex color code
+     * @returns {boolean} True if color is light
+     */
+    isLightColor(colorHex) {
+      // Default to a dark color if none provided
+      if (!colorHex) return false;
+
+      // Remove the # if it exists
+      const hex = colorHex.replace('#', '');
+
+      // Convert hex to RGB
+      const r = parseInt(hex.substr(0, 2), 16);
+      const g = parseInt(hex.substr(2, 2), 16);
+      const b = parseInt(hex.substr(4, 2), 16);
+
+      // Calculate perceived brightness using the formula
+      // (299*R + 587*G + 114*B) / 1000
+      const brightness = (r * 299 + g * 587 + b * 114) / 1000;
+
+      // Return true if the color is light (brightness > 155)
+      return brightness > 155;
+    },
     /**
      * Get status display text
      * @param {Object} sub - Subscription object
@@ -483,6 +528,41 @@ th {
 :deep(.dark-mode .subscription-table tr:hover) {
   background-color: rgba(255, 255, 255, 0.05) !important;
 }
+/* Category badge styling */
+.badge {
+  font-weight: 600;
+  padding: 5px 8px;
+  letter-spacing: 0.3px;
+}
+
+/* Fix form control styling in dark mode */
+.dark-mode .form-control {
+  background-color: #2d2d2d !important;
+  border-color: #444 !important;
+  color: #e0e0e0 !important;
+}
+
+.dark-mode .form-control:focus {
+  background-color: #333 !important;
+  border-color: rgb(var(--bs-primary-rgb)) !important;
+}
+
+/* Fix placeholder text color in dark mode */
+.dark-mode .form-control::placeholder {
+  color: #aaa;
+  opacity: 0.7;
+}
+
+.dark-mode .form-control::-webkit-input-placeholder {
+  color: #aaa;
+  opacity: 0.7;
+}
+
+.dark-mode .form-control::-moz-placeholder {
+  color: #aaa;
+  opacity: 0.7;
+}
+
 @media (max-width: 768px) {
   .table-responsive {
     font-size: 0.875rem;
