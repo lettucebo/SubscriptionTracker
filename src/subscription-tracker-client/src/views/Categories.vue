@@ -7,6 +7,8 @@
       </button>
     </div>
 
+    <hr>
+
     <table class="table table-hover categories-table">
       <thead class="table-light categories-table-header" :class="{ 'dark-header': $root.darkMode }">
         <tr :class="{ 'dark-row': $root.darkMode }">
