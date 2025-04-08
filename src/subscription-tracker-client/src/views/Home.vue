@@ -64,7 +64,7 @@
               <h3 class="card-title">Categories</h3>
               <div class="category-list">
                 <div v-for="(stats, categoryId) in categoryStats" :key="categoryId" class="category-item">
-                  <span class="badge bg-info">{{ getCategoryName(categoryId) }}</span>
+                  <span class="badge" :style="getCategoryBadgeStyle(categoryId)">{{ getCategoryName(categoryId) }}</span>
                   <span class="category-count">{{ stats.count }} (${{ stats.monthlyTotal.toFixed(2) }})</span>
                 </div>
               </div>
@@ -205,6 +205,49 @@ export default {
       return category?.name || 'Unknown'
     }
 
+    /**
+     * Get badge style based on category color
+     * @param {number} categoryId - Category ID
+     * @returns {Object} Style object with background and text color
+     */
+    const getCategoryBadgeStyle = (categoryId) => {
+      const category = categories.value.find(c => c.id === parseInt(categoryId))
+      const defaultColor = '#17a2b8' // Default color if category not found
+      const colorCode = category?.colorCode || defaultColor
+
+      // Calculate if the color is light or dark
+      const isLight = isLightColor(colorCode)
+
+      return {
+        backgroundColor: colorCode,
+        color: isLight ? '#000000' : '#ffffff',
+        textShadow: isLight ? '0 0 1px rgba(0,0,0,0.4)' : '0 0 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,1)',
+        border: isLight ? '1px solid rgba(0,0,0,0.2)' : 'none'
+      }
+    }
+
+    /**
+     * Check if a color is light (to determine text color)
+     * @param {string} hexColor - Hex color code
+     * @returns {boolean} True if color is light
+     */
+    const isLightColor = (hexColor) => {
+      // Remove # if present
+      const hex = hexColor.replace('#', '')
+
+      // Convert hex to RGB
+      const r = parseInt(hex.substr(0, 2), 16)
+      const g = parseInt(hex.substr(2, 2), 16)
+      const b = parseInt(hex.substr(4, 2), 16)
+
+      // Calculate perceived brightness using the formula
+      // (0.299*R + 0.587*G + 0.114*B)
+      const brightness = (0.299 * r + 0.587 * g + 0.114 * b) / 255
+
+      // Return true if the color is light (brightness > 0.5)
+      return brightness > 0.5
+    }
+
     return {
       subscriptions,
       loading,
@@ -213,7 +256,9 @@ export default {
       activeSubscriptions,
       expiringSoonCount,
       categoryStats,
-      getCategoryName
+      getCategoryName,
+      getCategoryBadgeStyle,
+      isLightColor
     }
   }
 }
