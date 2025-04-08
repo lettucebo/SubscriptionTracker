@@ -13,61 +13,102 @@
     </div>
 
     <div v-else>
-      <!-- Summary section -->
-      <div class="card mb-4">
-        <div class="card-body">
-          <h2 class="card-title">Summary</h2>
-          <div class="row">
-            <div class="col-md-6">
-              <p class="fs-4">Total Monthly Cost: <strong>${{ totalMonthlyCost.toFixed(2) }}</strong></p>
-              <p>Active Subscriptions: <strong>{{ subscriptions.length }}</strong></p>
-            </div>
-            <div class="col-md-6">
-              <p>Categories: <strong>{{ categories.length }}</strong></p>
-            </div>
-          </div>
-        </div>
-      </div>
+      <!-- Tab navigation -->
+      <ul class="nav nav-tabs mb-4">
+        <li class="nav-item">
+          <a class="nav-link" :class="{ active: activeTab === 'overview' }" href="#" @click.prevent="activeTab = 'overview'">Overview</a>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" :class="{ active: activeTab === 'categories' }" href="#" @click.prevent="activeTab = 'categories'">Category Breakdown</a>
+        </li>
+      </ul>
 
-      <!-- Chart section -->
-      <div class="row mb-4">
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h3 class="card-title">Cost by Category</h3>
-              <div class="chart-container" style="position: relative; height: 300px;">
-                <canvas ref="pieChart"></canvas>
+      <!-- Overview Tab -->
+      <div v-if="activeTab === 'overview'">
+        <!-- Summary section -->
+        <div class="card mb-4">
+          <div class="card-body">
+            <h2 class="card-title">Summary</h2>
+            <div class="row">
+              <div class="col-md-6">
+                <p class="fs-4">Total Monthly Cost: <strong>${{ totalMonthlyCost.toFixed(2) }}</strong></p>
+                <p>Active Subscriptions: <strong>{{ subscriptions.length }}</strong></p>
+              </div>
+              <div class="col-md-6">
+                <p>Categories: <strong>{{ categories.length }}</strong></p>
               </div>
             </div>
           </div>
         </div>
-        <div class="col-md-6">
-          <div class="card h-100">
-            <div class="card-body">
-              <h3 class="card-title">Monthly Distribution</h3>
-              <ul class="list-group list-group-flush">
-                <li v-for="(stats, categoryId) in categoryStats" :key="categoryId" class="list-group-item d-flex justify-content-between align-items-center">
-                  {{ getCategoryName(categoryId) }}
-                  <span class="badge bg-primary rounded-pill">${{ stats.monthlyTotal.toFixed(2) }}</span>
-                </li>
-              </ul>
+
+        <!-- Chart section -->
+        <div class="row mb-4">
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h3 class="card-title">Cost by Category</h3>
+                <div class="chart-container" style="position: relative; height: 300px;">
+                  <canvas ref="pieChart"></canvas>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="col-md-6">
+            <div class="card h-100">
+              <div class="card-body">
+                <h3 class="card-title">Monthly Distribution</h3>
+                <ul class="list-group list-group-flush">
+                  <li v-for="(stats, categoryId) in categoryStats" :key="categoryId" class="list-group-item d-flex justify-content-between align-items-center">
+                    {{ getCategoryName(categoryId) }}
+                    <span class="badge bg-primary rounded-pill">${{ stats.monthlyTotal.toFixed(2) }}</span>
+                  </li>
+                </ul>
+              </div>
             </div>
           </div>
         </div>
       </div>
 
-      <!-- Category cards section -->
-      <h2 class="mb-3">Category Breakdown</h2>
-      <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
-        <div v-for="(stats, categoryId) in categoryStats" :key="categoryId" class="col">
-          <div class="card h-100" :style="{ 'border-top': '5px solid ' + getCategoryColor(categoryId) }">
-            <div class="card-body">
-              <h3 class="card-title">{{ getCategoryName(categoryId) }}</h3>
-              <p class="card-text">Total Cost: ${{ stats.monthlyTotal.toFixed(2) }}</p>
-              <p class="card-text">Subscriptions: {{ stats.count }}</p>
-              <button class="btn btn-sm btn-outline-primary" @click="navigateToCategory(categoryId)">
-                <i class="bi bi-pencil"></i> Edit
-              </button>
+      <!-- Category Breakdown Tab -->
+      <div v-if="activeTab === 'categories'">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <h2>Category Breakdown</h2>
+          <div class="d-flex gap-2">
+            <button class="btn btn-outline-secondary btn-sm" @click="sortCategories('name')">
+              <i class="bi bi-sort-alpha-down"></i> Sort by Name
+            </button>
+            <button class="btn btn-outline-secondary btn-sm" @click="sortCategories('cost')">
+              <i class="bi bi-sort-numeric-down"></i> Sort by Cost
+            </button>
+          </div>
+        </div>
+
+        <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
+          <div v-for="categoryId in sortedCategoryIds" :key="categoryId" class="col">
+            <div class="card h-100" :style="{ 'border-top': '5px solid ' + getCategoryColor(categoryId) }">
+              <div class="card-body">
+                <h3 class="card-title">{{ getCategoryName(categoryId) }}</h3>
+                <p class="card-text">Total Cost: ${{ categoryStats[categoryId].monthlyTotal.toFixed(2) }}</p>
+                <p class="card-text">Subscriptions: {{ categoryStats[categoryId].count }}</p>
+
+                <!-- Subscription list for this category -->
+                <div class="mt-3">
+                  <h6 class="mb-2">Subscriptions:</h6>
+                  <ul class="list-group list-group-flush small">
+                    <li v-for="sub in getCategorySubscriptions(categoryId)" :key="sub.id"
+                        class="list-group-item px-0 py-1 d-flex justify-content-between align-items-center">
+                      {{ sub.name }}
+                      <span>${{ calculateMonthlyPrice(sub).toFixed(2) }}/mo</span>
+                    </li>
+                  </ul>
+                </div>
+
+                <div class="mt-3">
+                  <button class="btn btn-sm btn-outline-primary" @click="navigateToCategory(categoryId)">
+                    <i class="bi bi-pencil"></i> Edit Category
+                  </button>
+                </div>
+              </div>
             </div>
           </div>
         </div>
@@ -78,7 +119,7 @@
 
 <script>
 /* eslint-disable */
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { useRouter } from 'vue-router';
 import { apiService } from '@/services/apiService';
 
@@ -92,6 +133,8 @@ export default {
     const error = ref(null);
     const pieChart = ref(null);
     const chartInstance = ref(null);
+    const activeTab = ref('overview'); // Default active tab
+    const sortBy = ref('cost'); // Default sort order
 
     // Fetch data
     const fetchData = async () => {
@@ -172,6 +215,11 @@ export default {
 
     // Initialize pie chart
     const initChart = () => {
+      // Only initialize chart if we're on the overview tab
+      if (activeTab.value !== 'overview') {
+        return;
+      }
+
       // Wait for the next tick to ensure the DOM is updated
       setTimeout(() => {
         try {
@@ -246,12 +294,51 @@ export default {
       }, 100);
     };
 
+    // Get subscriptions for a specific category
+    const getCategorySubscriptions = (categoryId) => {
+      return subscriptions.value.filter(sub => sub.category.id === parseInt(categoryId));
+    };
+
+    // Sort categories by name or cost
+    const sortCategories = (sortType) => {
+      sortBy.value = sortType;
+    };
+
+    // Computed property for sorted category IDs
+    const sortedCategoryIds = computed(() => {
+      const categoryIds = Object.keys(categoryStats.value);
+
+      if (sortBy.value === 'name') {
+        // Sort by category name
+        return categoryIds.sort((a, b) => {
+          const nameA = getCategoryName(a).toLowerCase();
+          const nameB = getCategoryName(b).toLowerCase();
+          return nameA.localeCompare(nameB);
+        });
+      } else {
+        // Sort by cost (default)
+        return categoryIds.sort((a, b) => {
+          return categoryStats.value[b].monthlyTotal - categoryStats.value[a].monthlyTotal;
+        });
+      }
+    });
+
     // Navigate to category page
     const navigateToCategory = (categoryId) => {
       // We could use categoryId in the future to navigate to a specific category
       // For now, just navigate to the categories page
       router.push('/categories');
     };
+
+    // Watch for tab changes
+    watch(activeTab, (newTab) => {
+      if (newTab === 'overview') {
+        // Reinitialize chart when switching to overview tab
+        setTimeout(() => {
+          initChart();
+        }, 100);
+      }
+    });
 
     // Initialize component
     onMounted(() => {
@@ -268,7 +355,12 @@ export default {
       categoryStats,
       getCategoryName,
       getCategoryColor,
-      navigateToCategory
+      navigateToCategory,
+      activeTab,
+      sortCategories,
+      sortedCategoryIds,
+      getCategorySubscriptions,
+      calculateMonthlyPrice
     };
   }
 }
@@ -290,5 +382,30 @@ export default {
 
 .chart-container {
   margin: 0 auto;
+}
+
+.nav-tabs {
+  border-bottom: 2px solid #dee2e6;
+  margin-bottom: 1.5rem;
+}
+
+.nav-tabs .nav-link {
+  border: none;
+  color: #6c757d;
+  font-weight: 500;
+  padding: 0.75rem 1.25rem;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s ease;
+}
+
+.nav-tabs .nav-link:hover {
+  color: #495057;
+  border-bottom-color: #adb5bd;
+}
+
+.nav-tabs .nav-link.active {
+  color: #0d6efd;
+  background-color: transparent;
+  border-bottom-color: #0d6efd;
 }
 </style>
