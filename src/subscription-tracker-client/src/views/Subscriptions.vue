@@ -73,10 +73,10 @@
             </div>
           </td>
           <td class="text-capitalize" :class="{ 'dark-cell': $root.darkMode }">
-            <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
+            <span class="badge" :style="getStandardBadgeStyle('secondary')">{{ sub.billingCycle }}</span>
           </td>
           <td :class="{ 'dark-cell': $root.darkMode }">
-            <span class="badge bg-secondary">{{ sub.billingCycle }}</span>
+            <span class="badge" :style="getStandardBadgeStyle('secondary')">{{ sub.billingCycle }}</span>
             ${{ formatCurrency(sub.amount) }}
           </td>
           <td :class="{ 'dark-cell': $root.darkMode }">${{ formatCurrency(sub.effectiveMonthlyPrice) }}</td>
@@ -95,17 +95,17 @@
             </span>
           </td>
           <td :class="{ 'dark-cell': $root.darkMode }">
-            <span v-if="sub.isShared" class="badge bg-success" :title="sub.contactInfo">
+            <span v-if="sub.isShared" class="badge" :style="getStandardBadgeStyle('success')" :title="sub.contactInfo">
               <i class="fas fa-users me-1"></i> Shared
             </span>
-            <span v-else class="badge bg-secondary">
+            <span v-else class="badge" :style="getStandardBadgeStyle('secondary')">
               <i class="fas fa-user me-1"></i> Personal
             </span>
           </td>
           <td :class="{ 'dark-cell': $root.darkMode }">
             <span
               class="badge"
-              :class="getStatusClass(sub)"
+              :style="getStandardBadgeStyle(getStatusClass(sub).replace('bg-', ''))"
               :title="getStatusTitle(sub)"
             >
               {{ getStatusText(sub) }}
@@ -350,9 +350,9 @@ export default {
       const hex = colorHex.replace('#', '');
 
       // Convert hex to RGB
-      const r = parseInt(hex.substr(0, 2), 16);
-      const g = parseInt(hex.substr(2, 2), 16);
-      const b = parseInt(hex.substr(4, 2), 16);
+      const r = parseInt(hex.substring(0, 2), 16);
+      const g = parseInt(hex.substring(2, 2), 16);
+      const b = parseInt(hex.substring(4, 2), 16);
 
       // Calculate perceived brightness using the formula
       // (299*R + 587*G + 114*B) / 1000
@@ -360,6 +360,35 @@ export default {
 
       // Return true if the color is light (brightness > 155)
       return brightness > 155;
+    },
+
+    /**
+     * Get badge style for standard Bootstrap colors
+     * @param {string} colorName - Bootstrap color name (primary, secondary, success, etc.)
+     * @returns {Object} Style object with background and text color
+     */
+    getStandardBadgeStyle(colorName) {
+      // Map of Bootstrap color names to hex values
+      const colorMap = {
+        primary: '#0d6efd',
+        secondary: '#6c757d',
+        success: '#198754',
+        danger: '#dc3545',
+        warning: '#ffc107',
+        info: '#0dcaf0',
+        light: '#f8f9fa',
+        dark: '#212529'
+      };
+
+      const colorHex = colorMap[colorName] || colorMap.secondary;
+      const isLight = this.isLightColor(colorHex);
+
+      return {
+        backgroundColor: colorHex,
+        color: isLight ? '#000000' : '#ffffff',
+        textShadow: isLight ? '0 0 1px rgba(0,0,0,0.4)' : '0 0 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,1)',
+        border: this.$root.darkMode && isLight ? '1px solid rgba(0,0,0,0.2)' : 'none'
+      };
     },
     /**
      * Get status display text
