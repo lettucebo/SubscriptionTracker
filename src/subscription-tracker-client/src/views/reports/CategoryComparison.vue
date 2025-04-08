@@ -60,6 +60,7 @@
 import { ref, onMounted, watch } from 'vue';
 import { apiService } from '@/services/apiService';
 import Chart from 'chart.js/auto';
+import { getCurrentTheme } from '@/services/themeService';
 
 export default {
   name: 'CategoryComparison',
@@ -72,6 +73,7 @@ export default {
     const error = ref(null);
     const selectedCategories = ref([]);
     const chartType = ref('bar'); // Default to bar chart
+    const isDarkMode = ref(getCurrentTheme() === 'dark');
 
     // Fetch data
     const fetchData = async () => {
@@ -177,6 +179,120 @@ export default {
       return category ? category.colorCode : '#cccccc';
     };
 
+    // Get chart options based on current theme
+    const getChartOptions = () => {
+      // Common options for both themes
+      const commonOptions = {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          tooltip: {
+            callbacks: {
+              label: function(context) {
+                const label = context.dataset.label || '';
+                const value = context.raw;
+                const dataIndex = context.dataIndex;
+
+                // Format based on data type
+                if (dataIndex === 0 || dataIndex === 2 || dataIndex === 3 || dataIndex === 4) {
+                  return `${label}: $${value.toFixed(2)}`;
+                } else {
+                  return `${label}: ${value}`;
+                }
+              }
+            }
+          }
+        }
+      };
+
+      // Bar chart specific options
+      if (chartType.value === 'bar') {
+        return {
+          ...commonOptions,
+          scales: {
+            y: {
+              beginAtZero: true,
+              grid: {
+                color: isDarkMode.value ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: isDarkMode.value ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+              }
+            },
+            x: {
+              grid: {
+                color: isDarkMode.value ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.1)'
+              },
+              ticks: {
+                color: isDarkMode.value ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)'
+              }
+            }
+          }
+        };
+      }
+
+      // Radar chart specific options
+      return {
+        ...commonOptions,
+        scales: {
+          r: {
+            beginAtZero: true,
+            angleLines: {
+              color: isDarkMode.value ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+              lineWidth: isDarkMode.value ? 2 : 1
+            },
+            grid: {
+              color: isDarkMode.value ? 'rgba(255, 255, 255, 0.2)' : 'rgba(0, 0, 0, 0.1)',
+              lineWidth: isDarkMode.value ? 2 : 1
+            },
+            pointLabels: {
+              color: isDarkMode.value ? 'rgba(255, 255, 255, 0.9)' : 'rgba(0, 0, 0, 0.7)',
+              font: {
+                size: 12,
+                weight: isDarkMode.value ? 'bold' : 'normal'
+              }
+            },
+            ticks: {
+              color: isDarkMode.value ? 'rgba(255, 255, 255, 0.7)' : 'rgba(0, 0, 0, 0.7)',
+              backdropColor: isDarkMode.value ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)',
+              showLabelBackdrop: isDarkMode.value
+            }
+          }
+        },
+        elements: {
+          line: {
+            borderWidth: isDarkMode.value ? 3 : 2,
+            tension: 0.1 // Slightly smooth the lines for better visibility
+          },
+          point: {
+            radius: isDarkMode.value ? 5 : 3,
+            hoverRadius: isDarkMode.value ? 8 : 5,
+            borderWidth: isDarkMode.value ? 2 : 1,
+            backgroundColor: isDarkMode.value ? 'rgba(255, 255, 255, 0.9)' : undefined,
+            // Add a shadow to points in dark mode for better visibility
+            shadowOffsetX: isDarkMode.value ? 1 : 0,
+            shadowOffsetY: isDarkMode.value ? 1 : 0,
+            shadowBlur: isDarkMode.value ? 5 : 0,
+            shadowColor: 'rgba(0, 0, 0, 0.5)'
+          }
+        },
+        // Add a subtle shadow to the entire chart in dark mode
+        plugins: {
+          ...commonOptions.plugins,
+          // Add a subtle shadow to the chart in dark mode
+          shadowPlugin: {
+            beforeDraw: function(chart) {
+              if (isDarkMode.value) {
+                const ctx = chart.ctx;
+                ctx.shadowColor = 'rgba(255, 255, 255, 0.15)';
+                ctx.shadowBlur = 10;
+              }
+            }
+          }
+        }
+      };
+    };
+
     // Initialize chart
     const initChart = () => {
       try {
@@ -207,6 +323,7 @@ export default {
         // Prepare data for chart
         const labels = ['Total Monthly Cost', 'Number of Subscriptions', 'Average Cost', 'Maximum Cost', 'Minimum Cost'];
         const datasets = selectedCategories.value.map(categoryId => {
+          const color = getCategoryColor(categoryId);
           return {
             label: getCategoryName(categoryId),
             data: [
@@ -216,47 +333,33 @@ export default {
               stats[categoryId].maxPrice,
               stats[categoryId].minPrice
             ],
-            backgroundColor: `${getCategoryColor(categoryId)}40`, // Add transparency
-            borderColor: getCategoryColor(categoryId),
-            borderWidth: 2
+            backgroundColor: isDarkMode.value
+              ? `${color}80` // Higher opacity in dark mode (50%)
+              : `${color}40`, // Lower opacity in light mode (25%)
+            borderColor: color,
+            borderWidth: isDarkMode.value ? 3 : 2,
+            pointBackgroundColor: isDarkMode.value ? '#fff' : color, // White points in dark mode for contrast
+            pointBorderColor: color,
+            pointHoverBackgroundColor: isDarkMode.value ? '#fff' : '#fff',
+            pointHoverBorderColor: color,
+            // Add a glow effect to the line in dark mode
+            borderDash: isDarkMode.value && chartType.value === 'radar' ? [] : undefined,
+            fill: true
           };
         });
 
+        // Get chart options based on current theme
+        const options = getChartOptions();
+
         // Create chart
         chartInstance.value = new Chart(ctx, {
-        type: chartType.value,
-        data: {
-          labels: labels,
-          datasets: datasets
-        },
-        options: {
-          responsive: true,
-          maintainAspectRatio: false,
-          scales: chartType.value === 'bar' ? {
-            y: {
-              beginAtZero: true
-            }
-          } : {},
-          plugins: {
-            tooltip: {
-              callbacks: {
-                label: function(context) {
-                  const label = context.dataset.label || '';
-                  const value = context.raw;
-                  const dataIndex = context.dataIndex;
-
-                  // Format based on data type
-                  if (dataIndex === 0 || dataIndex === 2 || dataIndex === 3 || dataIndex === 4) {
-                    return `${label}: $${value.toFixed(2)}`;
-                  } else {
-                    return `${label}: ${value}`;
-                  }
-                }
-              }
-            }
-          }
-        }
-      });
+          type: chartType.value,
+          data: {
+            labels: labels,
+            datasets: datasets
+          },
+          options: options
+        });
       } catch (err) {
         console.error('Error initializing chart:', err);
       }
@@ -269,9 +372,36 @@ export default {
       // No need to do anything here as the watchers will handle it
     };
 
+    // Watch for theme changes in the document body
+    const watchThemeChanges = () => {
+      const observer = new MutationObserver((mutations) => {
+        mutations.forEach((mutation) => {
+          if (mutation.attributeName === 'class') {
+            const newDarkMode = document.body.classList.contains('dark-mode');
+            if (isDarkMode.value !== newDarkMode) {
+              isDarkMode.value = newDarkMode;
+              // Reinitialize chart when theme changes
+              if (!loading.value && selectedCategories.value.length > 0) {
+                setTimeout(() => initChart(), 100);
+              }
+            }
+          }
+        });
+      });
+
+      observer.observe(document.body, { attributes: true });
+      return observer;
+    };
+
     // Initialize component
     onMounted(() => {
       fetchData();
+
+      // Set initial dark mode state
+      isDarkMode.value = document.body.classList.contains('dark-mode');
+
+      // Watch for theme changes
+      const themeObserver = watchThemeChanges();
 
       // Initialize chart after the component is fully mounted and data is loaded
       setTimeout(() => {
@@ -279,6 +409,11 @@ export default {
           initChart();
         }
       }, 500); // Use a longer timeout to ensure everything is ready
+
+      // Clean up observer when component is unmounted
+      return () => {
+        themeObserver.disconnect();
+      };
     });
 
     // Watch for changes in data
@@ -344,7 +479,8 @@ export default {
       error,
       selectedCategories,
       chartType,
-      updateChart
+      updateChart,
+      isDarkMode
     };
   }
 }
