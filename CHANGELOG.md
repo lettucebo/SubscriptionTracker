@@ -5,6 +5,42 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.2] - 2025-04-12
+### Added
+- New Report page with subscription cost analytics and visualization
+- Tabbed interface for Report page with "Overview" and "Category Breakdown" sections
+- Pie chart visualization of costs by category using Chart.js
+- Sorting options for categories by name or cost in Category Breakdown
+- Colored headers in Category Breakdown matching each category's color
+- Category colors displayed in Home page badges for better visual identification
+- Separation line in categories for improved readability
+- Home page link in navbar for easier navigation
+- Comprehensive project guidelines with documentation requirements and naming conventions
+- MCP configuration with GitHub, Google Calendar, Spotify, Firecrawl, Sentry, and Git server integrations
+
+### Changed
+- Renamed SubscriptionDTO to SubscriptionViewModel following project naming conventions
+- Created new Models/ViewModels folder structure for better organization
+- Enhanced authentication flow with improved error handling and redirection
+- Updated frontend deployment settings to use Node.js 22
+- Improved category badge styling with dynamic colors based on category
+
+### Fixed
+- Improved text visibility in all badges (Billing Cycle, Amount, Sharing, Status) for dark mode
+- Enhanced text contrast with intelligent color calculation based on background brightness
+- Fixed invisible Calendar View title and icon in light mode
+- Maintained color of active navbar links in dark mode for better visibility
+- Pre-selection of category when editing subscriptions
+- Resolved 400 error when creating new categories by adding proper DTOs
+- Fixed subscription creation error with proper model handling
+
+### UI/UX
+- Added text shadows for better contrast in dark mode
+- Added borders for light-colored badges in dark mode
+- Enhanced readability with white text on colored backgrounds
+- Improved typography with better spacing and formatting
+- Added new logo assets including SVG and PNG formats
+
 ## [1.5.1] - 2025-04-10
 ### Changed
 - Migrated frontend from Azure Static Web App to Azure Web App for better integration
