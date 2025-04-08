@@ -38,6 +38,9 @@ Create ADRs in /docs/adr for:
 - DO NOT BE LAZY. DO NOT OMIT CODE.
 - Each step should be committed separately to preserve history.
 - OS is Windows 11
+- 分階段實作，先產生計畫，並在 Github 上面新增 issue 來追蹤進度，每完成一步驟就更新 issue 並加入 comment 補充說明
+  - When creating issue, remember to add corresponding labels
+  - note: remember always update the issue and add issue comment everytime
 
 # MS SQL Guidelines
 
