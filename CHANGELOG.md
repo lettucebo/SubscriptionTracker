@@ -5,6 +5,21 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.3] - 2025-04-08
+### Added
+- Subscription Lifecycle view for visualizing subscription timelines
+- Timeline visualization with monthly scale for better temporal understanding
+- Sorting options for subscriptions by start date, end date, name, category, or amount
+- Category filtering in Subscription Lifecycle view
+- Color-coded subscription bars matching their category colors
+- Monthly price display on timeline bars for quick cost assessment
+- Category legend with color indicators for easy reference
+
+### Fixed
+- Category filter error in Subscription Lifecycle view when changing selection
+- Enhanced error handling in filtering functions to prevent crashes
+- Improved type checking for subscription data to ensure consistent display
+
 ## [1.5.2] - 2025-04-08
 ### Added
 - New Report page with subscription cost analytics and visualization
