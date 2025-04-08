@@ -59,8 +59,8 @@
                 <h3 class="card-title">Monthly Distribution</h3>
                 <ul class="list-group list-group-flush">
                   <li v-for="(stats, categoryId) in categoryStats" :key="categoryId" class="list-group-item d-flex justify-content-between align-items-center">
-                    {{ getCategoryName(categoryId) }}
-                    <span class="badge bg-primary rounded-pill">${{ stats.monthlyTotal.toFixed(2) }}</span>
+                    <span :style="{ color: getCategoryColor(categoryId) }">{{ getCategoryName(categoryId) }}</span>
+                    <span class="badge rounded-pill" :style="{ backgroundColor: getCategoryColor(categoryId) }">${{ stats.monthlyTotal.toFixed(2) }}</span>
                   </li>
                 </ul>
               </div>
@@ -85,27 +85,32 @@
 
         <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-4">
           <div v-for="categoryId in sortedCategoryIds" :key="categoryId" class="col">
-            <div class="card h-100" :style="{ 'border-top': '5px solid ' + getCategoryColor(categoryId) }">
+            <div class="card h-100 category-card">
+              <!-- Category title with background color matching the category -->
+              <div class="category-header text-white p-2" :style="{ 'background-color': getCategoryColor(categoryId) }">
+                {{ getCategoryName(categoryId) }}
+              </div>
               <div class="card-body">
-                <h3 class="card-title">{{ getCategoryName(categoryId) }}</h3>
-                <p class="card-text">Total Cost: ${{ categoryStats[categoryId].monthlyTotal.toFixed(2) }}</p>
-                <p class="card-text">Subscriptions: {{ categoryStats[categoryId].count }}</p>
+                <p class="card-text"><strong>Total Cost:</strong> ${{ categoryStats[categoryId].monthlyTotal.toFixed(2) }}</p>
+                <p class="card-text"><strong>Subscriptions:</strong> {{ categoryStats[categoryId].count }}</p>
 
                 <!-- Subscription list for this category -->
                 <div class="mt-3">
-                  <h6 class="mb-2">Subscriptions:</h6>
+                  <h6 class="mb-2" :style="{ color: getCategoryColor(categoryId) }">Subscriptions:</h6>
                   <ul class="list-group list-group-flush small">
                     <li v-for="sub in getCategorySubscriptions(categoryId)" :key="sub.id"
                         class="list-group-item px-0 py-1 d-flex justify-content-between align-items-center">
                       {{ sub.name }}
-                      <span>${{ calculateMonthlyPrice(sub).toFixed(2) }}/mo</span>
+                      <span class="badge rounded-pill" :style="{ backgroundColor: getCategoryColor(categoryId), fontSize: '0.75rem' }">${{ calculateMonthlyPrice(sub).toFixed(2) }}/mo</span>
                     </li>
                   </ul>
                 </div>
 
                 <div class="mt-3">
-                  <button class="btn btn-sm btn-outline-primary" @click="navigateToCategory(categoryId)">
-                    <i class="bi bi-pencil"></i> Edit Category
+                  <button class="btn btn-sm"
+                          :style="{ borderColor: getCategoryColor(categoryId), color: getCategoryColor(categoryId) }"
+                          @click="navigateToCategory(categoryId)">
+                    <i class="bi bi-pencil"></i> Edit
                   </button>
                 </div>
               </div>
@@ -374,6 +379,7 @@ export default {
 .card {
   transition: transform 0.2s;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
 }
 
 .card:hover {
@@ -407,5 +413,37 @@ export default {
   color: #0d6efd;
   background-color: transparent;
   border-bottom-color: #0d6efd;
+}
+
+/* Category card styling */
+.category-card {
+  border: none;
+  overflow: hidden;
+  background-color: #1e1e1e;
+}
+
+.category-header {
+  font-size: 1.25rem;
+  font-weight: 500;
+  padding: 0.75rem 1rem !important;
+}
+
+.category-card .card-body {
+  padding-top: 1rem;
+}
+
+.category-card .card-text {
+  margin-bottom: 0.5rem;
+}
+
+/* Category-specific button hover effect */
+.btn:hover {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+/* Make badges more readable */
+.badge {
+  color: white;
+  text-shadow: 0 0 2px rgba(0, 0, 0, 0.5);
 }
 </style>
