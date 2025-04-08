@@ -4,6 +4,7 @@ import Subscriptions from '../views/Subscriptions.vue'
 import SubscriptionForm from '../views/SubscriptionForm.vue'
 import Calendar from '../views/Calendar.vue'
 import Categories from '../views/Categories.vue'
+import Report from '../views/Report.vue'
 import Login from '../views/Login.vue'
 import { authGuard } from './authGuard'
 
@@ -98,6 +99,17 @@ const routes = [
     path: '/subscription-form/:id',
     name: 'EditSubscription',
     component: SubscriptionForm,
+    meta: { requiresAuth: true }
+  },
+  /**
+   * Reports and analytics for subscription costs
+   * @memberof routes
+   * @name Report
+   */
+  {
+    path: '/report',
+    name: 'Report',
+    component: Report,
     meta: { requiresAuth: true }
   }
 ]
