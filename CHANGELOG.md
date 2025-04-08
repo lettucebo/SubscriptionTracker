@@ -5,6 +5,23 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.5] - 2025-04-08
+### Changed
+- Improved radar chart visibility in dark mode with enhanced contrast
+- Added theme detection to CategoryComparison component for dynamic styling
+
+### Fixed
+- Enhanced radar chart grid lines with higher contrast and thicker lines in dark mode
+- Improved data point visibility with larger points and white fill for better contrast
+- Added subtle shadow effects for better visual hierarchy in dark mode
+- Ensured proper label readability with bold text and backdrop colors
+
+### UI/UX
+- Optimized chart rendering for both dark and light modes
+- Added smooth line transitions for better data visualization
+- Implemented responsive point sizing based on current theme
+- Enhanced hover effects with contrasting colors for better interaction
+
 ## [1.5.3] - 2025-04-08
 ### Added
 - Subscription Lifecycle view for visualizing subscription timelines
