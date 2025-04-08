@@ -29,7 +29,7 @@
 
           <div class="mb-3">
             <label for="filterCategory" class="form-label">Filter by Category</label>
-            <select id="filterCategory" class="form-select" v-model="filterCategory" @change="filterSubscriptions">
+            <select id="filterCategory" class="form-select" v-model="filterCategory" @change="() => filterSubscriptions()">
               <option value="all">All Categories</option>
               <option v-for="category in categories" :key="category.id" :value="category.id">
                 {{ category.name }}
@@ -256,12 +256,29 @@ export default {
 
     // Filter subscriptions
     const filterSubscriptions = (sortedSubscriptions = null) => {
-      const toFilter = sortedSubscriptions || [...subscriptions.value];
+      try {
+        // Ensure toFilter is always an array
+        let toFilter = [];
 
-      if (filterCategory.value === 'all') {
-        filteredSubscriptions.value = toFilter;
-      } else {
-        filteredSubscriptions.value = toFilter.filter(s => s.category.id === parseInt(filterCategory.value));
+        if (Array.isArray(sortedSubscriptions)) {
+          toFilter = sortedSubscriptions;
+        } else if (sortedSubscriptions === null) {
+          toFilter = [...subscriptions.value];
+        } else {
+          console.warn('filterSubscriptions received non-array input:', sortedSubscriptions);
+          toFilter = [...subscriptions.value];
+        }
+
+        if (filterCategory.value === 'all') {
+          filteredSubscriptions.value = toFilter;
+        } else {
+          filteredSubscriptions.value = toFilter.filter(s => s.category.id === parseInt(filterCategory.value));
+        }
+      } catch (err) {
+        console.error('Error filtering subscriptions:', err);
+        error.value = 'An error occurred while filtering subscriptions.';
+        // Fallback to showing all subscriptions
+        filteredSubscriptions.value = [...subscriptions.value];
       }
     };
 
