@@ -23,3 +23,13 @@ yarn-error.log*
 dist/
 .idea/
 .DS_Store
+
+# Sensitive configuration files
+appsettings.Development.json
+appsettings.Production.json
+.env.local
+.env.development.local
+.env.production.local
+
+# Exclude files that might contain connection strings
+**/config.local.js
