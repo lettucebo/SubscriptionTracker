@@ -5,6 +5,25 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.6] - 2025-04-09
+### Added
+- Azure Application Insights integration for comprehensive monitoring
+- OpenTelemetry SDK implementation in backend API
+- Application Insights JavaScript SDK integration in frontend
+- Automatic tracking of page views, HTTP requests, and exceptions
+- Custom telemetry service for tracking application-specific events
+- Detailed documentation for Application Insights implementation
+
+### Security
+- Moved Application Insights connection string to user secrets
+- Enhanced .gitignore rules to prevent committing sensitive configuration
+- Implemented secure connection string handling in frontend
+
+### Changed
+- Simplified backend telemetry configuration for better compatibility
+- Optimized frontend telemetry implementation for browser environments
+- Enhanced error tracking with detailed context information
+
 ## [1.5.5] - 2025-04-08
 ### Changed
 - Improved radar chart visibility in dark mode with enhanced contrast

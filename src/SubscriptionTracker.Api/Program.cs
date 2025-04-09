@@ -11,6 +11,7 @@ using Swashbuckle.AspNetCore.Filters;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
 using SubscriptionTracker.Service.Services;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -82,6 +83,17 @@ builder.Services
 
 // Add user service
 builder.Services.AddScoped<IUserService, UserService>();
+
+// Configure Azure Application Insights with OpenTelemetry
+string? appInsightsConnectionString = builder.Configuration.GetConnectionString("ApplicationInsights");
+if (!string.IsNullOrEmpty(appInsightsConnectionString))
+{
+    // Add Azure Monitor OpenTelemetry
+    builder.Services.AddOpenTelemetry().UseAzureMonitor(o =>
+    {
+        o.ConnectionString = appInsightsConnectionString;
+    });
+}
 
 var app = builder.Build();
 
