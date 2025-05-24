@@ -12,11 +12,16 @@ Through Mend security scanning, the following security vulnerabilities were disc
    
 2. axios package (version 1.6.7)
 
+3. Microsoft.EntityFrameworkCore related packages (version 8.0.5), which also have security vulnerabilities:
+   - Microsoft.EntityFrameworkCore
+   - Microsoft.EntityFrameworkCore.InMemory
+   - Microsoft.EntityFrameworkCore.SqlServer
+
 ## Solution
 
 Upgrade all vulnerable packages to the latest stable versions:
 
-1. Upgrade Entity Framework Core related packages to 8.0.5
+1. Upgrade Entity Framework Core related packages to 8.0.6
 2. Upgrade axios to version 1.6.8
 
 ## Implementation Plan
@@ -54,3 +59,6 @@ Update the axios package version in the frontend `package.json` file.
 - GitHub Issue #15: microsoft.entityframeworkcore.inmemory.8.0.3.nupkg security vulnerability
 - GitHub Issue #16: axios-1.6.7.tgz security vulnerability
 - GitHub Issue #17: microsoft.entityframeworkcore.sqlserver.8.0.3.nupkg security vulnerability
+- GitHub Issue #18: microsoft.entityframeworkcore.inmemory.8.0.5.nupkg security vulnerability
+- GitHub Issue #19: microsoft.entityframeworkcore.sqlserver.8.0.5.nupkg security vulnerability
+- GitHub Issue #20: microsoft.entityframeworkcore.8.0.5.nupkg security vulnerability
