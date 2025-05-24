@@ -27,6 +27,7 @@ dist/
 # Sensitive configuration files
 appsettings.Development.json
 appsettings.Production.json
+.env
 .env.local
 .env.development.local
 .env.production.local
