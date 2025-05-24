@@ -17,7 +17,7 @@ Through Mend security scanning, the following security vulnerabilities were disc
 Upgrade all vulnerable packages to the latest stable versions:
 
 1. Upgrade Entity Framework Core related packages to 8.0.5
-2. Upgrade axios to version 1.6.8 or newer
+2. Upgrade axios to version 1.6.8
 
 ## Implementation Plan
 
