@@ -5,6 +5,12 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Conventional Commits](https://www.conventionalcommits.org/).
 
+## [1.5.7] - 2025-05-25
+### Security
+- Upgraded Entity Framework Core related packages from 8.0.3 to 8.0.5 to fix security vulnerabilities
+- Upgraded axios package from 1.6.7 to 1.6.8 to fix security vulnerabilities
+- Improved security compliance of package dependencies
+
 ## [1.5.6] - 2025-04-09
 ### Added
 - Azure Application Insights integration for comprehensive monitoring
