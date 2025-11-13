@@ -351,8 +351,8 @@ export default {
 
       // Convert hex to RGB
       const r = parseInt(hex.substring(0, 2), 16);
-      const g = parseInt(hex.substring(2, 2), 16);
-      const b = parseInt(hex.substring(4, 2), 16);
+      const g = parseInt(hex.substring(2, 4), 16);
+      const b = parseInt(hex.substring(4, 6), 16);
 
       // Calculate perceived brightness using the formula
       // (299*R + 587*G + 114*B) / 1000
