@@ -331,9 +331,22 @@ export default {
       }, 100);
     };
 
-    // Get subscriptions for a specific category
+    // Cached category subscriptions to avoid repeated filtering
+    const categorySubscriptionsMap = computed(() => {
+      const map = {};
+      subscriptions.value.forEach(sub => {
+        const categoryId = sub.category.id;
+        if (!map[categoryId]) {
+          map[categoryId] = [];
+        }
+        map[categoryId].push(sub);
+      });
+      return map;
+    });
+
+    // Get subscriptions for a specific category (using cache)
     const getCategorySubscriptions = (categoryId) => {
-      return subscriptions.value.filter(sub => sub.category.id === parseInt(categoryId));
+      return categorySubscriptionsMap.value[categoryId] || [];
     };
 
     // Sort categories by name or cost
@@ -368,18 +381,24 @@ export default {
     };
 
     // Watch for tab changes
-    watch(activeTab, (newTab) => {
-      // Use a longer timeout to ensure the DOM is fully updated
-      setTimeout(() => {
-        if (newTab === 'overview' && !loading.value) {
-          // Reinitialize chart when switching to overview tab
+    watch(activeTab, (newTab, oldTab) => {
+      if (newTab === 'overview' && oldTab !== 'overview' && !loading.value) {
+        // Only reinitialize chart when switching TO overview from another tab
+        // Use a longer timeout to ensure the DOM is fully updated
+        setTimeout(() => {
           try {
             initChart();
           } catch (err) {
             console.error('Error initializing chart on tab change:', err);
           }
+        }, 300);
+      } else if (oldTab === 'overview' && newTab !== 'overview') {
+        // Destroy chart when leaving overview tab to free memory
+        if (chartInstance.value) {
+          chartInstance.value.destroy();
+          chartInstance.value = null;
         }
-      }, 300);
+      }
     });
 
     // Initialize component

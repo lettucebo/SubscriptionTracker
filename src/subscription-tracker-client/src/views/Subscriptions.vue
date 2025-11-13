@@ -160,7 +160,9 @@ export default {
       error: null,
       searchQuery: '',
       sortKey: 'name',
-      sortOrder: 'asc'
+      sortOrder: 'asc',
+      // Cache for color brightness calculations
+      colorBrightnessCache: new Map()
     }
   },
   computed: {
@@ -173,6 +175,34 @@ export default {
         const monthlyAmount = sub.effectiveMonthlyPrice || 0;
         return total + Math.round(monthlyAmount * 100) / 100;
       }, 0);
+    },
+    /**
+     * Pre-computed standard badge styles for better performance
+     * @returns {Object} Map of color names to badge styles
+     */
+    standardBadgeStyles() {
+      const colorMap = {
+        primary: '#0d6efd',
+        secondary: '#6c757d',
+        success: '#198754',
+        danger: '#dc3545',
+        warning: '#ffc107',
+        info: '#0dcaf0',
+        light: '#f8f9fa',
+        dark: '#212529'
+      };
+
+      const styles = {};
+      for (const [name, colorHex] of Object.entries(colorMap)) {
+        const isLight = this.isLightColor(colorHex);
+        styles[name] = {
+          backgroundColor: colorHex,
+          color: isLight ? '#000000' : '#ffffff',
+          textShadow: isLight ? '0 0 1px rgba(0,0,0,0.4)' : '0 0 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,1)',
+          border: this.$root.darkMode && isLight ? '1px solid rgba(0,0,0,0.2)' : 'none'
+        };
+      }
+      return styles;
     }
   },
   /**
@@ -338,13 +368,18 @@ export default {
     },
 
     /**
-     * Determine if a color is light or dark
+     * Determine if a color is light or dark (with caching)
      * @param {string} colorHex - Hex color code
      * @returns {boolean} True if color is light
      */
     isLightColor(colorHex) {
       // Default to a dark color if none provided
       if (!colorHex) return false;
+
+      // Check cache first
+      if (this.colorBrightnessCache.has(colorHex)) {
+        return this.colorBrightnessCache.get(colorHex);
+      }
 
       // Remove the # if it exists
       const hex = colorHex.replace('#', '');
@@ -359,36 +394,21 @@ export default {
       const brightness = (r * 299 + g * 587 + b * 114) / 1000;
 
       // Return true if the color is light (brightness > 155)
-      return brightness > 155;
+      const isLight = brightness > 155;
+      
+      // Cache the result
+      this.colorBrightnessCache.set(colorHex, isLight);
+      
+      return isLight;
     },
 
     /**
-     * Get badge style for standard Bootstrap colors
+     * Get badge style for standard Bootstrap colors (optimized with computed cache)
      * @param {string} colorName - Bootstrap color name (primary, secondary, success, etc.)
      * @returns {Object} Style object with background and text color
      */
     getStandardBadgeStyle(colorName) {
-      // Map of Bootstrap color names to hex values
-      const colorMap = {
-        primary: '#0d6efd',
-        secondary: '#6c757d',
-        success: '#198754',
-        danger: '#dc3545',
-        warning: '#ffc107',
-        info: '#0dcaf0',
-        light: '#f8f9fa',
-        dark: '#212529'
-      };
-
-      const colorHex = colorMap[colorName] || colorMap.secondary;
-      const isLight = this.isLightColor(colorHex);
-
-      return {
-        backgroundColor: colorHex,
-        color: isLight ? '#000000' : '#ffffff',
-        textShadow: isLight ? '0 0 1px rgba(0,0,0,0.4)' : '0 0 3px rgba(0,0,0,0.8), 0 0 1px rgba(0,0,0,1)',
-        border: this.$root.darkMode && isLight ? '1px solid rgba(0,0,0,0.2)' : 'none'
-      };
+      return this.standardBadgeStyles[colorName] || this.standardBadgeStyles.secondary;
     },
     /**
      * Get status display text
