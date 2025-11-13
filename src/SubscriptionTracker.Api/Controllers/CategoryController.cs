@@ -37,6 +37,7 @@ namespace SubscriptionTracker.Api.Controllers
 
             return await _context.Categories
                 .Where(c => !c.IsDelete && c.UserId == currentUser.Id)
+                .AsNoTracking()
                 .ToListAsync();
         }
 
@@ -56,6 +57,7 @@ namespace SubscriptionTracker.Api.Controllers
             var currentUser = await _userService.GetCurrentUserAsync(User);
 
             var category = await _context.Categories
+                .AsNoTracking()
                 .FirstOrDefaultAsync(c => c.Id == id && c.UserId == currentUser.Id && !c.IsDelete);
 
             if (category == null)
@@ -153,8 +155,7 @@ namespace SubscriptionTracker.Api.Controllers
                 return StatusCode(500, "Internal server error: " + ex.Message);
             }
 
-            await _context.Entry(existingCategory).ReloadAsync();
-            return Ok(await _context.Categories.FindAsync(id));
+            return Ok(existingCategory);
         }
 
         /// <summary>

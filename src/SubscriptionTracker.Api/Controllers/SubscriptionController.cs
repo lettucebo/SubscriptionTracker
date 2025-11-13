@@ -72,6 +72,7 @@ namespace SubscriptionTracker.Api.Controllers
             var query = _context.Subscriptions
                 .Include(s => s.Category)
                 .Where(s => s.UserId == currentUser.Id)
+                .AsNoTracking()
                 .AsQueryable();
 
             if (categoryId.HasValue)
@@ -133,6 +134,7 @@ namespace SubscriptionTracker.Api.Controllers
 
             var subscription = await _context.Subscriptions
                 .Include(s => s.Category)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == id && s.UserId == currentUser.Id);
             if (subscription == null)
             {
@@ -223,6 +225,7 @@ namespace SubscriptionTracker.Api.Controllers
             // Reload the subscription with the category included
             subscription = await _context.Subscriptions
                 .Include(s => s.Category)
+                .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == subscription.Id);
 
             var result = new

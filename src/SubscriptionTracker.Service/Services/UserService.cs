@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Caching.Memory;
 using SubscriptionTracker.Service.Data;
 using SubscriptionTracker.Service.Models;
 using System;
@@ -16,14 +17,17 @@ namespace SubscriptionTracker.Service.Services
     public class UserService : IUserService
     {
         private readonly SubscriptionDbContext _context;
+        private readonly IMemoryCache _cache;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="UserService"/> class.
         /// </summary>
         /// <param name="context">The database context.</param>
-        public UserService(SubscriptionDbContext context)
+        /// <param name="cache">The memory cache for storing user data.</param>
+        public UserService(SubscriptionDbContext context, IMemoryCache cache)
         {
             _context = context;
+            _cache = cache;
         }
 
         /// <inheritdoc/>
@@ -69,12 +73,21 @@ namespace SubscriptionTracker.Service.Services
                 {
                     _context.Users.Add(user);
                     await _context.SaveChangesAsync();
+
+                    // Cache the newly created user
+                    var cacheKey = $"User_ObjectId_{objectId}";
+                    _cache.Set(cacheKey, user, TimeSpan.FromMinutes(5));
                 }
                 catch (DbUpdateException ex) when (ex.InnerException?.Message.Contains("duplicate key") == true)
                 {
                     // If we get a duplicate key error, the user was created by another concurrent request
-                    // Just retrieve the existing user
+                    // Just retrieve the existing user and invalidate the cache
                     _context.Entry(user).State = EntityState.Detached;
+                    
+                    // Remove from cache to ensure fresh data
+                    var cacheKey = $"User_ObjectId_{objectId}";
+                    _cache.Remove(cacheKey);
+                    
                     user = await GetUserByObjectIdAsync(objectId);
 
                     if (user == null)
@@ -91,10 +104,25 @@ namespace SubscriptionTracker.Service.Services
         /// <inheritdoc/>
         public async Task<User> GetUserByObjectIdAsync(string objectId)
         {
+            // Check cache first
+            var cacheKey = $"User_ObjectId_{objectId}";
+            if (_cache.TryGetValue(cacheKey, out User cachedUser))
+            {
+                return cachedUser;
+            }
+
             // Make sure to use AsNoTracking to avoid conflicts with tracked entities
-            return await _context.Users
+            var user = await _context.Users
                 .AsNoTracking()
                 .FirstOrDefaultAsync(u => u.ObjectId == objectId);
+
+            // Cache the user for 5 minutes
+            if (user != null)
+            {
+                _cache.Set(cacheKey, user, TimeSpan.FromMinutes(5));
+            }
+
+            return user;
         }
 
         /// <inheritdoc/>
